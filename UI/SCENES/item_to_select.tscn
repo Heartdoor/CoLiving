@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbammu6r40lpl"]
+
+[ext_resource type="Texture2D" uid="uid://dhp1noc5o6j6k" path="res://OBJECTS/SPRITES/couch.png" id="1_7t7h2"]
+[ext_resource type="Script" path="res://UI/SCRIPTS/ItemToSelect.cs" id="2_gub5o"]
+
+[node name="Button" type="Button"]
+offset_left = 1.0
+offset_top = -1.0
+offset_right = 192.0
+offset_bottom = 113.0
+icon = ExtResource("1_7t7h2")
+expand_icon = true
+script = ExtResource("2_gub5o")
+
+[connection signal="pressed" from="." to="." method="OnPressed"]

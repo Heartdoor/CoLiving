@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://bj7bw5jnmx0nn"]
+
+[ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/Characters.cs" id="1_ofd6p"]
+[ext_resource type="Texture2D" uid="uid://bkslwjsonhndd" path="res://CHARACTERS/SPRITES/granny.png" id="2_lmt1e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wgqit"]
+size = Vector2(58.5, 29)
+
+[node name="Character" type="CharacterBody2D" groups=["Character"]]
+z_index = -1
+y_sort_enabled = true
+script = ExtResource("1_ofd6p")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(3, -52)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_lmt1e")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.25, 2.5)
+shape = SubResource("RectangleShape2D_wgqit")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+unique_name_in_owner = true

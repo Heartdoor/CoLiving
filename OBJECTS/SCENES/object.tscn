@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://cyo7maaf58goi"]
+
+[ext_resource type="Script" path="res://OBJECTS/SCRIPTS/Furniture.cs" id="1_l254b"]
+[ext_resource type="Texture2D" uid="uid://dhp1noc5o6j6k" path="res://OBJECTS/SPRITES/couch.png" id="2_7h2er"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b214o"]
+size = Vector2(162, 67)
+
+[node name="StaticBody2D" type="StaticBody2D" groups=["Object"]]
+z_index = -1
+y_sort_enabled = true
+script = ExtResource("1_l254b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = -1
+y_sort_enabled = true
+position = Vector2(4, 34.5)
+shape = SubResource("RectangleShape2D_b214o")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(3, 8)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_7h2er")
