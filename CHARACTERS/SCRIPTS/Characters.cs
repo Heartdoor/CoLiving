@@ -46,7 +46,7 @@ public partial class Characters : CharacterBody2D
     #region EFFECTS
     private Dictionary<Main.Object, int> basePrefOfObjects = new Dictionary<Main.Object, int>();       // agent's item preferences 
     private Dictionary<Main.Object, float> heatOfObjects = new Dictionary<Main.Object, float>();           // current "heat" of items 
-    private Queue<Main.Object> objectQueue = new Queue<Main.Object>();
+    Queue<Main.Object> objectQueue = new Queue<Main.Object>();
     int maxQueueLength=20;
     #endregion
 
@@ -72,7 +72,30 @@ public partial class Characters : CharacterBody2D
             {
                 var objE = objectItem.usedEffects;
                 var charE = characterData.usedEffects;
-                basePrefOfObjects.Add(objectItem, objE.Keys.Intersect(charE.Keys).Select(key => objE[key] * charE[key]).Sum());
+                Log($"CALCULATING {objectItem.name}", LogType.step);
+                // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
+
+                //basePrefOfObjects.Add(objectItem, objE.Keys.Intersect(charE.Keys).Select(key => objE[key] * charE[key]).Sum());
+                // Assuming objE and charE are dictionaries
+                var intersectedKeys = objE.Keys.Intersect(charE.Keys).ToList();
+
+                Log("Intersected Keys: " + string.Join(", ", intersectedKeys), LogType.step);
+             
+
+                var products = intersectedKeys.Select(key =>
+                {
+                    var product = objE[key] * charE[key];
+                    //Log(, LogType.step);
+                    Log($"Key: {key}, objE[{key}] = {objE[key]}, charE[{key}] = {charE[key]}, Product: {product}", LogType.step); 
+                    return product;
+                }).ToList();
+
+                var sum = products.Sum();
+                Log("Sum of Products: " + sum, LogType.step);
+             
+
+                basePrefOfObjects.Add(objectItem, sum);
+
                 heatOfObjects.Add(objectItem, basePrefOfObjects[objectItem]);
 
             }
@@ -140,14 +163,14 @@ public partial class Characters : CharacterBody2D
         usingTarget = currentTarget;
         var furnitureObject = (Furniture)currentTarget;
         alarm.Start(TimerType.actionLength, furnitureObject.objectData.useLength, false, 0);
-        Log("🍔", LogType.step);
+        Log("Reached target", LogType.step);
     }
 
     void UseTarget()
     {
         GlobalPosition = currentTarget.GlobalPosition;
         mySprite.Texture = GetTexture2D($"res://CHARACTERS/SPRITES/{characterData.name}Sit.png");
-        Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
+        //Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
         if (alarm.Ended(TimerType.actionLength))
         {
         

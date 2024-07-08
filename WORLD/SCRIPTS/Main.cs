@@ -27,23 +27,23 @@ public partial class Main : Node2D
             public string name;
             public string image_path;
             public Texture2D texture;
-            public Dictionary<Effect, int> seenEffects;
             public Dictionary<Effect, int> usedEffects;
             public Vector2 usePosition;
             public float useLength;
             public Dictionary<Effect, int> flatEffects;
-            public Object(string name, Dictionary<Effect, int> seenEffects, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
+            public Object(string name,  Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
             {
                 this.name = name;
                 image_path = $"res://OBJECTS/SPRITES/{name}.png";
                 texture = (Texture2D)GetResource(image_path);
 
-                this.seenEffects = seenEffects;
-                this.usedEffects = usedEffects;
+
+                
                 this.usePosition = usePosition;
                 this.useLength = useLength;
-                this.flatEffects = flatEffects;
-            }
+                this.usedEffects = new Dictionary<Effect, int>(usedEffects);
+                this.flatEffects = new Dictionary<Effect, int>(flatEffects);
+        }
         }
         public static List<Object> objectsList = new List<Object>();
         public class Character
@@ -51,17 +51,15 @@ public partial class Main : Node2D
             public string name;
             public string image_path;
             public Texture2D texture;
-            public Dictionary<Effect, int> seenEffects;
             public Dictionary<Effect, int> usedEffects;
             public Dictionary<Effect, int> flatEffects;
-            public Character(string name, Dictionary<Effect, int> seenEffects, Dictionary<Effect, int> usedEffects, Dictionary<Effect, int> flatEffects)
+            public Character(string name,  Dictionary<Effect, int> usedEffects, Dictionary<Effect, int> flatEffects)
             {
                 this.name = name;
                 image_path = $"res://CHARACTERS/SPRITES/{name}.png";
                 texture = (Texture2D)GetResource(image_path);
-                this.seenEffects = seenEffects;
-                this.usedEffects = usedEffects;
-                this.flatEffects = flatEffects;
+                this.usedEffects = new Dictionary<Effect, int>(usedEffects);
+                this.flatEffects = new Dictionary<Effect, int>(flatEffects); 
             }
         }
         public static List<Character> charactersList = new List<Character>();
@@ -106,27 +104,27 @@ public partial class Main : Node2D
         useLength = 10;
         usedEffects.Add(Effect.comfort, 1);
         #region apply
-        objectsList.Add(new Object(name, seenEffects, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref seenEffects, ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(name, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
         #endregion
 
         name = "guitar";
         useLength = 10;
-        flatEffects.Add(Effect.music, 3);
-        flatEffects.Add(Effect.noise, 3);
-        flatEffects.Add(Effect.grunge, 2);
+        usedEffects.Add(Effect.music, 3);
+        usedEffects.Add(Effect.noise, 3);
+        usedEffects.Add(Effect.grunge, 2);
         #region apply
-        objectsList.Add(new Object(name, seenEffects, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref seenEffects, ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(name, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
         #endregion
 
         name = "recordplayer";
         useLength = 10;
-        flatEffects.Add(Effect.music, 3);
-        flatEffects.Add(Effect.vintage, 3);
+        usedEffects.Add(Effect.music, 3);
+        usedEffects.Add(Effect.vintage, 3);
         #region apply
-        objectsList.Add(new Object(name, seenEffects, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref seenEffects, ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(name, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
         #endregion
 
         
@@ -181,8 +179,9 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.hygiene, 3);
         usedEffects.Add(Effect.academic, 1);
         #region apply
-        charactersList.Add(new Character(name, seenEffects, usedEffects, flatEffects));
-        ClearCharacterListData(ref seenEffects, ref usedEffects, ref flatEffects);
+        var charInfo = new Character(name, usedEffects, flatEffects);
+        charactersList.Add(charInfo);
+        ClearCharacterListData( ref usedEffects, ref flatEffects);
         #endregion
 
         name = "punkrocker";
@@ -197,10 +196,16 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.hygiene, 0);
         usedEffects.Add(Effect.academic, -1);
         #region apply
-        charactersList.Add(new Character(name, seenEffects, usedEffects, flatEffects));
-        ClearCharacterListData(ref seenEffects, ref usedEffects, ref flatEffects);
+        charactersList.Add(new Character(name, usedEffects, flatEffects));
+        ClearCharacterListData(  ref usedEffects, ref flatEffects);
         #endregion
 
+    }
+
+    void AddNewFlat(int flatNumber, Color color)
+    {
+        flatsList.Add(new Flat(flatNumber, color));
+        objectsInFlat[flatNumber] = new List<Node2D>();
     }
 
     void Start()
@@ -212,8 +217,9 @@ public partial class Main : Node2D
         placeItemImage=GetNode<Sprite2D>("PlaceItemImage");
 
         #region ROOMS LIST
-        flatsList.Add(new Flat(0, ColorGrey));
-        flatsList.Add(new Flat(1, ColorBlue));
+
+        AddNewFlat(0, ColorGrey );
+        AddNewFlat(1, ColorBlue);
         #endregion
     }
 
@@ -299,18 +305,18 @@ public partial class Main : Node2D
        // }
     }
 
-    void ClearObjectListData(ref Dictionary<Effect, int> seenEffects, ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref Dictionary<Effect, int> flatEffects)
+    void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref Dictionary<Effect, int> flatEffects)
     {
-        seenEffects.Clear();
+     
         usedEffects.Clear();
         flatEffects.Clear();
         usePosition.X = 0;
         usePosition.Y = 0; 
     }
 
-    void ClearCharacterListData(ref Dictionary<Effect, int> seenEffects, ref Dictionary<Effect, int> usedEffects, ref Dictionary<Effect, int> flatEffects)
+    void ClearCharacterListData( ref Dictionary<Effect, int> usedEffects, ref Dictionary<Effect, int> flatEffects)
     {
-        seenEffects.Clear();
+       
         usedEffects.Clear();
         flatEffects.Clear();
     }
