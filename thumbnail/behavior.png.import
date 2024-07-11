@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://qa2nxg6an7l6"
-path="res://.godot/imported/guitar.png-8beb4d2667ccd45d88b81eb3b29aa3ec.ctex"
+uid="uid://c0jkfvvk64h50"
+path="res://.godot/imported/behavior.png-e5ff7f45beaf2afb30746f3926e0de62.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://OBJECTS/SPRITES/guitar.png"
-dest_files=["res://.godot/imported/guitar.png-8beb4d2667ccd45d88b81eb3b29aa3ec.ctex"]
+source_file="res://thumbnail/behavior.png"
+dest_files=["res://.godot/imported/behavior.png-e5ff7f45beaf2afb30746f3926e0de62.ctex"]
 
 [params]
 

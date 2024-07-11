@@ -95,7 +95,18 @@ namespace Asriela
         #endregion
 
         #region ENUMS
+        public enum FurnitureType : short
+        {
+            couch,
+            recordPlayer,
+            electricGuitar
+        }
 
+        public enum CharacterType : short
+        {
+            granny,
+            punkRocker
+        }
         public enum Effect : short
         {
             entertainment,
@@ -299,7 +310,7 @@ namespace Asriela
             ret = nearestDistance;
             return ret;
         }
-        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, string objectName)
+        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureType objectType)
         {
             var allObjects = GetAllObjects(tree, groupName);
             List<Node2D> objectsWithMatchingTags = new List<Node2D>();
@@ -314,7 +325,7 @@ namespace Asriela
                 {
                     Furniture objectClass = (Furniture)obj;
 
-                    if( objectName == objectClass.name)
+                    if(objectType == objectClass.objectData.type)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)

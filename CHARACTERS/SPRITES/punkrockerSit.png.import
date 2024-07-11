@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dxt0ekiethh8w"
-path="res://.godot/imported/punkrockerSit.png-3c91cf2898d7e55c9605f0085442f250.ctex"
+path="res://.godot/imported/punkRockerSit.png-6f9b70f60b68b289e437a728a4f42256.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CHARACTERS/SPRITES/punkrockerSit.png"
-dest_files=["res://.godot/imported/punkrockerSit.png-3c91cf2898d7e55c9605f0085442f250.ctex"]
+source_file="res://CHARACTERS/SPRITES/punkRockerSit.png"
+dest_files=["res://.godot/imported/punkRockerSit.png-6f9b70f60b68b289e437a728a4f42256.ctex"]
 
 [params]
 

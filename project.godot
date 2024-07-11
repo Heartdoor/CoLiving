@@ -30,7 +30,17 @@ project/assembly_name="New"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/astar2d_grid_node/plugin.cfg", "res://addons/cognite/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://CHARACTERS/": "pink",
+"res://OBJECTS/": "teal",
+"res://ROOMS/": "purple",
+"res://UI/": "gray",
+"res://WORLD/": "green"
+}
 
 [input]
 

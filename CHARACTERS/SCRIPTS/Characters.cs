@@ -23,7 +23,7 @@ public partial class Characters : CharacterBody2D
     Vector2 direction;
     public bool foundRandomPlace = false;
     Vector2 myVelocity;
-    public float interactionDistance = 80;
+    public float interactionDistance = 40;
     public bool performedAction = false;
     int count = 0;
     float restAtPoint = 0;
@@ -63,7 +63,7 @@ public partial class Characters : CharacterBody2D
 
 
 
-    string ChooseObjectFromList()
+    FurnitureType ChooseObjectFromList()
     {
         foreach (var item in Main.objectsInFlat[myFlatNumber])
         {
@@ -72,7 +72,7 @@ public partial class Characters : CharacterBody2D
             {
                 var objE = objectItem.usedEffects;
                 var charE = characterData.usedEffects;
-                Log($"CALCULATING {objectItem.name}", LogType.step);
+                Log($"CALCULATING {objectItem.type}", LogType.step);
                 // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
 
                 //basePrefOfObjects.Add(objectItem, objE.Keys.Intersect(charE.Keys).Select(key => objE[key] * charE[key]).Sum());
@@ -104,11 +104,11 @@ public partial class Characters : CharacterBody2D
             
                 // Create a list of items sorted by descending heat 
                 var sortedItems = heatOfObjects.OrderByDescending(item => item.Value).Select(item => item.Key).ToList();
-
+                objectQueue.Clear(); 
                 // Add critical items to the queue in order 
                 foreach (var item in sortedItems)
                 {
-                    if (heatOfObjects[item] > 10 && !objectQueue.Contains(item))
+                    if (heatOfObjects[item] > 0 && !objectQueue.Contains(item))
                     {
                         objectQueue.Enqueue(item);        // add item to queue if it's not already in the queue 
                                                     // Assume queue length is limited to n 
@@ -137,8 +137,8 @@ public partial class Characters : CharacterBody2D
 
                 //var mostValuedObject = myListOfObjects.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
          
-        Log($"CHOSE {mostValuedObject.name}", LogType.game);
-        string mostWantedObjectName= mostValuedObject.name;
+        Log($"CHOSE {mostValuedObject.type}", LogType.game);
+        FurnitureType mostWantedObjectName= mostValuedObject.type;
         return mostWantedObjectName;
     }
 
@@ -152,10 +152,11 @@ public partial class Characters : CharacterBody2D
 
     void MoveToTarget(Node2D target)
     {
-        ChangeApproachDistance(NavAgent, 200);
+        ChangeApproachDistance(NavAgent, interactionDistance);
         // Log($"{name}  GOTO TARGET", LogType.game);
         var destination = target.GlobalPosition;
-        GotoPointAndAvoid(this, NavAgent, speed, friction, accel, delta, destination, completedJourney);
+        // GotoPointAndAvoid(this, NavAgent, speed, friction, accel, delta, destination, completedJourney);
+        GotoPoint(this, NavAgent, speed, accel, delta, destination);
     }
 
     public void ReachTarget()
@@ -169,7 +170,7 @@ public partial class Characters : CharacterBody2D
     void UseTarget()
     {
         GlobalPosition = currentTarget.GlobalPosition;
-        mySprite.Texture = GetTexture2D($"res://CHARACTERS/SPRITES/{characterData.name}Sit.png");
+        mySprite.Texture = GetTexture2D($"res://CHARACTERS/SPRITES/{characterData.type}Sit.png");
         //Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
         if (alarm.Ended(TimerType.actionLength))
         {
@@ -180,9 +181,11 @@ public partial class Characters : CharacterBody2D
             // Update heat values after task completion 
             foreach (var key in heatOfObjects.Keys.ToList())
             {
-                heatOfObjects[key] += basePrefOfObjects[key];
+                var basePreferenceForObject = basePrefOfObjects[key];
+                if(basePreferenceForObject > 0)
+                heatOfObjects[key] += basePreferenceForObject;
             }
-            heatOfObjects[item] = basePrefOfObjects[item];
+            heatOfObjects[item] = 0;
 
             currentTarget = null;
             usingTarget = null;

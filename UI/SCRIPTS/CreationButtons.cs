@@ -45,7 +45,7 @@ public partial class CreationButtons : Button
                     Log("added character", LogType.game);
                     var newButton= (Button) SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
 
-                    newButton.Text = item.name;
+                    newButton.Text = $"{item.type}";
                     newButton.Icon = item.texture;
                     var buttonClass = (ItemToSelect)newButton;
                     buttonClass.MyCharacter = item;
@@ -58,7 +58,7 @@ public partial class CreationButtons : Button
                     Log("added objects", LogType.game);
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
 
-                    newButton.Text = item.name;
+                    newButton.Text = $"{item.type}";
                     newButton.Icon = item.texture;
                     var buttonClass = (ItemToSelect)newButton;
                     buttonClass.MyObject = item;
