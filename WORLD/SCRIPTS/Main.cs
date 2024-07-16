@@ -14,32 +14,53 @@ public partial class Main : Node2D
     #endregion
 
     #region MAIN CONTROL SETUP
-
+    public static float Money=200f;
     public static Object HeldObject=null;
     public static Character HeldCharacter= null;
     public static Dictionary<int,List<Node2D>> objectsInFlat = new Dictionary<int, List<Node2D>>(); 
-    public static int flatNumberMouseIsIn = 1;
+    public static int FlatNumberMouseIsIn = 1;
+    public static List<Character> CharactersAvailableToPlayerList = new List<Character> ();
     Sprite2D placeItemImage;
+    public static TileMap MyTileMap;
+    #endregion
+
+    #region SETTINGS
+    public static bool SpawnInitialObjects = false;
+    public static bool MoneyCheat = true;
+    public static bool QuickRestart = true;
+    public enum testGameMode : short
+    {
+        complex,
+        zooTycoon,
+        flowingMoney
+
+    }
+    public static testGameMode TestGameMode = testGameMode.flowingMoney;
     #endregion
 
     #region CLASSES SETUP
     public class Object
         {
             public FurnitureType type;
+            public bool flatWideEffect;
             public string image_path;
             public Texture2D texture;
             public Dictionary<Effect, int> usedEffects;
             public Vector2 usePosition;
             public float useLength;
+            public int size;
+            public int price;
             public Dictionary<Effect, int> flatEffects;
-            public Object(FurnitureType type,  Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
+            public Object(FurnitureType type, bool flatWideEffect, int size,int price, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
             {
                 this.type = type;
+                this.flatWideEffect = flatWideEffect;
                 image_path = $"res://OBJECTS/SPRITES/{type}.png";
                 texture = (Texture2D)GetResource(image_path);
 
 
-                
+                this.size = size;
+                this.price = price;
                 this.usePosition = usePosition;
                 this.useLength = useLength;
                 this.usedEffects = new Dictionary<Effect, int>(usedEffects);
@@ -54,13 +75,14 @@ public partial class Main : Node2D
             public Texture2D texture;
             public Dictionary<Effect, int> usedEffects;
             public Dictionary<Effect, int> flatEffects;
-            public Character(CharacterType type,  Dictionary<Effect, int> usedEffects, Dictionary<Effect, int> flatEffects)
+            public Dictionary<Effect, float> bleedEffects;
+            public Character(CharacterType type,  Dictionary<Effect, int> usedEffects, Dictionary<Effect, float> bleedEffects)
             {
                 this.type = type;
                 image_path = $"res://CHARACTERS/SPRITES/{type}.png";
                 texture = (Texture2D)GetResource(image_path);
                 this.usedEffects = new Dictionary<Effect, int>(usedEffects);
-                this.flatEffects = new Dictionary<Effect, int>(flatEffects); 
+                this.bleedEffects = new Dictionary<Effect, float>(bleedEffects); 
             }
         }
         public static List<Character> charactersList = new List<Character>();
@@ -70,13 +92,15 @@ public partial class Main : Node2D
             public string image_path;
             public Color color;
             public double happiness;
+            public List<Characters> charactersInFlat;
             public Dictionary<Effect, int> flatWideEffects = new Dictionary<Effect, int>();
 
-            public Flat(int number, Color color)
+            public Flat(int number, Color color, List<Characters> charactersInFlat)
             {
                 this.number = number;
                 image_path = $"res://FLATS/SPRITES/{number}.png";
                 this.color = color;
+                this.charactersInFlat = charactersInFlat;
             }
         }
         public static List<Flat> flatsList = new List<Flat>();
@@ -85,49 +109,71 @@ public partial class Main : Node2D
 
 
 
-
     #region SETUPS
+
     void SetupObjects()
     {
         #region setup
         FurnitureType type;
+        bool flatWideEffect;
         Dictionary<Effect, int> seenEffects = new Dictionary<Effect, int>();
         Dictionary<Effect, int> usedEffects = new Dictionary<Effect, int>();
         Vector2 usePosition = new Vector2(0, 0);
         float useLength = 1;
+        int size = 0;
+        int price = 0;
         Dictionary<Effect, int> flatEffects = new Dictionary<Effect, int>();
         #endregion
 
 
 
         type = FurnitureType.couch;
+        flatWideEffect = false;
+        size = 2;
+        price = 100;
         useLength = 10;
         usedEffects.Add(Effect.comfort, 1);
         #region apply
-        objectsList.Add(new Object(type, usedEffects, usePosition, useLength, flatEffects));
+        objectsList.Add(new Object(type, flatWideEffect,size, price,usedEffects, usePosition, useLength, flatEffects));
         ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
         #endregion
 
         type = FurnitureType.electricGuitar;
+        flatWideEffect = true;
+        size = 1;
+        price = 200;
         useLength = 10;
         usedEffects.Add(Effect.music, 3);
         usedEffects.Add(Effect.noise, 3);
         usedEffects.Add(Effect.grunge, 2);
         #region apply
-        objectsList.Add(new Object(type, usedEffects, usePosition, useLength, flatEffects));
+        objectsList.Add(new Object(type, flatWideEffect,size, price, usedEffects, usePosition, useLength, flatEffects));
         ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
         #endregion
 
         type = FurnitureType.recordPlayer;
+        flatWideEffect = true;
+        size = 1;
+        price = 100;
         useLength = 10;
         usedEffects.Add(Effect.music, 3);
         usedEffects.Add(Effect.vintage, 3);
         #region apply
-        objectsList.Add(new Object(type, usedEffects, usePosition, useLength, flatEffects));
+        objectsList.Add(new Object(type, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
         ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
         #endregion
 
-
+        type = FurnitureType.stove;  
+        flatWideEffect = false;
+        size = 1;
+        price = 200;
+        useLength = 10;
+        usedEffects.Add(Effect.food, 4);
+        usedEffects.Add(Effect.cozy,2);
+        #region apply
+        objectsList.Add(new Object(type, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
+        #endregion
 
         /* name = "paintEasel";
          usedEffects.Add(Effect.messy, 3);
@@ -143,7 +189,7 @@ public partial class Main : Node2D
     {
         #region setup
         CharacterType type;
-        Dictionary<Effect, int> seenEffects = new Dictionary<Effect, int>();
+        Dictionary<Effect, float> bleedEffects = new Dictionary<Effect, float>();
         Dictionary<Effect, int> usedEffects = new Dictionary<Effect, int>();
         Dictionary<Effect, int> flatEffects = new Dictionary<Effect, int>();
         #endregion
@@ -168,27 +214,27 @@ public partial class Main : Node2D
         */
 
         type = CharacterType.granny;
-        usedEffects.Add(Effect.comfort, 3);
+        usedEffects.Add(Effect.comfort, 3); 
         usedEffects.Add(Effect.grunge, -3);
         usedEffects.Add(Effect.cozy, 5);
         usedEffects.Add(Effect.music, 2);
         usedEffects.Add(Effect.vintage, 3);
-        usedEffects.Add(Effect.food, 2);
+        usedEffects.Add(Effect.food, 2); bleedEffects.Add(Effect.food, 0.01f);
         usedEffects.Add(Effect.noise, -3);
         usedEffects.Add(Effect.entertainment, 1);
         usedEffects.Add(Effect.hygiene, 3);
         usedEffects.Add(Effect.academic, 1);
         #region apply
-        var charInfo = new Character(type, usedEffects, flatEffects);
+        var charInfo = new Character(type, usedEffects, bleedEffects);
         charactersList.Add(charInfo);
-        ClearCharacterListData(ref usedEffects, ref flatEffects);
+        ClearCharacterListData(ref usedEffects, ref bleedEffects);
         #endregion
 
         type = CharacterType.punkRocker;
         usedEffects.Add(Effect.comfort, 1);
         usedEffects.Add(Effect.grunge, 3);
         usedEffects.Add(Effect.cozy, -5);
-        usedEffects.Add(Effect.music, 3);
+        usedEffects.Add(Effect.music, 3); bleedEffects.Add(Effect.music, 0.01f);
         usedEffects.Add(Effect.vintage, 3);
         usedEffects.Add(Effect.food, 1);
         usedEffects.Add(Effect.noise, 3);
@@ -196,16 +242,22 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.hygiene, 0);
         usedEffects.Add(Effect.academic, -1);
         #region apply
-        charactersList.Add(new Character(type, usedEffects, flatEffects));
-        ClearCharacterListData(ref usedEffects, ref flatEffects);
+        charactersList.Add(new Character(type, usedEffects, bleedEffects));
+        ClearCharacterListData(ref usedEffects, ref bleedEffects);
         #endregion
+
+        CharactersAvailableToPlayerList.Add(GetCharacterFromType(CharacterType.granny));
+        CharactersAvailableToPlayerList.Add(GetCharacterFromType(CharacterType.punkRocker));
 
     }
 
     void SetupFlats()
     {
-        AddNewFlat(0, ColorGrey); 
-        AddNewFlat(1, ColorBlue); 
+        AddNewFlat(0, ColorGrey, new List<Characters>()); 
+        AddNewFlat(1, ColorBlue, new List<Characters>());
+        AddNewFlat(2, ColorBlue, new List<Characters>());
+        AddNewFlat(3, ColorBlue, new List<Characters>());
+        AddNewFlat(4, ColorBlue, new List<Characters>());
     }
 
     void SetupUI()
@@ -215,10 +267,16 @@ public partial class Main : Node2D
 
     void SetupFirstFlat()
     {
+        if (SpawnInitialObjects == false) return;
         var theObject = GetObjectFromType(FurnitureType.couch);
 
         PlaceObjects(ref theObject, true, new Vector2(576, 237));
+        theObject = GetObjectFromType(FurnitureType.electricGuitar);
 
+        PlaceObjects(ref theObject, true, new Vector2(376, 437));
+        theObject = GetObjectFromType(FurnitureType.recordPlayer);
+
+        PlaceObjects(ref theObject, true, new Vector2(656, 437));
         var theCharacter = GetCharacterFromType(CharacterType.granny);
         PlaceCharacter(ref theCharacter , ref theObject, true, new Vector2(276, 237));
     }
@@ -230,6 +288,7 @@ public partial class Main : Node2D
 
     void Start()
     {
+        
         SetupUI();
         SetupObjects();
         SetupCharacters();
@@ -245,7 +304,8 @@ public partial class Main : Node2D
 
     void Run()
     {
-        RunFlatWideEffectsOnCharacters();
+
+        HotKeys();
 
         if (canPlace) 
         { 
@@ -258,36 +318,51 @@ public partial class Main : Node2D
         else
             placeItemImage.Texture = null;
     }
-    void PlaceObjects(ref Object heldObject, bool placeManually, Vector2 position)
+    void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
     {
 
-        if (heldObject == null) return;
+        if (HeldObject == null) return;
    
 
 
 
             placeItemImage.GlobalPosition = GetGlobalMousePosition();
-            placeItemImage.Texture = heldObject.texture;
-            if (ButtonPressed("RightClick") || placeManually)
+            placeItemImage.Texture = HeldObject.texture;
+            var cost = HeldObject.price;
+        if ((KeyPressed("RightClick") && Money >= cost) || placeManually)
             {
                 var newObject=Add2DNode("res://OBJECTS/SCENES/object.tscn",this);
-            if (placeManually)
-                newObject.GlobalPosition = position;
-            else
-                newObject.GlobalPosition = GetGlobalMousePosition();
                 var newObjectClass = (Furniture)newObject;
-                newObjectClass.objectData = heldObject;
-                newObjectClass.objectData.type = heldObject.type;
+                newObjectClass.objectData = HeldObject;
+                newObjectClass.objectData.type = HeldObject.type;
                 newObjectClass.mySprite.Texture = placeItemImage.Texture;
-                objectsInFlat[flatNumberMouseIsIn].Add(newObject);
+                newObjectClass.flatIAmIn = FlatNumberMouseIsIn;
+                objectsInFlat[FlatNumberMouseIsIn].Add(newObject);
+                newObjectClass.ChangeDimensions(newObjectClass.objectData.size);
+                
+
+            if (placeManually)
+            {
+                newObject.GlobalPosition = position;
 
 
+            }
+
+            else
+            {
+                newObject.GlobalPosition = GetGlobalMousePosition();
+              
+                    Money -= cost;
+            }
+               
+
+                
 
                 if (placeManually == false)
-                if (HeldCharacter != null || heldObject != null)
+                if (HeldCharacter != null || HeldObject != null)
                 {
-                    heldObject = null;
-                    HeldCharacter = null;
+                    HoldNothing();
+                    
                     Destroy(Main.SelectionMenuOpen);
                     Main.SelectionMenuOpen = null;
 
@@ -303,23 +378,29 @@ public partial class Main : Node2D
             placeItemImage.GlobalPosition = GetGlobalMousePosition();
             placeItemImage.Texture = heldCharacter.texture;
 
-            if (ButtonPressed("RightClick") || placeManually)
+            if (KeyPressed("RightClick") || placeManually)
             {
-                var newObject = Add2DNode("res://CHARACTERS/SCENES/character.tscn", this);
+
+            Log("CHARACTER PLACED", LogType.game);
+
+            var newObject = Add2DNode("res://CHARACTERS/SCENES/character.tscn", this);
             if (placeManually)
                 newObject.GlobalPosition = position;
             else
                 newObject.GlobalPosition = GetGlobalMousePosition();
-                var newObjectClass = (Characters)newObject;
-                newObjectClass.characterData = heldCharacter;
-                newObjectClass.mySprite.Texture = placeItemImage.Texture;
-                newObjectClass.myFlatNumber = flatNumberMouseIsIn;
+            var character = heldCharacter;
+            Main.CharactersAvailableToPlayerList = Main.CharactersAvailableToPlayerList.Where(x => x != character).ToList();
 
+            var newObjectClass = (Characters)newObject;
+                newObjectClass.characterData = heldCharacter;
+                newObjectClass.SetupBleedList();
+                newObjectClass.mySprite.Texture = placeItemImage.Texture;
+                newObjectClass.myFlatNumber = FlatNumberMouseIsIn;
+                flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newObjectClass);
                 if(placeManually==false)
                 if (heldCharacter != null || heldObject != null)
                 {
-                    heldObject = null;
-                    heldCharacter = null;
+                    HoldNothing();
                     Destroy(Main.SelectionMenuOpen);
                     Main.SelectionMenuOpen = null;
 
@@ -327,13 +408,21 @@ public partial class Main : Node2D
                 }
         
     }   
-
-
-    void RunFlatWideEffectsOnCharacters()
+    public static void HoldNothing()
     {
-        //foreach(){
-
-       // }
+        HeldObject = null;
+        HeldCharacter = null;
+    }
+    void HotKeys()
+    {
+        if(KeyPressed("Restart") && QuickRestart)
+        {
+            RestartScene(this); 
+        }
+        if (KeyPressed("Money") && MoneyCheat)
+        {
+            Money += 100;
+        }
     }
 
     void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref Dictionary<Effect, int> flatEffects)
@@ -345,16 +434,16 @@ public partial class Main : Node2D
         usePosition.Y = 0; 
     }
 
-    void ClearCharacterListData( ref Dictionary<Effect, int> usedEffects, ref Dictionary<Effect, int> flatEffects)
+    void ClearCharacterListData( ref Dictionary<Effect, int> usedEffects, ref Dictionary<Effect, float> bleedEffects)
     {
        
         usedEffects.Clear();
-        flatEffects.Clear();
+        bleedEffects.Clear();
     }
 
-    void AddNewFlat(int flatNumber, Color color)
+    void AddNewFlat(int flatNumber, Color color, List<Characters> charactersInFlat )
     {
-        flatsList.Add(new Flat(flatNumber, color));
+        flatsList.Add(new Flat(flatNumber, color, charactersInFlat));
         objectsInFlat[flatNumber] = new List<Node2D>();
     }
 
@@ -369,6 +458,8 @@ public partial class Main : Node2D
         var correctObject = charactersList.FirstOrDefault(obj => obj.type == type);
         return correctObject;
     }
+
+
 
     #region OLD
     public override void _Ready()

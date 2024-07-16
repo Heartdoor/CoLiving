@@ -1,12 +1,13 @@
 using Godot;
 using System;
+using System.Linq;
 using static Asriela.BasicFunctions;
 
 public partial class ItemToSelect : Button
 {
     public Main.Object MyObject=null;
     public Main.Character MyCharacter=null;
-
+    public int listIndex;
 
 
     void OnPressed()
@@ -23,6 +24,7 @@ public partial class ItemToSelect : Button
         else
         if (MyCharacter != null)
         {
+            
             Main.HeldCharacter = MyCharacter;
 
         }

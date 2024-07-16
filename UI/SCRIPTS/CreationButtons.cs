@@ -39,26 +39,29 @@ public partial class CreationButtons : Button
         switch (buttonType)
         {
             case "characters":
+                Main.HoldNothing();
                 Log("start character fillup", LogType.game);
-                foreach (var item in Main.charactersList)
+                foreach (var item in Main.CharactersAvailableToPlayerList)
                 {
                     Log("added character", LogType.game);
                     var newButton= (Button) SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
-
+                    
                     newButton.Text = $"{item.type}";
                     newButton.Icon = item.texture;
                     var buttonClass = (ItemToSelect)newButton;
+                    
                     buttonClass.MyCharacter = item;
                 }
             break;
             case "objects":
+                Main.HoldNothing();
                 Log("start objects fillup", LogType.game);
                 foreach (var item in Main.objectsList)
                 {
                     Log("added objects", LogType.game);
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
 
-                    newButton.Text = $"{item.type}";
+                    newButton.Text = $"{item.type}  ${item.price}";
                     newButton.Icon = item.texture;
                     var buttonClass = (ItemToSelect)newButton;
                     buttonClass.MyObject = item;
@@ -66,6 +69,7 @@ public partial class CreationButtons : Button
                 }
                 break;
             case "rooms":
+                Main.HoldNothing();
                 Log("start rooms fillup", LogType.game);
                 foreach (var item in Main.flatsList)
                 {

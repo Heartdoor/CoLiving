@@ -4,11 +4,14 @@
 [ext_resource type="Script" path="res://UI/SCRIPTS/ItemToSelect.cs" id="2_gub5o"]
 
 [node name="Button" type="Button"]
+custom_minimum_size = Vector2(200, 0)
 offset_left = 1.0
 offset_top = -1.0
-offset_right = 192.0
+offset_right = 275.0
 offset_bottom = 113.0
 icon = ExtResource("1_7t7h2")
+alignment = 0
+icon_alignment = 2
 expand_icon = true
 script = ExtResource("2_gub5o")
 

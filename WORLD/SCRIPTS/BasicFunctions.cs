@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using static Asriela.BasicFunctions;
 
 namespace Asriela
@@ -65,7 +66,7 @@ namespace Asriela
         { LogType.state,            BinaryBool(0)},
         { LogType.game,             BinaryBool(1)},
         { LogType.file,             BinaryBool(0)},
-        { LogType.error,            BinaryBool(0)},
+        { LogType.error,            BinaryBool(1)},
         { LogType.ui,               BinaryBool(0)},
         { LogType.player,           BinaryBool(1)},
         { LogType.step,             BinaryBool(1)},
@@ -81,13 +82,14 @@ namespace Asriela
                 if (LogTypesOn[type] == true)
                     GD.Print(text);
             }
+            else
             if (type == LogType.step)
             {
                 text = "🐾 " + text;
                 if (LogTypesOn[type] == true)
                     GD.Print(text);
             }
-
+            else
             if (LogTypesOn[type] == true)
                 GD.Print(text);
         }
@@ -97,9 +99,11 @@ namespace Asriela
         #region ENUMS
         public enum FurnitureType : short
         {
+            none,
             couch,
             recordPlayer,
-            electricGuitar
+            electricGuitar,
+            stove
         }
 
         public enum CharacterType : short
@@ -130,8 +134,26 @@ namespace Asriela
             down,
             left,
             right
-        } 
-        
+        }
+
+        #endregion
+
+        #region EMOJIS
+
+        public static string ConvertToEmoji(Effect effect)
+        {
+            return effect switch
+            {
+                Effect.grunge => "💀",
+                Effect.music => "🎵",
+                Effect.noise => "📢",
+                Effect.vintage => "🎩",
+                Effect.comfort => "🛋",
+                Effect.food => "🍽",
+                Effect.cozy => "🌸",
+                _ => ""
+            };
+        }
         #endregion
         #region EMOTIONS
         public enum Trait : short
@@ -310,7 +332,7 @@ namespace Asriela
             ret = nearestDistance;
             return ret;
         }
-        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureType objectType)
+        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureType objectType, int flatNumber)
         {
             var allObjects = GetAllObjects(tree, groupName);
             List<Node2D> objectsWithMatchingTags = new List<Node2D>();
@@ -325,7 +347,7 @@ namespace Asriela
                 {
                     Furniture objectClass = (Furniture)obj;
 
-                    if(objectType == objectClass.objectData.type)
+                    if(objectType == objectClass.objectData.type && objectClass.flatIAmIn == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -339,7 +361,7 @@ namespace Asriela
                 }
             }
 
-            Log($"   {nearestObject.Name} was the closest  ", LogType.nearest);
+           // Log($"   {nearestObject.Name} was the closest  ", LogType.nearest);
             return nearestObject;
         }
 
@@ -510,7 +532,9 @@ namespace Asriela
             FindTarget,
             life,
             moveOn,
-            stateMachineLoop
+            stateMachineLoop,
+            wander,
+            grumpy
         }
 
         public static float globalTimer = 0;
@@ -666,9 +690,14 @@ namespace Asriela
         #region BUTTON
 
 
-        public static bool ButtonPressed(string actionName)
+        public static bool KeyPressed(string actionName)
         {
             return Input.IsActionJustPressed(actionName);
+        }
+
+        public static bool KeyHeld(string actionName)
+        {
+            return Input.IsActionPressed(actionName);
         }
 
         #endregion
@@ -941,6 +970,18 @@ namespace Asriela
 
         }
 
+
+        public static Control AddUINode(string path, Node subject)
+        {
+            PackedScene armScene = (PackedScene)GD.Load(path);
+            Control arm = (Control)armScene.Instantiate();
+
+            subject.AddChild(arm);
+
+
+            return arm;
+        }
+
         public static Node3D Add3DNode(string path, Node subject)
         {
             PackedScene armScene = (PackedScene)GD.Load($"{path}");
@@ -1006,7 +1047,10 @@ namespace Asriela
         #endregion
 
         #region END GAME
-
+        public static void RestartScene(Node subject)
+        {
+            subject.GetTree().ChangeSceneToFile(subject.GetTree().CurrentScene.SceneFilePath);
+        }
         public static void EndGame(Node subject)
         {
             subject.GetTree().Quit();
@@ -1150,10 +1194,10 @@ namespace Asriela
 
         #region COLOR
         public static readonly Color ColorBlue = new Color(0x0094FFff);
-        public static readonly Color red = new Color(0xFF5B4Cff);
-        public static readonly Color green = new Color(0xAEFF4Cff);
-        public static readonly Color yellow = new Color(0xFFCC4Cff);
-        public static readonly Color purple = new Color(0xCC4CFFff);
+        public static readonly Color ColorRed = new Color(0xFF5B4Cff);
+        public static readonly Color ColorGreen = new Color(0xAEFF4Cff);
+        public static readonly Color ColorYellow = new Color(0xFFCC4Cff);
+        public static readonly Color ColorPurple = new Color(0xCC4CFFff);
         public static readonly Color ColorGrey = new Color(0xCCd3d3d3);
 
         public static void ChangeColor(Sprite2D sprite, Color newColor)
@@ -1163,13 +1207,41 @@ namespace Asriela
                 sprite.Modulate = newColor; // Change the Modulate property to set the color
             }
         }
+        public static void ChangeColorUI(Control sprite, Color newColor)
+        {
+            if (sprite != null)
+            {
+                sprite.Modulate = newColor; // Change the Modulate property to set the color
+            }
+        }
+
+        public static void SetAlpha(Control myLabel, float value)
+        {
+            Color modulateColor = myLabel.SelfModulate;
+            modulateColor.A = value;
+            myLabel.SelfModulate = modulateColor;
+        }
+
+        public static void ChangeAlpha(Control myLabel, float value)
+        {
+            Color modulateColor = myLabel.SelfModulate;
+            modulateColor.A += value;
+            myLabel.SelfModulate = modulateColor;
+        }
+
+        public static float GetAlpha(Control myLabel)
+        {
+            Color modulateColor = myLabel.SelfModulate;
+            return modulateColor.A;
+
+        }
         #endregion
 
         #region GET PARENT NODE
-        
+
         // public static Node GetTreeNode(Node subject, string nodeName)
-       // {
-           // return subject.GetTree().GetFirstNodeInGroup().GetNode<Node>(nodeName);
+        // {
+        // return subject.GetTree().GetFirstNodeInGroup().GetNode<Node>(nodeName);
         //}
         //USE this keyword in subject
         public static Node GetParentNode(Node subject, string nodeName)
@@ -1198,9 +1270,9 @@ namespace Asriela
             return node.GetNode<Button>(name);
 
         }
-        public static Label GetLabel(Node node, string name)
+        public static Godot.Label GetLabel(Node node, string name)
         {
-            return node.GetNode<Label>(name);
+            return node.GetNode<Godot.Label>(name);
 
         }
         public static NavigationRegion2D GetNavRegion2D(Node node, string name)
