@@ -103,13 +103,15 @@ namespace Asriela
             couch,
             recordPlayer,
             electricGuitar,
-            stove
+            stove,
+            roarRock
         }
 
         public enum CharacterType : short
         {
             granny,
-            punkRocker
+            punkRocker,
+            yeti
         }
         public enum Effect : short
         {

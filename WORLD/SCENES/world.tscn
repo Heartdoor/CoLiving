@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://bvj56a8xici12"]
+[gd_scene load_steps=25 format=3 uid="uid://bvj56a8xici12"]
 
 [ext_resource type="Script" path="res://WORLD/SCRIPTS/Main.cs" id="1_b17qk"]
 [ext_resource type="Script" path="res://UI/SCRIPTS/CreationButtons.cs" id="2_5twg1"]
@@ -8,10 +8,11 @@
 [ext_resource type="Texture2D" uid="uid://cov5fc03hcmh8" path="res://WORLD/TILEMAP/2.png" id="4_1h5i6"]
 [ext_resource type="Texture2D" uid="uid://dhp1noc5o6j6k" path="res://OBJECTS/SPRITES/couch.png" id="4_bk1bb"]
 [ext_resource type="Texture2D" uid="uid://c3106sjx04ry4" path="res://WORLD/TILEMAP/3.png" id="5_k3tn3"]
-[ext_resource type="Script" path="res://WORLD/SCENES/FlatHappinessLabel.cs" id="6_e85xs"]
+[ext_resource type="Script" path="res://UI/SCRIPTS/FlatHappinessLabel.cs" id="6_e85xs"]
 [ext_resource type="Texture2D" uid="uid://bbfdtjcti7c6a" path="res://WORLD/TILEMAP/4.png" id="6_qngb8"]
 [ext_resource type="Script" path="res://WORLD/SCENES/Camera2D.cs" id="8_jctud"]
-[ext_resource type="Script" path="res://WORLD/SCENES/FlatWeAreInLabel.cs" id="10_lxq2t"]
+[ext_resource type="Script" path="res://UI/SCRIPTS/FlatWeAreInLabel.cs" id="10_lxq2t"]
+[ext_resource type="Script" path="res://WORLD/SCENES/UnlocksLabel.cs" id="11_ps41o"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kvwny"]
 texture = ExtResource("3_8n3hg")
@@ -106,6 +107,11 @@ sources/2 = SubResource("TileSetAtlasSource_solk0")
 sources/3 = SubResource("TileSetAtlasSource_2fgpg")
 sources/4 = SubResource("TileSetAtlasSource_f02b0")
 
+[sub_resource type="LabelSettings" id="LabelSettings_qt5pn"]
+font_size = 21
+shadow_size = 7
+shadow_color = Color(0, 0, 0, 0.737255)
+
 [node name="Main" type="Node2D"]
 z_index = -1
 z_as_relative = false
@@ -121,6 +127,7 @@ layer_0/tile_data = PackedInt32Array(0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0
 script = ExtResource("3_5kti7")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+unique_name_in_owner = true
 position = Vector2(681, 389)
 limit_smoothed = true
 position_smoothing_enabled = true
@@ -167,6 +174,20 @@ offset_bottom = -348.0
 theme_type_variation = &"HeaderLarge"
 horizontal_alignment = 1
 script = ExtResource("6_e85xs")
+
+[node name="UnlocksLabel" type="Label" parent="Camera2D"]
+unique_name_in_owner = true
+offset_left = -142.0
+offset_top = -349.0
+offset_right = 200.0
+offset_bottom = -308.0
+theme_type_variation = &"HeaderLarge"
+text = "New unlock"
+label_settings = SubResource("LabelSettings_qt5pn")
+horizontal_alignment = 1
+vertical_alignment = 1
+uppercase = true
+script = ExtResource("11_ps41o")
 
 [node name="FlatWeAreInLabel" type="Label" parent="Camera2D"]
 offset_left = 590.0

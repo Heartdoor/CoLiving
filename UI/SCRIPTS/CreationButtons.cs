@@ -56,7 +56,7 @@ public partial class CreationButtons : Button
             case "objects":
                 Main.HoldNothing();
                 Log("start objects fillup", LogType.game);
-                foreach (var item in Main.objectsList)
+                foreach (var item in Main.FurnitureUnlockedList)
                 {
                     Log("added objects", LogType.game);
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);

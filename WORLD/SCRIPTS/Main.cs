@@ -20,8 +20,12 @@ public partial class Main : Node2D
     public static Dictionary<int,List<Node2D>> objectsInFlat = new Dictionary<int, List<Node2D>>(); 
     public static int FlatNumberMouseIsIn = 1;
     public static List<Character> CharactersAvailableToPlayerList = new List<Character> ();
+    public static List<Character> PlacedCharactersList = new List<Character>();
+    
     Sprite2D placeItemImage;
     public static TileMap MyTileMap;
+    public static Label MyUnlocksLabel;
+    float highestUnlock = 0;
     #endregion
 
     #region SETTINGS
@@ -39,6 +43,8 @@ public partial class Main : Node2D
     #endregion
 
     #region CLASSES SETUP
+    public static List<Object>  FurnitureUnlockedList = new List<Object>();
+    public int startingAmountOfUnlockedFurniture;
     public class Object
         {
             public FurnitureType type;
@@ -182,6 +188,13 @@ public partial class Main : Node2D
          ClearObjectListData(ref seenEffects, ref usedEffects, ref usePosition, ref flatEffects);
          #endregion
         */
+        startingAmountOfUnlockedFurniture = 2;
+     
+
+        for (int i = 0; i < startingAmountOfUnlockedFurniture; i++)
+        {
+            ChooseNewFurnitureToUnlock();
+        }
 
     }
 
@@ -246,8 +259,25 @@ public partial class Main : Node2D
         ClearCharacterListData(ref usedEffects, ref bleedEffects);
         #endregion
 
-        CharactersAvailableToPlayerList.Add(GetCharacterFromType(CharacterType.granny));
-        CharactersAvailableToPlayerList.Add(GetCharacterFromType(CharacterType.punkRocker));
+        type = CharacterType.yeti;
+        usedEffects.Add(Effect.comfort, 2);
+        usedEffects.Add(Effect.grunge, 0);
+        usedEffects.Add(Effect.cozy, 3);
+        usedEffects.Add(Effect.music, 1); 
+        usedEffects.Add(Effect.vintage, 0);
+        usedEffects.Add(Effect.food, 1); bleedEffects.Add(Effect.food, 0.01f);
+        usedEffects.Add(Effect.noise, 3);
+        usedEffects.Add(Effect.entertainment, 0);
+        usedEffects.Add(Effect.hygiene, 0);
+        usedEffects.Add(Effect.academic, 0);
+        #region apply
+        charactersList.Add(new Character(type, usedEffects, bleedEffects));
+        ClearCharacterListData(ref usedEffects, ref bleedEffects);
+        #endregion
+
+        ChooseNewCharacterToUnlock();
+        ChooseNewCharacterToUnlock();
+
 
     }
 
@@ -263,6 +293,7 @@ public partial class Main : Node2D
     void SetupUI()
     {
         placeItemImage = GetNode<Sprite2D>("PlaceItemImage");
+        MyUnlocksLabel = GetNode<Camera2D>("Camera2D").GetNode<Label>("UnlocksLabel");
     }
 
     void SetupFirstFlat()
@@ -317,6 +348,69 @@ public partial class Main : Node2D
         }
         else
             placeItemImage.Texture = null;
+
+        UnlockNewCharacters();
+    }
+    void UnlockNewCharacters()
+    {
+        if (Money > 400 && highestUnlock<400)
+        {
+            highestUnlock = 400;
+            UnlockNewCharacter();
+        }
+
+    }
+    Object ChooseNewFurnitureToUnlock()
+    {
+        Random random = new Random();
+        Object chosenItem;
+            do
+            {
+                
+
+                chosenItem = objectsList.OrderBy(x => random.Next()).FirstOrDefault();
+
+            }
+            while (FurnitureUnlockedList.Contains(chosenItem));
+
+            FurnitureUnlockedList.Add(chosenItem);
+        
+        return chosenItem;
+    }
+
+    Character ChooseNewCharacterToUnlock()
+    {
+        Random random = new Random();
+        Character chosenItem;
+        do
+        {
+
+
+            chosenItem = charactersList.OrderBy(x => random.Next()).FirstOrDefault();
+
+        }
+        while (CharactersAvailableToPlayerList.Contains(chosenItem) || PlacedCharactersList.Contains(chosenItem));
+
+        CharactersAvailableToPlayerList.Add(chosenItem);
+
+        return chosenItem;
+    }
+    void UnlockNewFurniture( )
+    {
+        var unlocksLabelClass = (UnlocksLabel)MyUnlocksLabel;
+
+        var furnitureItem = ChooseNewFurnitureToUnlock();
+
+        unlocksLabelClass.NewUnlock($"{furnitureItem.type}");
+    }
+
+    void UnlockNewCharacter()
+    {
+        var unlocksLabelClass = (UnlocksLabel)MyUnlocksLabel;
+
+        var furnitureItem = ChooseNewCharacterToUnlock();
+
+        unlocksLabelClass.NewUnlock($"{furnitureItem.type}");
     }
     void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
     {
@@ -350,6 +444,7 @@ public partial class Main : Node2D
 
             else
             {
+                UnlockNewFurniture();
                 newObject.GlobalPosition = GetGlobalMousePosition();
               
                     Money -= cost;
@@ -380,6 +475,7 @@ public partial class Main : Node2D
 
             if (KeyPressed("RightClick") || placeManually)
             {
+            PlacedCharactersList.Add(heldCharacter);
 
             Log("CHARACTER PLACED", LogType.game);
 
