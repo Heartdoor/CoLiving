@@ -1,24 +1,26 @@
 using Godot;
 using System;
 
-public partial class TileMap : Godot.TileMap
+public partial class GameTileGrid : Godot.TileMap
 {
     private int _tileId = 0; // The ID of the tile you want to place. Change this to the ID of your desired tile.
-    Vector2 globalMousePosition;
-    Vector2 localMousePosition;
-    Vector2I cellCoordinates;
+    public static Vector2 globalMousePosition;
+    public static Vector2 localMousePosition;
+    public static Vector2I cellCoordinates;
+  
+    
     public override void _Input(InputEvent @event)
     {
         // Check if the input event is a mouse button press and if it's the left mouse button.
         if (@event is InputEventMouseButton eventMouseButton && eventMouseButton.Pressed && eventMouseButton.ButtonIndex == MouseButton.Left)
         {
 
-
+         
             // Get the cell coordinates from the local mouse position.
-              
+
 
             // Set the tile at the cell coordinates.
-           //SetCell(0, cellCoordinates, 2);
+            //SetCell(0, cellCoordinates, 2);
         }
     }
 
@@ -31,12 +33,14 @@ public partial class TileMap : Godot.TileMap
     {
         GetMousePositions();
         GetTileAtlasPositionWeAreOver();
-        
+  
     }
 
     void GetTileAtlasPositionWeAreOver()
     {
         Main.FlatNumberMouseIsIn = GetCellSourceId(0,cellCoordinates);
+        Main.OverPlaceableTile = GetCellSourceId(1, cellCoordinates) == 5 ? true : false;
+
     }
     void GetMousePositions()
     {

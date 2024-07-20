@@ -20,17 +20,17 @@ script = ExtResource("1_l254b")
 unique_name_in_owner = true
 z_index = -1
 y_sort_enabled = true
-position = Vector2(2.5, -4)
+position = Vector2(2, 7)
 shape = SubResource("RectangleShape2D_b214o")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(2, -23)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("2_l842f")
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
 unique_name_in_owner = true
+position = Vector2(-1, 6)
 shape = SubResource("RectangleShape2D_8r313")
 
 [node name="UseLocation1" type="Node2D" parent="."]

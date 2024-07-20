@@ -26,11 +26,15 @@ public partial class Main : Node2D
     public static TileMap MyTileMap;
     public static Label MyUnlocksLabel;
     float highestUnlock = 0;
+
+    public static bool OverPlaceableTile;
     #endregion
 
     #region SETTINGS
     public static bool SpawnInitialObjects = false;
     public static bool MoneyCheat = true;
+    public static bool UnlockCheat = true;
+    
     public static bool QuickRestart = true;
     public enum testGameMode : short
     {
@@ -57,14 +61,18 @@ public partial class Main : Node2D
             public int size;
             public int price;
             public Dictionary<Effect, int> flatEffects;
-            public Object(FurnitureType type, bool flatWideEffect, int size,int price, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
+            public FurnitureGroup isGroupLeader = FurnitureGroup.none;
+            public List<FurnitureGroup> furnitureGroups;
+            public Object(FurnitureType type, FurnitureGroup isGroupLeader, List<FurnitureGroup> furnitureGroups, bool flatWideEffect,  int size,int price, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
             {
                 this.type = type;
+                this.isGroupLeader = isGroupLeader;
+                this.furnitureGroups = new List<FurnitureGroup>(furnitureGroups);
                 this.flatWideEffect = flatWideEffect;
                 image_path = $"res://OBJECTS/SPRITES/{type}.png";
                 texture = (Texture2D)GetResource(image_path);
-
-
+                
+                
                 this.size = size;
                 this.price = price;
                 this.usePosition = usePosition;
@@ -113,7 +121,10 @@ public partial class Main : Node2D
 
     #endregion
 
-
+    #region COLOR SETUPS
+    public static readonly Color ColorCantBePlaced = new Color(0xff00008d);
+    public static readonly Color ColorPlace = new Color(0x00ffff64);
+    #endregion
 
     #region SETUPS
 
@@ -121,6 +132,8 @@ public partial class Main : Node2D
     {
         #region setup
         FurnitureType type;
+        FurnitureGroup isGroupLeader;
+        List<FurnitureGroup> furnitureGroups = new List<FurnitureGroup>();
         bool flatWideEffect;
         Dictionary<Effect, int> seenEffects = new Dictionary<Effect, int>();
         Dictionary<Effect, int> usedEffects = new Dictionary<Effect, int>();
@@ -134,17 +147,19 @@ public partial class Main : Node2D
 
 
         type = FurnitureType.couch;
+        isGroupLeader = FurnitureGroup.couch;     
         flatWideEffect = false;
         size = 2;
         price = 100;
         useLength = 10;
         usedEffects.Add(Effect.comfort, 1);
         #region apply
-        objectsList.Add(new Object(type, flatWideEffect,size, price,usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect,size, price,usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
         #endregion
 
         type = FurnitureType.electricGuitar;
+        isGroupLeader = FurnitureGroup.guitar;
         flatWideEffect = true;
         size = 1;
         price = 200;
@@ -153,8 +168,8 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.noise, 3);
         usedEffects.Add(Effect.grunge, 2);
         #region apply
-        objectsList.Add(new Object(type, flatWideEffect,size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect,size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
         #endregion
 
         type = FurnitureType.recordPlayer;
@@ -162,23 +177,28 @@ public partial class Main : Node2D
         size = 1;
         price = 100;
         useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.couch);
+        furnitureGroups.Add(FurnitureGroup.chair);
+
         usedEffects.Add(Effect.music, 3);
         usedEffects.Add(Effect.vintage, 3);
         #region apply
-        objectsList.Add(new Object(type, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups,flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
         #endregion
 
-        type = FurnitureType.stove;  
+        type = FurnitureType.stove;
+        isGroupLeader = FurnitureGroup.stove;
         flatWideEffect = false;
         size = 1;
         price = 200;
         useLength = 10;
+
         usedEffects.Add(Effect.food, 4);
         usedEffects.Add(Effect.cozy,2);
         #region apply
-        objectsList.Add(new Object(type, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref flatEffects);
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect , size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
         #endregion
 
         /* name = "paintEasel";
@@ -292,8 +312,8 @@ public partial class Main : Node2D
 
     void SetupUI()
     {
-        placeItemImage = GetNode<Sprite2D>("PlaceItemImage");
-        MyUnlocksLabel = GetNode<Camera2D>("Camera2D").GetNode<Label>("UnlocksLabel");
+        placeItemImage = GetNode<Node2D>("PlaceItemImage").GetNode<Sprite2D>("Sprite2D");
+        MyUnlocksLabel = GetNode<Godot.CanvasLayer>("CanvasLayer").GetNode<Label>("UnlocksLabel");
     }
 
     void SetupFirstFlat()
@@ -364,17 +384,21 @@ public partial class Main : Node2D
     {
         Random random = new Random();
         Object chosenItem;
+        var tries = 50;
+        var i = 0;
             do
             {
                 
 
                 chosenItem = objectsList.OrderBy(x => random.Next()).FirstOrDefault();
-
+                i++;
             }
-            while (FurnitureUnlockedList.Contains(chosenItem));
+            while (FurnitureUnlockedList.Contains(chosenItem) && i< tries);
 
+        if (i < tries)
             FurnitureUnlockedList.Add(chosenItem);
-        
+        else
+            chosenItem = null;
         return chosenItem;
     }
 
@@ -382,17 +406,21 @@ public partial class Main : Node2D
     {
         Random random = new Random();
         Character chosenItem;
+        var tries = 50;
+        var i = 0;
         do
         {
 
 
             chosenItem = charactersList.OrderBy(x => random.Next()).FirstOrDefault();
-
+            i++;
         }
-        while (CharactersAvailableToPlayerList.Contains(chosenItem) || PlacedCharactersList.Contains(chosenItem));
+        while ((CharactersAvailableToPlayerList.Contains(chosenItem) || PlacedCharactersList.Contains(chosenItem)) && i < tries);
 
+        if(i< tries)
         CharactersAvailableToPlayerList.Add(chosenItem);
-
+        else
+            chosenItem = null;
         return chosenItem;
     }
     void UnlockNewFurniture( )
@@ -400,7 +428,7 @@ public partial class Main : Node2D
         var unlocksLabelClass = (UnlocksLabel)MyUnlocksLabel;
 
         var furnitureItem = ChooseNewFurnitureToUnlock();
-
+        if(furnitureItem!=null)
         unlocksLabelClass.NewUnlock($"{furnitureItem.type}");
     }
 
@@ -409,19 +437,24 @@ public partial class Main : Node2D
         var unlocksLabelClass = (UnlocksLabel)MyUnlocksLabel;
 
         var furnitureItem = ChooseNewCharacterToUnlock();
-
-        unlocksLabelClass.NewUnlock($"{furnitureItem.type}");
+        if (furnitureItem != null)
+            unlocksLabelClass.NewUnlock($"{furnitureItem.type}");
     }
     void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
     {
 
         if (HeldObject == null) return;
-   
+
+     
 
 
+            placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates* MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
+        placeItemImage.Texture = HeldObject.texture;
+        if(OverPlaceableTile)
+            ChangeColor(placeItemImage, ColorPlace);
+        else
+            ChangeColor(placeItemImage, ColorCantBePlaced);
 
-            placeItemImage.GlobalPosition = GetGlobalMousePosition();
-            placeItemImage.Texture = HeldObject.texture;
             var cost = HeldObject.price;
         if ((KeyPressed("RightClick") && Money >= cost) || placeManually)
             {
@@ -445,7 +478,7 @@ public partial class Main : Node2D
             else
             {
                 UnlockNewFurniture();
-                newObject.GlobalPosition = GetGlobalMousePosition();
+                newObject.GlobalPosition = placeItemImage.GlobalPosition;
               
                     Money -= cost;
             }
@@ -468,10 +501,10 @@ public partial class Main : Node2D
     void PlaceCharacter(ref Character heldCharacter, ref Object heldObject, bool placeManually, Vector2 position)
     {
         if (heldCharacter == null) return;
-        
+
 
             placeItemImage.GlobalPosition = GetGlobalMousePosition();
-            placeItemImage.Texture = heldCharacter.texture;
+        placeItemImage.Texture = heldCharacter.texture;
 
             if (KeyPressed("RightClick") || placeManually)
             {
@@ -519,13 +552,18 @@ public partial class Main : Node2D
         {
             Money += 100;
         }
+        if (KeyPressed("UnlockObject") && UnlockCheat)
+        {
+            UnlockNewFurniture();
+        }
+        
     }
 
-    void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref Dictionary<Effect, int> flatEffects)
+    void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref List<FurnitureGroup> furnitureGroups)
     {
      
         usedEffects.Clear();
-        flatEffects.Clear();
+        furnitureGroups.Clear();
         usePosition.X = 0;
         usePosition.Y = 0; 
     }

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Data.SqlTypes;
 using static Asriela.BasicFunctions;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -63,6 +64,8 @@ public partial class CreationButtons : Button
 
                     newButton.Text = $"{item.type}  ${item.price}";
                     newButton.Icon = item.texture;
+                    if(Main.Money< item.price)
+                    ChangeColorUI(newButton, ColorRed);
                     var buttonClass = (ItemToSelect)newButton;
                     buttonClass.MyObject = item;
 

@@ -21,6 +21,10 @@ public partial class Furniture : StaticBody2D
     private int _tileId = 0; // The ID of the tile you want to place. Change this to the ID of your desired tile.
     private TileMap _tileMap;
 
+    Vector2I myTopLeftTile;
+    Vector2I myBottomRightTile;
+    Vector2I myCenterTile;
+
     #region BASIC OBJECT
     public Sprite2D mySprite;
 
@@ -33,14 +37,15 @@ public partial class Furniture : StaticBody2D
         Vector2 bottomRight = shapeRect.Position + shapeRect.Size + GlobalPosition;
 
         // Convert these coordinates to tile coordinates.
-        Vector2I topLeftTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(topLeft));
-        Vector2I bottomRightTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(bottomRight));
-
-        // Loop through the tile coordinates and set the tile.
-        for (int x = topLeftTile.X; x <= bottomRightTile.X; x++)
+        myCenterTile= Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(GlobalPosition));
+        myTopLeftTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(topLeft));
+        myBottomRightTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(bottomRight));
+        // Loop through t =he tile coordinates and set the tile.
+        for (int x = myTopLeftTile.X; x <= myBottomRightTile.X; x++)
         {
-            for (int y = topLeftTile.Y; y <= bottomRightTile.Y; y++)
+            for (int y = myTopLeftTile.Y; y <= myBottomRightTile.Y; y++)
             {
+
                 Main.MyTileMap.SetCell(0, new Vector2I(x, y), flatIAmIn, new Vector2I(1, 0) );
             }
         }
@@ -91,8 +96,28 @@ public partial class Furniture : StaticBody2D
 
         }
 
+        ShowFurnitureGroupArea();
+  
 
+    }
 
+    public void ShowFurnitureGroupArea()
+    {
+        if (Main.HeldObject == null || objectData.isGroupLeader == FurnitureGroup.none) return;
+           if( !Main.HeldObject.furnitureGroups.Contains(objectData.isGroupLeader) ) return;
+        var halfWidth = 8;
+        var halfHeight = 8;
+        var topLeftTile = new Vector2I(myCenterTile.X-halfWidth, myCenterTile.Y-halfHeight);
+        var bottomRightTile = new Vector2I(myCenterTile.X + halfWidth, myCenterTile.Y + halfHeight);
+        // Loop through the tile coordinates and set the tile.
+        for (int x = topLeftTile.X; x <= bottomRightTile.X; x++)
+        {
+            for (int y = topLeftTile.Y; y <= bottomRightTile.Y; y++)
+            {
+                if(Main.MyTileMap.GetCellSourceId(0, new Vector2I(x,y))== flatIAmIn)
+                Main.MyTileMap.SetCell(1, new Vector2I(x, y), 5, new Vector2I(0, 0) );
+            }
+        }
     }
     public void ChangeDimensions(int size)
     {

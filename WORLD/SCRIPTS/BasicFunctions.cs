@@ -107,6 +107,17 @@ namespace Asriela
             roarRock
         }
 
+        public enum FurnitureGroup : short
+        {
+            none,
+            couch,
+            chair,
+            stove,
+            bed,
+            guitar
+
+        }
+
         public enum CharacterType : short
         {
             granny,
@@ -125,7 +136,9 @@ namespace Asriela
             academic,
             music,
             food,
-            hygiene
+            hygiene,
+            painting,
+            safety
 
 
 
@@ -1072,6 +1085,22 @@ namespace Asriela
             {
                 // If moving left, set scale.x to negative value
                 animator.FlipH = false;
+            }
+
+        }
+
+        public static void FlipSprite(Sprite2D animator, Vector2 velocity)
+        {
+
+            if (velocity.X != 0)
+            {
+                // If moving right, set scale.x to positive value
+                animator.FlipH = false;
+            }
+            if (velocity.X < 0)
+            {
+                // If moving left, set scale.x to negative value
+                animator.FlipH = true;
             }
 
         }

@@ -17,9 +17,9 @@ public partial class ItemToSelect : Button
         {
 
             
-
+            if(Main.Money>= MyObject.price)
             Main.HeldObject = MyObject;
-
+         
         }
         else
         if (MyCharacter != null)

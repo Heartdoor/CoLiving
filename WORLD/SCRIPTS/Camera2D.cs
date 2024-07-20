@@ -8,9 +8,14 @@ public partial class Camera2D : Godot.Camera2D
     
     void Run()
     {
-        if (KeyHeld("CamZoom"))
+        if (KeyPressed("ScrollUp"))
         {
             Zoom = new Vector2 (Zoom.X+0.1f, Zoom.Y+0.1f);
+        }
+
+        if (KeyPressed("ScrollDown"))
+        {
+            Zoom = new Vector2(Zoom.X - 0.1f, Zoom.Y - 0.1f);
         }
     }
 

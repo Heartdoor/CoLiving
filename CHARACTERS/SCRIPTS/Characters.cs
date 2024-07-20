@@ -125,6 +125,7 @@ public partial class Characters : CharacterBody2D
     void Run()
     {
         ZIndex = (int)GlobalPosition.Y;
+        FlipSprite(mySprite,Velocity);
         alarm.Run();
         if (wander)
             Wander(); 
