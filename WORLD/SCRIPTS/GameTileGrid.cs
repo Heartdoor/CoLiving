@@ -39,7 +39,15 @@ public partial class GameTileGrid : Godot.TileMap
     void GetTileAtlasPositionWeAreOver()
     {
         Main.FlatNumberMouseIsIn = GetCellSourceId(0,cellCoordinates);
-        Main.OverPlaceableTile = GetCellSourceId(1, cellCoordinates) == 5 ? true : false;
+        Main.OverPlaceableTile = false;
+
+        for (var i = 1; i < 9; i++) 
+        {
+            if(!Main.OverPlaceableTile)
+            Main.OverPlaceableTile = GetCellSourceId(i, cellCoordinates) == 5 ? true : false;
+            if (GetCellSourceId(i, cellCoordinates) == 5 ? true : false)
+            Main.OverLeaderFurnitureLayer = i;  
+        }
 
     }
     void GetMousePositions()
@@ -53,6 +61,24 @@ public partial class GameTileGrid : Godot.TileMap
         cellCoordinates = LocalToMap(localMousePosition);
     }
 
+
+
+    public void FillFlatWithPlaceableArea()
+    {
+        Main.MyTileMap.ClearLayer(1);
+        var topLeftTile = new Vector2I(0, 0);
+        var size = GetUsedRect().Size;
+        var bottomRightTile = new Vector2I(size.X, size.Y);
+        // Loop through the tile coordinates and set the tile.
+        for (int x = topLeftTile.X; x <= bottomRightTile.X; x++)
+        {
+            for (int y = topLeftTile.Y; y <= bottomRightTile.Y; y++)
+            {
+                if (Main.MyTileMap.GetCellSourceId(0, new Vector2I(x, y)) == Main.FlatNumberMouseIsIn)
+                    Main.MyTileMap.SetCell(1, new Vector2I(x, y), 5, new Vector2I(0, 0));
+            }
+        }
+    }
     #region OLD
     public override void _Ready()
     {

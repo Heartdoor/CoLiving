@@ -104,8 +104,18 @@ namespace Asriela
             recordPlayer,
             electricGuitar,
             stove,
+            fridge,
+            counterTop,
+            rockingChair,
+            rug,
+            tv,
+            sideCountertop,
+            yarnBasket,
+            stonePainting,
             roarRock
         }
+
+
 
         public enum FurnitureGroup : short
         {
@@ -114,7 +124,10 @@ namespace Asriela
             chair,
             stove,
             bed,
-            guitar
+            guitar,
+            painting
+     
+
 
         }
 
@@ -126,23 +139,37 @@ namespace Asriela
         }
         public enum Effect : short
         {
-            entertainment,
-            noise,
+            food,
+            sleep,
+            hygiene,
+            social,
+            safety,
             comfort,
+            romance,
+            noise,
+            music,
+            painting,
+            entertainment,
             grunge,
-            messy,
             cozy,
             vintage,
             academic,
-            music,
-            food,
-            hygiene,
-            painting,
-            safety
+            hunting
+
+
+
 
 
 
         }
+
+        public enum DesireAction : short
+        {
+            none,
+            hug,
+            talk
+        }
+
         public enum Direction : short
         {
             up,

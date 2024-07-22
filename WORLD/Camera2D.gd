@@ -5,11 +5,15 @@ const MIN_ZOOM: float = 0.1
 const MAX_ZOOM: float = 2
 const ZOOM_RATE: float = 8.0
 const ZOOM_INCREMENT: float = 0.1
-
+var CAN_PAN: bool = false
 var _target_zoom: float = 1.0
 
+func _ready():
+	var alarm_timer = $Timer
+	alarm_timer.start(1)
+	
 
-
+	
 # Constants
 const PAN_SPEED: float = 300  # Speed at which the camera pans
 const PAN_SMOOTHING: float = 0.8  # Smoothing factor for panning
@@ -19,30 +23,31 @@ const MOUSE_MARGIN: float = 20.0
 var target_position: Vector2
 
 func _process(delta):
-	var viewport_size = get_viewport_rect().size
-	var mouse_pos = get_viewport().get_mouse_position()
+	if CAN_PAN:
+		var viewport_size = get_viewport_rect().size
+		var mouse_pos = get_viewport().get_mouse_position()
 
 
-	mouse_pos.x = clamp(mouse_pos.x, 0, viewport_size.x)
-	mouse_pos.y = clamp(mouse_pos.y, 0, viewport_size.y)
+		mouse_pos.x = clamp(mouse_pos.x, 0, viewport_size.x)
+		mouse_pos.y = clamp(mouse_pos.y, 0, viewport_size.y)
 
-	var motion = Vector2()
-	
-	# Check if the mouse is near the edges of the viewport
-	if mouse_pos.x < EDGE_PAN_THRESHOLD:
-		motion.x = -1
-	elif mouse_pos.x > viewport_size.x - EDGE_PAN_THRESHOLD:
-		motion.x = 1
+		var motion = Vector2()
+		
+		# Check if the mouse is near the edges of the viewport
+		if mouse_pos.x < EDGE_PAN_THRESHOLD:
+			motion.x = -1
+		elif mouse_pos.x > viewport_size.x - EDGE_PAN_THRESHOLD:
+			motion.x = 1
 
-	if mouse_pos.y < EDGE_PAN_THRESHOLD:
-		motion.y = -1
-	elif mouse_pos.y > viewport_size.y - EDGE_PAN_THRESHOLD:
-		motion.y = 1
+		if mouse_pos.y < EDGE_PAN_THRESHOLD:
+			motion.y = -1
+		elif mouse_pos.y > viewport_size.y - EDGE_PAN_THRESHOLD:
+			motion.y = 1
 
-	# Update the target position
-	target_position += motion * PAN_SPEED * delta
-	# Smoothly move the camera to the target position
-	position = position.lerp(target_position, PAN_SMOOTHING)
+		# Update the target position
+		target_position += motion * PAN_SPEED * delta
+		# Smoothly move the camera to the target position
+		position = position.lerp(target_position, PAN_SMOOTHING)
 	
 func _physics_process(delta: float) -> void:
 	zoom = lerp(zoom, _target_zoom * Vector2.ONE, ZOOM_RATE * delta)
@@ -73,5 +78,10 @@ func zoom_out() -> void:
 
 
 
+
 			
 
+
+
+func _on_timer_timeout() -> void:
+	CAN_PAN = true

@@ -14,6 +14,10 @@ public partial class Furniture : StaticBody2D
     public Node2D myUseLocation2;
     public List<CharacterBody2D> occupants = new List<CharacterBody2D>();
     public int flatIAmIn = 0;
+    public List<Furniture> myConnectedFurniture = new List<Furniture>();
+    public int myLayer;
+    public Furniture myLeader=null;
+    public bool isALeader = false;
 
     [Export]
     public NodePath TileMapPath; // The path to the TileMap node in the scene.
@@ -27,7 +31,7 @@ public partial class Furniture : StaticBody2D
 
     #region BASIC OBJECT
     public Sprite2D mySprite;
-
+    public Label myLabel;
     #endregion
 
     private void PlaceTilesToCoverShape(Rect2 shapeRect)
@@ -68,7 +72,8 @@ public partial class Furniture : StaticBody2D
     void SetupObject()
     {
         mySprite = GetNode<Sprite2D>("Sprite2D");
-        myUseLocation1= GetNode<Node2D>("UseLocation1");
+        myLabel = GetNode<Label>("Label");
+        myUseLocation1 = GetNode<Node2D>("UseLocation1");
         myUseLocation2 = GetNode<Node2D>("UseLocation2");
         Area2D areaParent= GetNode<Area2D>("Area2D");
         myArea = areaParent.GetNode<CollisionShape2D>("AreaShape");
@@ -97,8 +102,11 @@ public partial class Furniture : StaticBody2D
         }
 
         ShowFurnitureGroupArea();
-  
 
+        if (myLeader != null)
+        {
+            myLabel.Text = $"{ myLeader.objectData.type}";
+        }
     }
 
     public void ShowFurnitureGroupArea()
@@ -115,7 +123,7 @@ public partial class Furniture : StaticBody2D
             for (int y = topLeftTile.Y; y <= bottomRightTile.Y; y++)
             {
                 if(Main.MyTileMap.GetCellSourceId(0, new Vector2I(x,y))== flatIAmIn)
-                Main.MyTileMap.SetCell(1, new Vector2I(x, y), 5, new Vector2I(0, 0) );
+                Main.MyTileMap.SetCell(myLayer, new Vector2I(x, y), 5, new Vector2I(0, 0) );
             }
         }
     }

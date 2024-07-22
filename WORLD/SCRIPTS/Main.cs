@@ -19,9 +19,12 @@ public partial class Main : Node2D
     public static Character HeldCharacter= null;
     public static Dictionary<int,List<Node2D>> objectsInFlat = new Dictionary<int, List<Node2D>>(); 
     public static int FlatNumberMouseIsIn = 1;
+    int lastFlatWeWereIn = 1;
     public static List<Character> CharactersAvailableToPlayerList = new List<Character> ();
     public static List<Character> PlacedCharactersList = new List<Character>();
-    
+    public static List<Furniture> leaderFurnitureList = new List<Furniture>();
+    public static int OverLeaderFurnitureLayer=0;
+
     Sprite2D placeItemImage;
     public static TileMap MyTileMap;
     public static Label MyUnlocksLabel;
@@ -51,19 +54,20 @@ public partial class Main : Node2D
     public int startingAmountOfUnlockedFurniture;
     public class Object
         {
-            public FurnitureType type;
-            public bool flatWideEffect;
-            public string image_path;
-            public Texture2D texture;
-            public Dictionary<Effect, int> usedEffects;
-            public Vector2 usePosition;
-            public float useLength;
-            public int size;
-            public int price;
-            public Dictionary<Effect, int> flatEffects;
-            public FurnitureGroup isGroupLeader = FurnitureGroup.none;
-            public List<FurnitureGroup> furnitureGroups;
-            public Object(FurnitureType type, FurnitureGroup isGroupLeader, List<FurnitureGroup> furnitureGroups, bool flatWideEffect,  int size,int price, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
+            public FurnitureType type { get; set; }
+            public bool flatWideEffect { get; set; }
+            public string image_path { get; set; }
+            public Texture2D texture { get; set; }
+            public Dictionary<Effect, int> usedEffects { get; set; }
+            public Vector2 usePosition { get; set; }
+            public float useLength { get; set; }
+            public int size { get; set; }
+            public int price { get; set; }
+            public Dictionary<Effect, int> flatEffects { get; set; }
+            public FurnitureGroup isGroupLeader { get; set; }
+            public List<FurnitureGroup> furnitureGroups { get; set; }
+
+        public Object(FurnitureType type, FurnitureGroup isGroupLeader, List<FurnitureGroup> furnitureGroups, bool flatWideEffect,  int size,int price, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
             {
                 this.type = type;
                 this.isGroupLeader = isGroupLeader;
@@ -82,32 +86,53 @@ public partial class Main : Node2D
         }
         }
         public static List<Object> objectsList = new List<Object>();
+
+        public class EffectProperties
+        {
+       
+            public float strength { get; set; }
+            public float needBleedRate { get; set; }
+            public float desireGrowRate { get; set; }
+            public DesireAction action { get; set; }
+
+            public bool syncDesireWithNeed { get; set; }
+
+        public EffectProperties( float strength, float needBleedRate, float desireGrowRate, DesireAction action = DesireAction.none, bool syncDesireWithNeed = false)
+            {
+   
+                this.strength = strength;
+                this.needBleedRate = needBleedRate;
+                this.desireGrowRate = desireGrowRate;
+                this.action = action;
+                this.syncDesireWithNeed = syncDesireWithNeed;
+            }
+        }
         public class Character
         {
-            public CharacterType type;
-            public string image_path;
-            public Texture2D texture;
-            public Dictionary<Effect, int> usedEffects;
-            public Dictionary<Effect, int> flatEffects;
-            public Dictionary<Effect, float> bleedEffects;
-            public Character(CharacterType type,  Dictionary<Effect, int> usedEffects, Dictionary<Effect, float> bleedEffects)
+            public CharacterType type { get; set; }
+            public string image_path { get; set; }
+            public Texture2D texture { get; set; }
+            public Dictionary<Effect,EffectProperties> effectsList { get; set; }
+
+
+        public Character(CharacterType type, Dictionary<Effect, EffectProperties> effectsList)
             {
                 this.type = type;
                 image_path = $"res://CHARACTERS/SPRITES/{type}.png";
                 texture = (Texture2D)GetResource(image_path);
-                this.usedEffects = new Dictionary<Effect, int>(usedEffects);
-                this.bleedEffects = new Dictionary<Effect, float>(bleedEffects); 
+                this.effectsList = new Dictionary<Effect, EffectProperties>(effectsList);
+
             }
         }
         public static List<Character> charactersList = new List<Character>();
         public class Flat
         {
-            public int number;
-            public string image_path;
-            public Color color;
-            public double happiness;
-            public List<Characters> charactersInFlat;
-            public Dictionary<Effect, int> flatWideEffects = new Dictionary<Effect, int>();
+            public int number { get; set; }
+            public string image_path { get; set; }
+            public Color color { get; set; }
+            public double happiness { get; set; }
+            public List<Characters> charactersInFlat { get; set; }
+
 
             public Flat(int number, Color color, List<Characters> charactersInFlat)
             {
@@ -155,7 +180,7 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.comfort, 1);
         #region apply
         objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect,size, price,usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
         #endregion
 
         type = FurnitureType.electricGuitar;
@@ -169,7 +194,7 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.grunge, 2);
         #region apply
         objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect,size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
         #endregion
 
         type = FurnitureType.recordPlayer;
@@ -184,7 +209,7 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.vintage, 3);
         #region apply
         objectsList.Add(new Object(type, isGroupLeader, furnitureGroups,flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
         #endregion
 
         type = FurnitureType.stove;
@@ -198,9 +223,130 @@ public partial class Main : Node2D
         usedEffects.Add(Effect.cozy,2);
         #region apply
         objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect , size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups);
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
         #endregion
 
+        type = FurnitureType.fridge;
+        isGroupLeader = FurnitureGroup.none;
+        flatWideEffect = false;
+        size = 1;
+        price = 200;
+        useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.stove);
+        usedEffects.Add(Effect.food, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+
+        type = FurnitureType.counterTop;
+        isGroupLeader = FurnitureGroup.none;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.stove);
+
+        usedEffects.Add(Effect.food, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.sideCountertop;
+        isGroupLeader = FurnitureGroup.none;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.stove);
+        usedEffects.Add(Effect.food, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.rockingChair;
+        isGroupLeader = FurnitureGroup.chair;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+
+        usedEffects.Add(Effect.comfort, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.rug;
+        isGroupLeader = FurnitureGroup.none;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.chair);
+        furnitureGroups.Add(FurnitureGroup.couch);
+        furnitureGroups.Add(FurnitureGroup.bed);
+        usedEffects.Add(Effect.comfort, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.tv;
+        isGroupLeader = FurnitureGroup.none;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.couch);
+        usedEffects.Add(Effect.comfort, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.yarnBasket;
+        isGroupLeader = FurnitureGroup.none;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+        furnitureGroups.Add(FurnitureGroup.chair);
+        usedEffects.Add(Effect.comfort, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.stonePainting;
+        isGroupLeader = FurnitureGroup.painting;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+
+        usedEffects.Add(Effect.comfort, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
+        type = FurnitureType.roarRock;
+        isGroupLeader = FurnitureGroup.guitar;
+        flatWideEffect = false;
+        size = 1;
+        price = 100;
+        useLength = 10;
+
+        usedEffects.Add(Effect.comfort, 4);
+        usedEffects.Add(Effect.cozy, 2);
+        #region apply
+        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
+        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
+        #endregion
         /* name = "paintEasel";
          usedEffects.Add(Effect.messy, 3);
          #region apply
@@ -222,9 +368,14 @@ public partial class Main : Node2D
     {
         #region setup
         CharacterType type;
-        Dictionary<Effect, float> bleedEffects = new Dictionary<Effect, float>();
-        Dictionary<Effect, int> usedEffects = new Dictionary<Effect, int>();
-        Dictionary<Effect, int> flatEffects = new Dictionary<Effect, int>();
+
+        Dictionary<Effect, EffectProperties> myEffects =new Dictionary<Effect, EffectProperties>();
+
+        void NewEffect(ref Dictionary<Effect, EffectProperties>  myEffects, Effect type, float strength, float needBleedRate, float desireGrowRate, DesireAction action = DesireAction.none, bool syncDesireWithNeed = false)
+        {
+
+            myEffects.Add(type, new EffectProperties(strength, needBleedRate, desireGrowRate, action, syncDesireWithNeed));  
+        }
         #endregion
 
 
@@ -245,54 +396,78 @@ public partial class Main : Node2D
                 ClearCharacterListData(ref seenEffects, ref usedEffects, ref flatEffects);
                 #endregion
         */
+        var sleepyR = 0.001f;
+        var hungryR = 0.01f;
+        var hygieneR = 0.001f;
+        var socialR = 0.0001f;
+        var desireR = 0.0001f;
 
         type = CharacterType.granny;
-        usedEffects.Add(Effect.comfort, 3); 
-        usedEffects.Add(Effect.grunge, -3);
-        usedEffects.Add(Effect.cozy, 5);
-        usedEffects.Add(Effect.music, 2);
-        usedEffects.Add(Effect.vintage, 3);
-        usedEffects.Add(Effect.food, 2); bleedEffects.Add(Effect.food, 0.01f);
-        usedEffects.Add(Effect.noise, -3);
-        usedEffects.Add(Effect.entertainment, 1);
-        usedEffects.Add(Effect.hygiene, 3);
-        usedEffects.Add(Effect.academic, 1);
+        NewEffect(ref myEffects, Effect.food,           2, hungryR, 0);
+        NewEffect(ref myEffects,Effect.sleep,           3, sleepyR, 0);
+        NewEffect(ref myEffects,Effect.hygiene,         3, hygieneR, 0);
+        NewEffect(ref myEffects,Effect.social,           1, socialR, 0);
+        NewEffect(ref myEffects,Effect.safety,           3, 0, 0);
+        NewEffect(ref myEffects,Effect.comfort,         3, 0, 0);
+        NewEffect(ref myEffects,Effect.romance,        0, 0, 0);
+        NewEffect(ref myEffects,Effect.noise,          -3, 0, 0);
+        NewEffect(ref myEffects,Effect.music,           2, 0, 0);
+        NewEffect(ref myEffects,Effect.painting,         0, 0, 0);
+        NewEffect(ref myEffects,Effect.entertainment,    1, 0, 0);
+        NewEffect(ref myEffects,Effect.grunge,         -3, 0, 0);
+        NewEffect(ref myEffects,Effect.cozy,            5, 0, 0);
+        NewEffect(ref myEffects,Effect.vintage,          3, 0, 0);
+        NewEffect(ref myEffects,Effect.academic,        1, 0, 0);
+        NewEffect(ref myEffects,Effect.hunting,          1, 0, 0);
         #region apply
-        var charInfo = new Character(type, usedEffects, bleedEffects);
+        var charInfo = new Character(type, myEffects);
         charactersList.Add(charInfo);
-        ClearCharacterListData(ref usedEffects, ref bleedEffects);
+        ClearCharacterListData(ref myEffects);
         #endregion
 
         type = CharacterType.punkRocker;
-        usedEffects.Add(Effect.comfort, 1);
-        usedEffects.Add(Effect.grunge, 3);
-        usedEffects.Add(Effect.cozy, -5);
-        usedEffects.Add(Effect.music, 3); bleedEffects.Add(Effect.music, 0.01f);
-        usedEffects.Add(Effect.vintage, 3);
-        usedEffects.Add(Effect.food, 1);
-        usedEffects.Add(Effect.noise, 3);
-        usedEffects.Add(Effect.entertainment, 3);
-        usedEffects.Add(Effect.hygiene, 0);
-        usedEffects.Add(Effect.academic, -1);
+        NewEffect(ref myEffects,Effect.food,         0, 0, 0);
+        NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
+        NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
+        NewEffect(ref myEffects,Effect.social,        1, socialR, 0);
+        NewEffect(ref myEffects,Effect.safety,        0, 0, 0);
+        NewEffect(ref myEffects,Effect.comfort,      1, 0, 0);
+        NewEffect(ref myEffects,Effect.romance,     0, 0, 0);
+        NewEffect(ref myEffects,Effect.noise,        3, 0, 0);
+        NewEffect(ref myEffects,Effect.music,        4, 0, 0);
+        NewEffect(ref myEffects,Effect.painting,      0, 0, 0);
+        NewEffect(ref myEffects,Effect.entertainment, 1, 0, 0);
+        NewEffect(ref myEffects,Effect.grunge,       5, 0, 0);
+        NewEffect(ref myEffects,Effect.cozy,        -4, 0, 0);
+        NewEffect(ref myEffects,Effect.vintage,       3, 0, 0);
+        NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
+        NewEffect(ref myEffects,Effect.hunting,       0, 0, 0);
+
         #region apply
-        charactersList.Add(new Character(type, usedEffects, bleedEffects));
-        ClearCharacterListData(ref usedEffects, ref bleedEffects);
+        charactersList.Add(new Character(type, myEffects));
+        ClearCharacterListData(ref myEffects);
         #endregion
 
         type = CharacterType.yeti;
-        usedEffects.Add(Effect.comfort, 2);
-        usedEffects.Add(Effect.grunge, 0);
-        usedEffects.Add(Effect.cozy, 3);
-        usedEffects.Add(Effect.music, 1); 
-        usedEffects.Add(Effect.vintage, 0);
-        usedEffects.Add(Effect.food, 1); bleedEffects.Add(Effect.food, 0.01f);
-        usedEffects.Add(Effect.noise, 3);
-        usedEffects.Add(Effect.entertainment, 0);
-        usedEffects.Add(Effect.hygiene, 0);
-        usedEffects.Add(Effect.academic, 0);
+        NewEffect(ref myEffects,Effect.food,         3, hungryR*2, 0);
+        NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
+        NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
+        NewEffect(ref myEffects,Effect.social,        1, socialR, 0);
+        NewEffect(ref myEffects,Effect.safety,        3, 0, 0);
+        NewEffect(ref myEffects,Effect.comfort,      1, 0, 0);
+        NewEffect(ref myEffects,Effect.romance,     0, 0, 0);
+        NewEffect(ref myEffects,Effect.noise,        4, 0, 0);
+        NewEffect(ref myEffects,Effect.music,        1, 0, 0);
+        NewEffect(ref myEffects,Effect.painting,      2, 0, 0);
+        NewEffect(ref myEffects,Effect.entertainment, 1, 0, 0);
+        NewEffect(ref myEffects,Effect.grunge,       0, 0, 0);
+        NewEffect(ref myEffects,Effect.cozy,         3, 0, desireR, DesireAction.hug, false);
+        NewEffect(ref myEffects,Effect.vintage,       0, 0, 0);
+        NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
+        NewEffect(ref myEffects,Effect.hunting,       2, 0, 0);
         #region apply
-        charactersList.Add(new Character(type, usedEffects, bleedEffects));
-        ClearCharacterListData(ref usedEffects, ref bleedEffects);
+        charactersList.Add(new Character(type, myEffects));
+        ClearCharacterListData(ref myEffects);
         #endregion
 
         ChooseNewCharacterToUnlock();
@@ -370,6 +545,8 @@ public partial class Main : Node2D
             placeItemImage.Texture = null;
 
         UnlockNewCharacters();
+
+
     }
     void UnlockNewCharacters()
     {
@@ -445,10 +622,16 @@ public partial class Main : Node2D
 
         if (HeldObject == null) return;
 
-     
+        if(lastFlatWeWereIn != FlatNumberMouseIsIn && HeldObject.isGroupLeader!=FurnitureGroup.none)
+        {
+            var tilemap = (GameTileGrid)MyTileMap;
+            
+            tilemap.FillFlatWithPlaceableArea();
+            lastFlatWeWereIn = FlatNumberMouseIsIn;
+        }
 
 
-            placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates* MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
+        placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates* MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
         placeItemImage.Texture = HeldObject.texture;
         if(OverPlaceableTile)
             ChangeColor(placeItemImage, ColorPlace);
@@ -456,14 +639,26 @@ public partial class Main : Node2D
             ChangeColor(placeItemImage, ColorCantBePlaced);
 
             var cost = HeldObject.price;
-        if ((KeyPressed("RightClick") && Money >= cost) || placeManually)
+        if ((KeyPressed("RightClick") && Money >= cost && OverPlaceableTile) || placeManually)
             {
+                Main.MyTileMap.ClearLayer(1);
                 var newObject=Add2DNode("res://OBJECTS/SCENES/object.tscn",this);
                 var newObjectClass = (Furniture)newObject;
                 newObjectClass.objectData = HeldObject;
                 newObjectClass.objectData.type = HeldObject.type;
                 newObjectClass.mySprite.Texture = placeItemImage.Texture;
                 newObjectClass.flatIAmIn = FlatNumberMouseIsIn;
+                if(HeldObject.isGroupLeader != FurnitureGroup.none)
+                {
+                    leaderFurnitureList.Add(newObjectClass);
+                    newObjectClass.myLayer = leaderFurnitureList.Count;
+                    newObjectClass.isALeader = true;
+                }
+                else
+                {
+                    newObjectClass.myLeader = leaderFurnitureList[OverLeaderFurnitureLayer-1];
+                }
+                
                 objectsInFlat[FlatNumberMouseIsIn].Add(newObject);
                 newObjectClass.ChangeDimensions(newObjectClass.objectData.size);
                 
@@ -537,6 +732,9 @@ public partial class Main : Node2D
                 }
         
     }   
+
+
+
     public static void HoldNothing()
     {
         HeldObject = null;
@@ -559,20 +757,21 @@ public partial class Main : Node2D
         
     }
 
-    void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref List<FurnitureGroup> furnitureGroups)
+    void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref List<FurnitureGroup> furnitureGroups,  ref FurnitureGroup isGroupLeader)
     {
      
         usedEffects.Clear();
         furnitureGroups.Clear();
         usePosition.X = 0;
-        usePosition.Y = 0; 
+        usePosition.Y = 0;
+        isGroupLeader = FurnitureGroup.none;
     }
 
-    void ClearCharacterListData( ref Dictionary<Effect, int> usedEffects, ref Dictionary<Effect, float> bleedEffects)
+    void ClearCharacterListData( ref Dictionary<Effect, EffectProperties> usedEffects)
     {
        
         usedEffects.Clear();
-        bleedEffects.Clear();
+
     }
 
     void AddNewFlat(int flatNumber, Color color, List<Characters> charactersInFlat )

@@ -86,12 +86,12 @@ public partial class UseItem : Node
                 
         }
     }
-    public Dictionary<Effect, int> CalculateBasePreference(Main.Character tenant, Main.Object furniture, out float sum)
+    public Dictionary<Effect, float> CalculateBasePreference(Main.Character tenant, Main.Object furniture, out float sum)
     {
 
-            Dictionary<Effect, int> effectsBreakdown = new Dictionary<Effect, int>();
+            Dictionary<Effect, float> effectsBreakdown = new Dictionary<Effect, float>();
             var objE = furniture.usedEffects;
-            var charE = tenant.usedEffects;
+            var charE = tenant.effectsList;
             Log($"CALCULATING {furniture.type}", LogType.step);
             // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
 
@@ -104,7 +104,7 @@ public partial class UseItem : Node
 
             var products = intersectedKeys.Select(key =>
             {
-                var product = objE[key] * charE[key];
+                var product = objE[key] * charE[key].strength;
                 effectsBreakdown.Add(key, product);
                 //Log(, LogType.step);
                 Log($"Key: {key}, objE[{key}] = {objE[key]}, charE[{key}] = {charE[key]}, Product: {product}", LogType.step);
@@ -124,7 +124,7 @@ public partial class UseItem : Node
         if (Main.TestGameMode != Main.testGameMode.zooTycoon) return;
         myCharacter.happiness = myCharacter.basePrefOfObjects.Values.Sum();
     }
-    public void GetMoneyEffected(float effectValue, Dictionary<Effect,int> effectBreakdown)
+    public void GetMoneyEffected(float effectValue, Dictionary<Effect, float> effectBreakdown)
     {
         if (Main.TestGameMode != Main.testGameMode.flowingMoney) return;
         Main.Money += effectValue;
@@ -141,7 +141,7 @@ public partial class UseItem : Node
 
 
         int index=0;
-        foreach (KeyValuePair<Effect,int> effect in effectBreakdown)
+        foreach (KeyValuePair<Effect, float> effect in effectBreakdown)
         {
             var effectLabel = (EffectLabel)AddUINode("res://UI/SCENES/effects_label.tscn", myCharacter);
             effectLabel.GlobalPosition = ChangePosition(effectLabel.GlobalPosition, 0, -100);

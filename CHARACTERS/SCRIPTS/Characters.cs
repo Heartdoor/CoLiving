@@ -54,12 +54,15 @@ public partial class Characters : CharacterBody2D
 
     #region EFFECTS
     public float happiness=0; 
-    public Dictionary<Main.Object, int> basePrefOfObjects = new Dictionary<Main.Object, int>();       // agent's item preferences 
+    public Dictionary<Main.Object, float> basePrefOfObjects = new Dictionary<Main.Object, float>();       // agent's item preferences 
     public Dictionary<Main.Object, float> heatOfObjects = new Dictionary<Main.Object, float>();           // current "heat" of items 
     Queue<Main.Object> objectQueue = new Queue<Main.Object>();
     int maxQueueLength=20;
     public int lastMoneyEffect =0;
     public Dictionary<Effect, float> bleedList = new Dictionary<Effect, float>();
+    /// <summary>
+    /// 
+    /// </summary>
     public string bleedText="";
     #endregion
 
@@ -110,8 +113,12 @@ public partial class Characters : CharacterBody2D
 
     public void SetupBleedList()
     {
-        foreach (KeyValuePair<Effect, float> effect in characterData.bleedEffects)
-            bleedList.Add(effect.Key, 0);
+        foreach (KeyValuePair<Effect, Main.EffectProperties> effect in characterData.effectsList)
+        {
+            if(effect.Value.needBleedRate>0)
+                bleedList.Add(effect.Key, 0);
+        }
+            
     }
     void Start()
     {
@@ -155,7 +162,7 @@ public partial class Characters : CharacterBody2D
         bleedText = "";
         foreach (KeyValuePair<Effect, float> effect in bleedList)
         {
-            bleedList[effect.Key] -= characterData.bleedEffects[effect.Key]/1000;
+            bleedList[effect.Key] -= characterData.effectsList[effect.Key].needBleedRate/1000;
             if (bleedList[effect.Key] < 0)
             {
                 if (Main.TestGameMode == Main.testGameMode.flowingMoney)
@@ -218,24 +225,26 @@ public partial class Characters : CharacterBody2D
 
         foreach (var item in Main.objectsInFlat[myFlatNumber])
         {
-            var objectItem = ((Furniture)item).objectData;
-            if (basePrefOfObjects.ContainsKey(objectItem) == false)
+            var furnitureItem = (Furniture)item;
+            var objectItem = (furnitureItem).objectData;
+            
+            if (basePrefOfObjects.ContainsKey(objectItem) == false && furnitureItem.isALeader)
             {
                 var objE = objectItem.usedEffects;
-                var charE = characterData.usedEffects;
+                var charE = characterData.effectsList;
                 Log($"CALCULATING {objectItem.type}", LogType.step);
                 // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
 
                 //basePrefOfObjects.Add(objectItem, objE.Keys.Intersect(charE.Keys).Select(key => objE[key] * charE[key]).Sum());
                 // Assuming objE and charE are dictionaries
-                var intersectedKeys = objE.Keys.Intersect(charE.Keys).ToList();
+                var intersectedEffects = charE.Keys.Intersect(objE.Keys).ToList(); 
 
-                Log("Intersected Keys: " + string.Join(", ", intersectedKeys), LogType.step);
+                Log("Intersected Keys: " + string.Join(", ", intersectedEffects), LogType.step);
 
 
-                var products = intersectedKeys.Select(key =>
+                var products = intersectedEffects.Select(key =>
                 {
-                    var product = objE[key] * charE[key];
+                    var product = objE[key] * charE[key].strength;
                     //Log(, LogType.step);
                     Log($"Key: {key}, objE[{key}] = {objE[key]}, charE[{key}] = {charE[key]}, Product: {product}", LogType.step);
                     return product;
