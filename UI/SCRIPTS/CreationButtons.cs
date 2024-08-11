@@ -62,7 +62,7 @@ public partial class CreationButtons : Button
                     Log("added objects", LogType.game);
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
 
-                    newButton.Text = $"{item.type}  ${item.price}";
+                    newButton.Text = $"{item.name}  ${item.price}";
                     newButton.Icon = item.texture;
                     if(Main.Money< item.price)
                     ChangeColorUI(newButton, ColorRed);

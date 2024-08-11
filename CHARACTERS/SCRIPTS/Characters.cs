@@ -15,6 +15,7 @@ public partial class Characters : CharacterBody2D
     NavigationRegion2D navRegion;
     public NavigationAgent2D NavAgent = null;
     public Node2D currentTarget;
+    public Node2D remoteTarget;
     public bool completedJourney;
     public bool hasTarget;
     bool reachedPoint = false;
@@ -23,7 +24,7 @@ public partial class Characters : CharacterBody2D
     Vector2 direction;
     public bool foundRandomPlace = false;
     Vector2 myVelocity;
-    public float interactionDistance = 40;
+    public float interactionDistance = 80;
     public bool performedAction = false;
     int count = 0;
     float restAtPoint = 0;
@@ -45,6 +46,7 @@ public partial class Characters : CharacterBody2D
     #endregion
     #region BASIC OBJECT
     public Sprite2D mySprite;
+    public Sprite2D myShadow;
     public Sprite2D grumpyIcon;
     public Main.Character characterData;
     public UseItem useItemArm;
@@ -69,6 +71,7 @@ public partial class Characters : CharacterBody2D
     #region ACTIONS
     public Furniture busyUsing =null;
     public bool wander = false;
+
     #endregion
 
     #region DATA
@@ -91,7 +94,8 @@ public partial class Characters : CharacterBody2D
     void SetupObject()
     {
         mySprite = GetNode<Sprite2D>("Sprite2D");
-        happinessLabel= GetNode<Label>("HappinessLabel");
+        myShadow = GetNode<Sprite2D>("Shadow");
+        happinessLabel = GetNode<Label>("HappinessLabel");
 
         bleedLabel= GetNode<Label>("BleedLabel");
         grumpyIcon = GetNode<Sprite2D>("Grumpy");
@@ -180,9 +184,11 @@ public partial class Characters : CharacterBody2D
     }
     public void ManageIconsCharacterUI()
     {
-        
-        happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";
-        if(alarm.Ended(TimerType.grumpy))
+
+        // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
+        if (currentTarget != null)
+            happinessLabel.Text = $"{((Furniture)remoteTarget).objectData.name}";
+        if (alarm.Ended(TimerType.grumpy))
             grumpyIcon.Visible = false;
     }
     public void Wander()
@@ -219,20 +225,20 @@ public partial class Characters : CharacterBody2D
     }
 
 
-    FurnitureType ChooseObjectFromList()
+    Main.Object ChooseObjectFromList()
     {
         var noObjectsFound = false;
 
-        foreach (var item in Main.objectsInFlat[myFlatNumber])
+        foreach (var item in Main.flatsList[myFlatNumber].objects)
         {
             var furnitureItem = (Furniture)item;
-            var objectItem = (furnitureItem).objectData;
-            
-            if (basePrefOfObjects.ContainsKey(objectItem) == false && furnitureItem.isALeader)
+            var objectItem = furnitureItem.objectData;
+            //not already in list add new base preference 
+            if (basePrefOfObjects.ContainsKey(objectItem) == false && (objectItem.type == FurnitureType._core || objectItem.type == FurnitureType._object))
             {
                 var objE = objectItem.usedEffects;
                 var charE = characterData.effectsList;
-                Log($"CALCULATING {objectItem.type}", LogType.step);
+                Log($"CALCULATING {objectItem.name}", LogType.step);
                 // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
 
                 //basePrefOfObjects.Add(objectItem, objE.Keys.Intersect(charE.Keys).Select(key => objE[key] * charE[key]).Sum());
@@ -292,38 +298,53 @@ public partial class Characters : CharacterBody2D
 
 
         //  Log($"{basePrefOfObjects[item]}", LogType.game);  
-        FurnitureType mostWantedObjectName = FurnitureType.none;
+        Main.Object mostValuedObject=null;
         if (noObjectsFound == false)
         {
 
 
-            Main.Object mostValuedObject;
+            
             objectQueue.TryPeek(out mostValuedObject);
 
 
             //var mostValuedObject = myListOfObjects.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
 
-            Log($"CHOSE {mostValuedObject.type}", LogType.game);
-            mostWantedObjectName = mostValuedObject.type;
+            Log($"CHOSE {mostValuedObject.name}", LogType.game);
+       
         }
 
-        return mostWantedObjectName;
+        return mostValuedObject;
     }
 
     void FindTarget()
     {
 
-        var objectType = ChooseObjectFromList();
-        if (objectType == FurnitureType.none)
-            currentTarget = null;
-        else
-            currentTarget = FindNearest(this, this.GetTree(), null, "Object", objectType, myFlatNumber);
+        var highestValuedObject = ChooseObjectFromList();
 
-        if (currentTarget == null)
+        if (highestValuedObject== null)
         {
             alarm.Start(TimerType.wander, 5, false, 0);
             wander = true;
+            currentTarget = null;
         }
+        else
+        {
+           
+            if (highestValuedObject.useFromGroup== FurnitureGroup.chair)
+            {
+                remoteTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
+                currentTarget = FindNearestOfGroupType(remoteTarget, this.GetTree(), null, "Object", highestValuedObject.useFromGroup, myFlatNumber);
+                
+            }
+            else
+            {
+                remoteTarget = null;
+                currentTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
+            }
+                
+        }
+            
+
 
         // UpdatePath(currentTarget.GlobalPosition);
 
@@ -341,8 +362,12 @@ public partial class Characters : CharacterBody2D
 
     public void ReachTarget()
     {
+        if(remoteTarget!=null )
+        usingTarget = remoteTarget;
+        else
         usingTarget = currentTarget;
-        var furnitureObject = (Furniture)currentTarget;
+
+        var furnitureObject = (Furniture)usingTarget;
         alarm.Start(TimerType.actionLength, furnitureObject.objectData.useLength, false, 0);
         Log("Reached target", LogType.step);
     }

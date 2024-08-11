@@ -39,6 +39,10 @@ namespace Asriela
         {
             return binary == 0 ? false : true;
         }
+        public static bool Toggle(int binary)
+        {
+            return binary == 0 ? false : true;
+        }
         #endregion
         #region LOG
         public enum LogType : short
@@ -97,7 +101,7 @@ namespace Asriela
         #endregion
 
         #region ENUMS
-        public enum FurnitureType : short
+        public enum FurnitureName : short
         {
             none,
             couch,
@@ -129,6 +133,22 @@ namespace Asriela
      
 
 
+        }
+
+        public enum FurnitureType : short
+        {
+           _core,
+           _object,
+           _decor
+        }
+
+        public enum RoomType :short
+        {
+            none,
+            kitchen,
+            bathroom,
+            livingroom,
+            bedroom
         }
 
         public enum CharacterType : short
@@ -193,6 +213,11 @@ namespace Asriela
                 Effect.comfort => "🛋",
                 Effect.food => "🍽",
                 Effect.cozy => "🌸",
+                Effect.entertainment => "🎭",
+                Effect.hygiene => "💧",
+                Effect.romance => "💋",
+                Effect.safety => "🔑",
+                Effect.academic => "📕",
                 _ => ""
             };
         }
@@ -374,7 +399,7 @@ namespace Asriela
             ret = nearestDistance;
             return ret;
         }
-        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureType objectType, int flatNumber)
+        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureName objectName, int flatNumber)
         {
             var allObjects = GetAllObjects(tree, groupName);
             List<Node2D> objectsWithMatchingTags = new List<Node2D>();
@@ -389,7 +414,7 @@ namespace Asriela
                 {
                     Furniture objectClass = (Furniture)obj;
 
-                    if(objectType == objectClass.objectData.type && objectClass.flatIAmIn == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if(objectName == objectClass.objectData.name && objectClass.flatIAmIn == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -407,70 +432,102 @@ namespace Asriela
             return nearestObject;
         }
 
+        public static Node2D FindNearestOfGroupType(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureGroup objectGroup, int flatNumber)
+        {
+            var allObjects = GetAllObjects(tree, groupName);
+            List<Node2D> objectsWithMatchingTags = new List<Node2D>();
 
-          /* public static Node2D FindNearestWithTags(Node2D subject, SceneTree tree, List<Tag> objectTypeTags, Node2D mayNotBe, string groupName, Vector2 pointToMeasureFrom, float maxDistance, ref float theDistanceToTarget)
-              {
-                  Log($"Starting search for nearest with tags", LogType.nearest);
-                  var allObjects = GetAllObjects(tree, groupName);
-                  List<Node2D> objectsWithMatchingTags = new List<Node2D>();
-                  Log($"found {allObjects.Count} objects from group {groupName}", LogType.nearest);
-                  Log($"amount of objects to ch {allObjects.Count}...", LogType.nearest);
+            float nearestDistance = 99999999999999;
+            Node2D nearestObject = null;
+
+            foreach (Node2D obj in allObjects)
+            {
+
+                if (subject != obj && (mayNotBe != obj))
+                {
+                    Furniture objectClass = (Furniture)obj;
+
+                    if (objectGroup == objectClass.objectData.group && objectClass.flatIAmIn == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    {
+                        float distance = MeasureDistance(subject, obj);
+                        if (distance < nearestDistance)
+                        {
+                            nearestDistance = distance;
+                            nearestObject = obj;
+
+                        }
+                    }
+
+                }
+            }
+
+            // Log($"   {nearestObject.Name} was the closest  ", LogType.nearest);
+            return nearestObject;
+        }
+
+        /* public static Node2D FindNearestWithTags(Node2D subject, SceneTree tree, List<Tag> objectTypeTags, Node2D mayNotBe, string groupName, Vector2 pointToMeasureFrom, float maxDistance, ref float theDistanceToTarget)
+            {
+                Log($"Starting search for nearest with tags", LogType.nearest);
+                var allObjects = GetAllObjects(tree, groupName);
+                List<Node2D> objectsWithMatchingTags = new List<Node2D>();
+                Log($"found {allObjects.Count} objects from group {groupName}", LogType.nearest);
+                Log($"amount of objects to ch {allObjects.Count}...", LogType.nearest);
 
 
 
 
-                  string targName;
+                string targName;
 
-                  for (int i = 0; i < allObjects.Count; i++) {
-                      //Log($"Checking tags of ...", LogType.nearest);
+                for (int i = 0; i < allObjects.Count; i++) {
+                    //Log($"Checking tags of ...", LogType.nearest);
 
-                      var obj = (Node2D)allObjects[i];
-                      targName = ((Entity)obj).name;
+                    var obj = (Node2D)allObjects[i];
+                    targName = ((Entity)obj).name;
 
-                      if (subject != obj && ( mayNotBe!=obj) )
-                      {//&& con.alreadyTargetedBy==null
-
-
-
-                          if (CheckIfObjectMatchesAllTags(obj, objectTypeTags))
-                          {
-                              Log($"🏆{targName} matched all tags", LogType.nearest);
-                              objectsWithMatchingTags.Add(obj);
-                          }
-                          else
-                          {
-                              Log($"{targName} didnt match all the tags", LogType.nearest);
-
-                          }
+                    if (subject != obj && ( mayNotBe!=obj) )
+                    {//&& con.alreadyTargetedBy==null
 
 
 
-                      }
-                  }
-                  if(objectsWithMatchingTags.Count==0)
-                      Log($"  found no matches", LogType.nearest);
-                  float nearestDistance = 99999999999999;
-                  Node2D nearestObject = null;
-                  if (objectsWithMatchingTags.Count > 0)
-                  {
-                      foreach (Node2D obj in objectsWithMatchingTags)
-                      {
+                        if (CheckIfObjectMatchesAllTags(obj, objectTypeTags))
+                        {
+                            Log($"🏆{targName} matched all tags", LogType.nearest);
+                            objectsWithMatchingTags.Add(obj);
+                        }
+                        else
+                        {
+                            Log($"{targName} didnt match all the tags", LogType.nearest);
 
-                          float distance = MeasureDistance(subject, obj);
-                          if (distance < nearestDistance)
-                          {
-                              nearestDistance = distance;
-                              nearestObject = obj;
+                        }
 
-                          }
-                      }
-                  }
-                  else
-                      nearestObject = null;
-                  Log($" was the closest  ", LogType.nearest);
-                  return nearestObject;
-              }  
-          */
+
+
+                    }
+                }
+                if(objectsWithMatchingTags.Count==0)
+                    Log($"  found no matches", LogType.nearest);
+                float nearestDistance = 99999999999999;
+                Node2D nearestObject = null;
+                if (objectsWithMatchingTags.Count > 0)
+                {
+                    foreach (Node2D obj in objectsWithMatchingTags)
+                    {
+
+                        float distance = MeasureDistance(subject, obj);
+                        if (distance < nearestDistance)
+                        {
+                            nearestDistance = distance;
+                            nearestObject = obj;
+
+                        }
+                    }
+                }
+                else
+                    nearestObject = null;
+                Log($" was the closest  ", LogType.nearest);
+                return nearestObject;
+            }  
+        */
         public static float MeasureDistance(Node2D subjectNode, Node2D objNode)
         {
             if (subjectNode != null && objNode != null)
@@ -1257,6 +1314,8 @@ namespace Asriela
         public static readonly Color ColorYellow = new Color(0xFFCC4Cff);
         public static readonly Color ColorPurple = new Color(0xCC4CFFff);
         public static readonly Color ColorGrey = new Color(0xCCd3d3d3);
+        public static readonly Color ColorTransparent = new Color(0xFFFFFF00);
+        
 
         public static void ChangeColor(Sprite2D sprite, Color newColor)
         {

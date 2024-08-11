@@ -5,6 +5,7 @@ using System.Data.SqlTypes;
 using System.Linq;
 using System.Xml.Linq;
 using static Asriela.BasicFunctions;
+using static Main;
 
 public partial class Main : Node2D
 {
@@ -17,8 +18,10 @@ public partial class Main : Node2D
     public static float Money=200f;
     public static Object HeldObject=null;
     public static Character HeldCharacter= null;
-    public static Dictionary<int,List<Node2D>> objectsInFlat = new Dictionary<int, List<Node2D>>(); 
+
+
     public static int FlatNumberMouseIsIn = 1;
+    public static int RoomNumberMouseIsIn = 1;
     int lastFlatWeWereIn = 1;
     public static List<Character> CharactersAvailableToPlayerList = new List<Character> ();
     public static List<Character> PlacedCharactersList = new List<Character>();
@@ -54,35 +57,43 @@ public partial class Main : Node2D
     public int startingAmountOfUnlockedFurniture;
     public class Object
         {
-            public FurnitureType type { get; set; }
+            public FurnitureName name { get; set; }
             public bool flatWideEffect { get; set; }
             public string image_path { get; set; }
             public Texture2D texture { get; set; }
+            public Texture2D shadowTexture { get; set; }
             public Dictionary<Effect, int> usedEffects { get; set; }
             public Vector2 usePosition { get; set; }
             public float useLength { get; set; }
             public int size { get; set; }
             public int price { get; set; }
-            public Dictionary<Effect, int> flatEffects { get; set; }
-            public FurnitureGroup isGroupLeader { get; set; }
-            public List<FurnitureGroup> furnitureGroups { get; set; }
 
-        public Object(FurnitureType type, FurnitureGroup isGroupLeader, List<FurnitureGroup> furnitureGroups, bool flatWideEffect,  int size,int price, Dictionary<Effect, int> usedEffects, Vector2 usePosition, float useLength,Dictionary<Effect, int> flatEffects)
+            public FurnitureType type { get; set; }
+            public List<RoomType> roomTypes { get; set; }
+        
+            public bool floorObject { get; set; }
+            public FurnitureGroup group { get; set; }
+
+            public FurnitureGroup useFromGroup { get; set; }
+
+        public Object(FurnitureName name,  bool flatWideEffect = false,  int size=1,int price=0,  float useLength = 10f) 
             {
-                this.type = type;
-                this.isGroupLeader = isGroupLeader;
-                this.furnitureGroups = new List<FurnitureGroup>(furnitureGroups);
+                this.name = name;
+                this.type = FurnitureType._decor;
+                this.roomTypes = new List<RoomType>();
                 this.flatWideEffect = flatWideEffect;
-                image_path = $"res://OBJECTS/SPRITES/{type}.png";
+                image_path = $"res://OBJECTS/SPRITES/{name}.png";
                 texture = (Texture2D)GetResource(image_path);
-                
-                
+                shadowTexture = (Texture2D)GetResource($"res://OBJECTS/SPRITES/{name}_s.png");
+                useFromGroup = FurnitureGroup.none;
+                group = FurnitureGroup.none;
                 this.size = size;
                 this.price = price;
-                this.usePosition = usePosition;
+                this.usePosition =   new Vector2(0, 0);
                 this.useLength = useLength;
-                this.usedEffects = new Dictionary<Effect, int>(usedEffects);
-                this.flatEffects = new Dictionary<Effect, int>(flatEffects);
+                this.usedEffects = new Dictionary<Effect, int>();
+                this.floorObject = false;
+
         }
         }
         public static List<Object> objectsList = new List<Object>();
@@ -112,6 +123,7 @@ public partial class Main : Node2D
             public CharacterType type { get; set; }
             public string image_path { get; set; }
             public Texture2D texture { get; set; }
+            public Texture2D shadowTexture { get; set; }
             public Dictionary<Effect,EffectProperties> effectsList { get; set; }
 
 
@@ -120,27 +132,62 @@ public partial class Main : Node2D
                 this.type = type;
                 image_path = $"res://CHARACTERS/SPRITES/{type}.png";
                 texture = (Texture2D)GetResource(image_path);
+                shadowTexture = (Texture2D)GetResource($"res://CHARACTERS/SPRITES/{type}_s.png");
                 this.effectsList = new Dictionary<Effect, EffectProperties>(effectsList);
 
             }
         }
         public static List<Character> charactersList = new List<Character>();
+
+        public class Room
+        {
+            public RoomType type { get; set; }
+            public int number { get; set; }
+         
+            public List<Node2D> objects { get; set; }
+
+        public Room(int number, RoomType type)
+        {
+            this.number = number;
+            this.type = type;
+            objects = new List<Node2D>();
+
+        }
+
+
+    }
         public class Flat
         {
             public int number { get; set; }
+        private List<Room> _rooms;
+
+        public List<Node2D> objects { get; set; }
+
             public string image_path { get; set; }
             public Color color { get; set; }
             public double happiness { get; set; }
             public List<Characters> charactersInFlat { get; set; }
 
 
-            public Flat(int number, Color color, List<Characters> charactersInFlat)
+            public Flat(int number, Color color, params Room[] rooms)
             {
+           
                 this.number = number;
                 image_path = $"res://FLATS/SPRITES/{number}.png";
                 this.color = color;
-                this.charactersInFlat = charactersInFlat;
+                this.charactersInFlat = new List<Characters>();
+            this._rooms = new List<Room>(rooms);
+
+            this.objects = new List<Node2D>();
+           }
+          public List<Room> rooms
+        {
+            get
+            {
+                return new List<Room>(_rooms.Select((room, index)=>index>0 ? _rooms[index - 1] :room));
             }
+            set { _rooms = value; }
+        } 
         }
         public static List<Flat> flatsList = new List<Flat>();
 
@@ -151,211 +198,172 @@ public partial class Main : Node2D
     public static readonly Color ColorPlace = new Color(0x00ffff64);
     #endregion
 
+    #region LOCAL SETUPS
+    Object o;
+    #endregion
+
     #region SETUPS
 
+
+    void AddNewObject(FurnitureName name)
+    {
+        o = new Object(name);  
+        objectsList.Add(o);
+    }
     void SetupObjects()
     {
-        #region setup
-        FurnitureType type;
-        FurnitureGroup isGroupLeader;
-        List<FurnitureGroup> furnitureGroups = new List<FurnitureGroup>();
-        bool flatWideEffect;
-        Dictionary<Effect, int> seenEffects = new Dictionary<Effect, int>();
-        Dictionary<Effect, int> usedEffects = new Dictionary<Effect, int>();
-        Vector2 usePosition = new Vector2(0, 0);
-        float useLength = 1;
-        int size = 0;
-        int price = 0;
-        Dictionary<Effect, int> flatEffects = new Dictionary<Effect, int>();
-        #endregion
 
 
 
-        type = FurnitureType.couch;
-        isGroupLeader = FurnitureGroup.couch;     
-        flatWideEffect = false;
-        size = 2;
-        price = 100;
-        useLength = 10;
-        usedEffects.Add(Effect.comfort, 1);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect,size, price,usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
+        AddNewObject(FurnitureName.couch);
+        o.type = FurnitureType._core;
+        o.group = FurnitureGroup.chair;
+        o.roomTypes.Add(RoomType.livingroom); 
+        o.flatWideEffect = false;
+        o.size = 2;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.comfort, 1);
 
-        type = FurnitureType.electricGuitar;
-        isGroupLeader = FurnitureGroup.guitar;
-        flatWideEffect = true;
-        size = 1;
-        price = 200;
-        useLength = 10;
-        usedEffects.Add(Effect.music, 3);
-        usedEffects.Add(Effect.noise, 3);
-        usedEffects.Add(Effect.grunge, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect,size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
 
-        type = FurnitureType.recordPlayer;
-        flatWideEffect = true;
-        size = 1;
-        price = 100;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.couch);
-        furnitureGroups.Add(FurnitureGroup.chair);
 
-        usedEffects.Add(Effect.music, 3);
-        usedEffects.Add(Effect.vintage, 3);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups,flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
+        AddNewObject(FurnitureName.electricGuitar);
+        o.type = FurnitureType._object;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.flatWideEffect = true;
+        o.size = 1;
+        o.price = 200;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.music, 3);
+        o.usedEffects.Add(Effect.noise, 3);
+        o.usedEffects.Add(Effect.grunge, 2);
 
-        type = FurnitureType.stove;
-        isGroupLeader = FurnitureGroup.stove;
-        flatWideEffect = false;
-        size = 1;
-        price = 200;
-        useLength = 10;
+        AddNewObject(FurnitureName.recordPlayer);
+        o.type = FurnitureType._object;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.flatWideEffect = true;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.music, 3);
+        o.usedEffects.Add(Effect.vintage, 3);
+ 
 
-        usedEffects.Add(Effect.food, 4);
-        usedEffects.Add(Effect.cozy,2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect , size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
+        AddNewObject(FurnitureName.stove);
+        o.type = FurnitureType._core;
+        o.roomTypes.Add(RoomType.kitchen);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 200;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.food, 4);
+        o.usedEffects.Add(Effect.cozy,2);
 
-        type = FurnitureType.fridge;
-        isGroupLeader = FurnitureGroup.none;
-        flatWideEffect = false;
-        size = 1;
-        price = 200;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.stove);
-        usedEffects.Add(Effect.food, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
+        AddNewObject(FurnitureName.fridge);
+        o.type = FurnitureType._core;
+        o.roomTypes.Add(RoomType.kitchen);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 200;
+        o.useLength = 10; 
+        o.usedEffects.Add(Effect.food, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
 
-        type = FurnitureType.counterTop;
-        isGroupLeader = FurnitureGroup.none;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.stove);
+        AddNewObject(FurnitureName.counterTop);
+        o.type = FurnitureType._core;
+        o.roomTypes.Add(RoomType.kitchen);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.food, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
 
-        usedEffects.Add(Effect.food, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.sideCountertop;
-        isGroupLeader = FurnitureGroup.none;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.stove);
-        usedEffects.Add(Effect.food, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.rockingChair;
-        isGroupLeader = FurnitureGroup.chair;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
+        AddNewObject(FurnitureName.sideCountertop);
+        o.type = FurnitureType._core;
+        o.roomTypes.Add(RoomType.kitchen);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.food, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
 
-        usedEffects.Add(Effect.comfort, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.rug;
-        isGroupLeader = FurnitureGroup.none;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.chair);
-        furnitureGroups.Add(FurnitureGroup.couch);
-        furnitureGroups.Add(FurnitureGroup.bed);
-        usedEffects.Add(Effect.comfort, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.tv;
-        isGroupLeader = FurnitureGroup.none;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.couch);
-        usedEffects.Add(Effect.comfort, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.yarnBasket;
-        isGroupLeader = FurnitureGroup.none;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
-        furnitureGroups.Add(FurnitureGroup.chair);
-        usedEffects.Add(Effect.comfort, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.stonePainting;
-        isGroupLeader = FurnitureGroup.painting;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
+        AddNewObject(FurnitureName.rockingChair);
+        o.type = FurnitureType._object;
+        o.group = FurnitureGroup.chair;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.comfort, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
 
-        usedEffects.Add(Effect.comfort, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        type = FurnitureType.roarRock;
-        isGroupLeader = FurnitureGroup.guitar;
-        flatWideEffect = false;
-        size = 1;
-        price = 100;
-        useLength = 10;
+        AddNewObject(FurnitureName.rug);
+        o.type = FurnitureType._decor;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.roomTypes.Add(RoomType.bedroom);
+        o.roomTypes.Add(RoomType.kitchen);
+        o.roomTypes.Add(RoomType.bathroom);
+        o.floorObject = true;
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.comfort, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
 
-        usedEffects.Add(Effect.comfort, 4);
-        usedEffects.Add(Effect.cozy, 2);
-        #region apply
-        objectsList.Add(new Object(type, isGroupLeader, furnitureGroups, flatWideEffect, size, price, usedEffects, usePosition, useLength, flatEffects));
-        ClearObjectListData(ref usedEffects, ref usePosition, ref furnitureGroups, ref isGroupLeader);
-        #endregion
-        /* name = "paintEasel";
-         usedEffects.Add(Effect.messy, 3);
-         #region apply
-         objectsList.Add(new Object(name, seenEffects, usedEffects, usePosition, flatEffects));
-         ClearObjectListData(ref seenEffects, ref usedEffects, ref usePosition, ref flatEffects);
-         #endregion
-        */
-        startingAmountOfUnlockedFurniture = 2;
-     
+        AddNewObject(FurnitureName.tv);
+        o.type = FurnitureType._object;
+        o.useFromGroup = FurnitureGroup.chair;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.roomTypes.Add(RoomType.bedroom);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.entertainment, 5);
+        o.usedEffects.Add(Effect.cozy, 2);
+
+        AddNewObject(FurnitureName.yarnBasket);
+        o.type = FurnitureType._object;
+        o.useFromGroup = FurnitureGroup.chair;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.roomTypes.Add(RoomType.bedroom);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.comfort, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
+
+        AddNewObject(FurnitureName.stonePainting);
+        o.type = FurnitureType._object;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.roomTypes.Add(RoomType.bedroom);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.comfort, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
+
+        AddNewObject(FurnitureName.roarRock);
+        o.type = FurnitureType._object;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.roomTypes.Add(RoomType.bedroom);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 100;
+        o.useLength = 10;
+        o.usedEffects.Add(Effect.comfort, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
+
+        if (Settings.furnitureUnlocked)
+            startingAmountOfUnlockedFurniture = objectsList.Count();//2;
+        else
+            startingAmountOfUnlockedFurniture = 2;
 
         for (int i = 0; i < startingAmountOfUnlockedFurniture; i++)
         {
@@ -413,7 +421,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.noise,          -3, 0, 0);
         NewEffect(ref myEffects,Effect.music,           2, 0, 0);
         NewEffect(ref myEffects,Effect.painting,         0, 0, 0);
-        NewEffect(ref myEffects,Effect.entertainment,    1, 0, 0);
+        NewEffect(ref myEffects,Effect.entertainment,    5, 0, 0);
         NewEffect(ref myEffects,Effect.grunge,         -3, 0, 0);
         NewEffect(ref myEffects,Effect.cozy,            5, 0, 0);
         NewEffect(ref myEffects,Effect.vintage,          3, 0, 0);
@@ -470,19 +478,32 @@ public partial class Main : Node2D
         ClearCharacterListData(ref myEffects);
         #endregion
 
-        ChooseNewCharacterToUnlock();
-        ChooseNewCharacterToUnlock();
 
+ 
+        var startingAmountOfUnlocked = 1;
+        if (Settings.charactersUnlocked)
+            startingAmountOfUnlocked = charactersList.Count();//2;
+
+            
+
+        for (int i = 0; i < startingAmountOfUnlocked; i++)
+        {
+            ChooseNewCharacterToUnlock();
+        }
 
     }
 
     void SetupFlats()
     {
-        AddNewFlat(0, ColorGrey, new List<Characters>()); 
-        AddNewFlat(1, ColorBlue, new List<Characters>());
-        AddNewFlat(2, ColorBlue, new List<Characters>());
-        AddNewFlat(3, ColorBlue, new List<Characters>());
-        AddNewFlat(4, ColorBlue, new List<Characters>());
+        AddNewFlat(0, ColorGrey); 
+        var firstflat=AddNewFlat(1, ColorBlue, 
+            new Room(1,RoomType.none),
+            new Room(2, RoomType.none),
+            new Room(3, RoomType.none),
+            new Room(4, RoomType.none),
+            new Room(4, RoomType.none));
+
+ 
     }
 
     void SetupUI()
@@ -494,13 +515,13 @@ public partial class Main : Node2D
     void SetupFirstFlat()
     {
         if (SpawnInitialObjects == false) return;
-        var theObject = GetObjectFromType(FurnitureType.couch);
+        var theObject = GetObjectFromType(FurnitureName.couch);
 
         PlaceObjects(ref theObject, true, new Vector2(576, 237));
-        theObject = GetObjectFromType(FurnitureType.electricGuitar);
+        theObject = GetObjectFromType(FurnitureName.electricGuitar);
 
         PlaceObjects(ref theObject, true, new Vector2(376, 437));
-        theObject = GetObjectFromType(FurnitureType.recordPlayer);
+        theObject = GetObjectFromType(FurnitureName.recordPlayer);
 
         PlaceObjects(ref theObject, true, new Vector2(656, 437));
         var theCharacter = GetCharacterFromType(CharacterType.granny);
@@ -622,13 +643,14 @@ public partial class Main : Node2D
 
         if (HeldObject == null) return;
 
-        if(lastFlatWeWereIn != FlatNumberMouseIsIn && HeldObject.isGroupLeader!=FurnitureGroup.none)
-        {
-            var tilemap = (GameTileGrid)MyTileMap;
-            
-            tilemap.FillFlatWithPlaceableArea();
-            lastFlatWeWereIn = FlatNumberMouseIsIn;
-        }
+        var roomWeAreIn = flatsList[FlatNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
+
+        if (RoomNumberMouseIsIn>-1 && 
+            (HeldObject.type==FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type== HeldObject.roomTypes[0]) ) ||
+                (HeldObject.type != FurnitureType._core &&  HeldObject.roomTypes.Contains(roomWeAreIn.type)))
+            OverPlaceableTile = true;
+        else
+            OverPlaceableTile = false;
 
 
         placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates* MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
@@ -641,26 +663,31 @@ public partial class Main : Node2D
             var cost = HeldObject.price;
         if ((KeyPressed("RightClick") && Money >= cost && OverPlaceableTile) || placeManually)
             {
-                Main.MyTileMap.ClearLayer(1);
+                
+          
                 var newObject=Add2DNode("res://OBJECTS/SCENES/object.tscn",this);
                 var newObjectClass = (Furniture)newObject;
-                newObjectClass.objectData = HeldObject;
-                newObjectClass.objectData.type = HeldObject.type;
+                var newObjectData = newObjectClass.objectData;
+                newObjectData = HeldObject;
+                newObjectClass.objectData = newObjectData;
+                newObjectClass.myShadow.Texture = HeldObject.shadowTexture;
                 newObjectClass.mySprite.Texture = placeItemImage.Texture;
                 newObjectClass.flatIAmIn = FlatNumberMouseIsIn;
-                if(HeldObject.isGroupLeader != FurnitureGroup.none)
+                newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
+                newObjectClass.myRoom = roomWeAreIn;
+                if (newObjectData.floorObject)
+                    newObjectClass.mySprite.ZIndex = -3000;
+
+            if (HeldObject.type == FurnitureType._core)
                 {
-                    leaderFurnitureList.Add(newObjectClass);
-                    newObjectClass.myLayer = leaderFurnitureList.Count;
-                    newObjectClass.isALeader = true;
+                    roomWeAreIn.type = newObjectData.roomTypes[0];
                 }
-                else
-                {
-                    newObjectClass.myLeader = leaderFurnitureList[OverLeaderFurnitureLayer-1];
-                }
-                
-                objectsInFlat[FlatNumberMouseIsIn].Add(newObject);
-                newObjectClass.ChangeDimensions(newObjectClass.objectData.size);
+     
+
+                roomWeAreIn.objects.Add(newObject);
+                flatsList[FlatNumberMouseIsIn].objects.Add(newObject);
+
+            newObjectClass.ChangeDimensions(newObjectData.size);
                 
 
             if (placeManually)
@@ -715,12 +742,13 @@ public partial class Main : Node2D
             var character = heldCharacter;
             Main.CharactersAvailableToPlayerList = Main.CharactersAvailableToPlayerList.Where(x => x != character).ToList();
 
-            var newObjectClass = (Characters)newObject;
-                newObjectClass.characterData = heldCharacter;
-                newObjectClass.SetupBleedList();
-                newObjectClass.mySprite.Texture = placeItemImage.Texture;
-                newObjectClass.myFlatNumber = FlatNumberMouseIsIn;
-                flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newObjectClass);
+            var newCharacterClass = (Characters)newObject;
+                newCharacterClass.characterData = heldCharacter;
+                newCharacterClass.SetupBleedList();
+                newCharacterClass.mySprite.Texture = placeItemImage.Texture;
+                newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
+                newCharacterClass.myFlatNumber = FlatNumberMouseIsIn;
+                flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newCharacterClass);
                 if(placeManually==false)
                 if (heldCharacter != null || heldObject != null)
                 {
@@ -774,15 +802,17 @@ public partial class Main : Node2D
 
     }
 
-    void AddNewFlat(int flatNumber, Color color, List<Characters> charactersInFlat )
+    Flat AddNewFlat(int flatNumber, Color color, params Room[] rooms  )
     {
-        flatsList.Add(new Flat(flatNumber, color, charactersInFlat));
-        objectsInFlat[flatNumber] = new List<Node2D>();
+        var newFlat = new Flat(flatNumber, color, rooms);
+        
+        flatsList.Add(newFlat);
+        return newFlat;
     }
 
-    Object GetObjectFromType(FurnitureType type)
+    Object GetObjectFromType(FurnitureName name)
     {
-        var correctObject = objectsList.FirstOrDefault(obj => obj.type == type);
+        var correctObject = objectsList.FirstOrDefault(obj => obj.name == name);
         return correctObject;
     }
 

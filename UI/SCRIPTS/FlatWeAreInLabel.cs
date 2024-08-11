@@ -7,7 +7,7 @@ public partial class FlatWeAreInLabel : Label
     void Run()
     {
 
-            Text = $"Flat: {Main.FlatNumberMouseIsIn}";
+            Text = $"Room: {Main.RoomNumberMouseIsIn}";
     }
 
 

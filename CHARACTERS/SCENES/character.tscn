@@ -1,12 +1,13 @@
-[gd_scene load_steps=7 format=3 uid="uid://bj7bw5jnmx0nn"]
+[gd_scene load_steps=8 format=3 uid="uid://bj7bw5jnmx0nn"]
 
 [ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/Characters.cs" id="1_ofd6p"]
 [ext_resource type="Texture2D" uid="uid://bkslwjsonhndd" path="res://CHARACTERS/SPRITES/granny.png" id="2_lmt1e"]
 [ext_resource type="Texture2D" uid="uid://gq60cixma6cl" path="res://UI/SPRITES/grumpy.png" id="3_sh27w"]
+[ext_resource type="Texture2D" uid="uid://dqr11f2ca3cf2" path="res://CHARACTERS/SPRITES/granny_s.png" id="4_2ttrf"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d43sc"]
-radius = 16.5
-height = 39.5
+radius = 5.00009
+height = 14.0002
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mf7c"]
 bg_color = Color(0.772549, 0, 0, 0.223529)
@@ -32,15 +33,14 @@ script = ExtResource("1_ofd6p")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(-1, -52)
-scale = Vector2(0.15, 0.15)
+position = Vector2(1, -21)
 texture = ExtResource("2_lmt1e")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 unique_name_in_owner = true
+path_desired_distance = 0.1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.25, 2.5)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_d43sc")
 
@@ -54,15 +54,21 @@ horizontal_alignment = 1
 
 [node name="BleedLabel" type="Label" parent="."]
 unique_name_in_owner = true
-offset_left = -16.0
-offset_top = -142.0
-offset_right = 28.0
-offset_bottom = -115.0
+offset_left = -21.0
+offset_top = -80.0
+offset_right = 23.0
+offset_bottom = -53.0
 theme = SubResource("Theme_dhth7")
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Grumpy" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(16, -164)
+position = Vector2(2, -107)
 texture = ExtResource("3_sh27w")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+z_index = -2000
+position = Vector2(1, -21)
+texture = ExtResource("4_2ttrf")

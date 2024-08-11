@@ -14,11 +14,13 @@ public partial class Furniture : StaticBody2D
     public Node2D myUseLocation2;
     public List<CharacterBody2D> occupants = new List<CharacterBody2D>();
     public int flatIAmIn = 0;
+    public int roomIAmIn = 0;
+    
     public List<Furniture> myConnectedFurniture = new List<Furniture>();
     public int myLayer;
-    public Furniture myLeader=null;
-    public bool isALeader = false;
+    public Main.Room myRoom;
 
+    public bool inUse = false;
     [Export]
     public NodePath TileMapPath; // The path to the TileMap node in the scene.
 
@@ -31,6 +33,7 @@ public partial class Furniture : StaticBody2D
 
     #region BASIC OBJECT
     public Sprite2D mySprite;
+    public Sprite2D myShadow;
     public Label myLabel;
     #endregion
 
@@ -44,15 +47,20 @@ public partial class Furniture : StaticBody2D
         myCenterTile= Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(GlobalPosition));
         myTopLeftTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(topLeft));
         myBottomRightTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(bottomRight));
+
+        var count = 0;
         // Loop through t =he tile coordinates and set the tile.
         for (int x = myTopLeftTile.X; x <= myBottomRightTile.X; x++)
         {
             for (int y = myTopLeftTile.Y; y <= myBottomRightTile.Y; y++)
             {
-
-                Main.MyTileMap.SetCell(0, new Vector2I(x, y), flatIAmIn, new Vector2I(1, 0) );
+                count++;
+               Main.MyTileMap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(0, 2) );
             }
         }
+
+        Log($"{count}", LogType.game);
+
     }
 
 
@@ -72,6 +80,8 @@ public partial class Furniture : StaticBody2D
     void SetupObject()
     {
         mySprite = GetNode<Sprite2D>("Sprite2D");
+        myShadow = GetNode<Sprite2D>("Shadow");
+        
         myLabel = GetNode<Label>("Label");
         myUseLocation1 = GetNode<Node2D>("UseLocation1");
         myUseLocation2 = GetNode<Node2D>("UseLocation2");
@@ -95,6 +105,7 @@ public partial class Furniture : StaticBody2D
         {
             PlaceOnTileMap();
             firstRun = false;
+   
         }
         if (KeyPressed("RightClick"))
         {
@@ -103,15 +114,30 @@ public partial class Furniture : StaticBody2D
 
         ShowFurnitureGroupArea();
 
-        if (myLeader != null)
+
+            myLabel.Text = $"{ myRoom.type}";
+        if (occupants.Count > 0 && inUse==false)
         {
-            myLabel.Text = $"{ myLeader.objectData.type}";
+            inUse = true;
+            var temp_texture = (Texture2D)GetResource($"res://OBJECTS/SPRITES/{objectData.name}_used.png");
+            if (temp_texture != null)
+            mySprite.Texture = temp_texture;
         }
+        else
+        if(inUse && occupants.Count==0)
+        {
+            inUse = false;
+            mySprite.Texture = (Texture2D)GetResource($"res://OBJECTS/SPRITES/{objectData.name}.png");
+        }
+
+
     }
 
     public void ShowFurnitureGroupArea()
     {
-        if (Main.HeldObject == null || objectData.isGroupLeader == FurnitureGroup.none) return;
+        /*
+        //if we are not holding a core object 
+        if (Main.HeldObject == null || objectData.type != FurnitureType._core) return;
            if( !Main.HeldObject.furnitureGroups.Contains(objectData.isGroupLeader) ) return;
         var halfWidth = 8;
         var halfHeight = 8;
@@ -126,6 +152,7 @@ public partial class Furniture : StaticBody2D
                 Main.MyTileMap.SetCell(myLayer, new Vector2I(x, y), 5, new Vector2I(0, 0) );
             }
         }
+        */
     }
     public void ChangeDimensions(int size)
     {
@@ -137,8 +164,8 @@ public partial class Furniture : StaticBody2D
             case 2:
                 myArea.Scale = new Vector2(2,1) ;
                 myCollision.Scale = new Vector2(6, 1);
-                myUseLocation1.Position= new Vector2(-39, 14);
-                myUseLocation2.Position = new Vector2(39, 14);
+                myUseLocation1.Position= new Vector2(-19, 14);
+                myUseLocation2.Position = new Vector2(19, 14);
                 break;
         }
     }
@@ -151,7 +178,7 @@ public partial class Furniture : StaticBody2D
             var target = (Furniture)character.currentTarget;
             var myType = target.objectData.type;
             var yourType = objectData.type;
-            if (myType == yourType)
+            if (character.currentTarget == this)
             {
                 character.ReachTarget();
 

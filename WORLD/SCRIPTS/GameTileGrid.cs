@@ -1,6 +1,6 @@
 using Godot;
 using System;
-
+using static Asriela.BasicFunctions;
 public partial class GameTileGrid : Godot.TileMap
 {
     private int _tileId = 0; // The ID of the tile you want to place. Change this to the ID of your desired tile.
@@ -27,6 +27,7 @@ public partial class GameTileGrid : Godot.TileMap
     void Start()
     {
         Main.MyTileMap = this;
+        SetLayerModulate(1, ColorTransparent);
     }
 
     void Run()
@@ -38,16 +39,10 @@ public partial class GameTileGrid : Godot.TileMap
 
     void GetTileAtlasPositionWeAreOver()
     {
-        Main.FlatNumberMouseIsIn = GetCellSourceId(0,cellCoordinates);
+        Main.RoomNumberMouseIsIn = GetCellSourceId(1,cellCoordinates);
         Main.OverPlaceableTile = false;
 
-        for (var i = 1; i < 9; i++) 
-        {
-            if(!Main.OverPlaceableTile)
-            Main.OverPlaceableTile = GetCellSourceId(i, cellCoordinates) == 5 ? true : false;
-            if (GetCellSourceId(i, cellCoordinates) == 5 ? true : false)
-            Main.OverLeaderFurnitureLayer = i;  
-        }
+        
 
     }
     void GetMousePositions()
@@ -65,6 +60,7 @@ public partial class GameTileGrid : Godot.TileMap
 
     public void FillFlatWithPlaceableArea()
     {
+        /*
         Main.MyTileMap.ClearLayer(1);
         var topLeftTile = new Vector2I(0, 0);
         var size = GetUsedRect().Size;
@@ -78,6 +74,7 @@ public partial class GameTileGrid : Godot.TileMap
                     Main.MyTileMap.SetCell(1, new Vector2I(x, y), 5, new Vector2I(0, 0));
             }
         }
+        */
     }
     #region OLD
     public override void _Ready()

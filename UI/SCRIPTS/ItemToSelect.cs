@@ -20,11 +20,11 @@ public partial class ItemToSelect : Button
             if(Main.Money>= MyObject.price)
             {
                 Main.HeldObject = MyObject;
-                if(Main.HeldObject.isGroupLeader != FurnitureGroup.none)
-                {
-                    var mapClass=(GameTileGrid)Main.MyTileMap;
-                    mapClass.FillFlatWithPlaceableArea();
-                }
+               // if(Main.HeldObject.isGroupLeader != FurnitureGroup.none)
+                //{
+                //    var mapClass=(GameTileGrid)Main.MyTileMap;
+                 //   mapClass.FillFlatWithPlaceableArea();
+               // }
                 
             }
         
