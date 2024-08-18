@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using static Asriela.BasicFunctions;
 public partial class GameTileGrid : Godot.TileMap
 {
@@ -7,15 +8,20 @@ public partial class GameTileGrid : Godot.TileMap
     public static Vector2 globalMousePosition;
     public static Vector2 localMousePosition;
     public static Vector2I cellCoordinates;
-  
-    
+    public static ShaderMaterial shaderMaterial;
+    public static Dictionary<FloorTexture, Texture2D> floorTextures = new Dictionary<FloorTexture, Texture2D>();
+
+    public static List<string> roomNames = new List<string>();
+
+
+
     public override void _Input(InputEvent @event)
     {
         // Check if the input event is a mouse button press and if it's the left mouse button.
         if (@event is InputEventMouseButton eventMouseButton && eventMouseButton.Pressed && eventMouseButton.ButtonIndex == MouseButton.Left)
         {
 
-         
+
             // Get the cell coordinates from the local mouse position.
 
 
@@ -26,23 +32,47 @@ public partial class GameTileGrid : Godot.TileMap
 
     void Start()
     {
+        floorTextures[FloorTexture.wood] = GetTexture2D("res://WORLD/FLOORS/woodFloor.png");
+        floorTextures[FloorTexture.tiledKitchen] = GetTexture2D("res://WORLD/FLOORS/tiledKitchenFloor.png");
+        floorTextures[FloorTexture.tiledBathroom] = GetTexture2D("res://WORLD/FLOORS/tiledBathroomFloor.png");
+        floorTextures[FloorTexture.carpet] = GetTexture2D("res://WORLD/FLOORS/carpetFloor.png");
+
+        roomNames.Add("none");
+        roomNames.Add("floor_texture_blue");
+        roomNames.Add("floor_texture_red");
+        roomNames.Add("floor_texture_green");
+        roomNames.Add("floor_texture_yellow");
         Main.MyTileMap = this;
-        SetLayerModulate(1, ColorTransparent);
+        shaderMaterial = (ShaderMaterial)Material;
+
+        //  SetLayerModulate(1, ColorTransparent);
     }
 
+    public static void SetFloorMaterial(int roomNumber, RoomType roomType)
+    {
+        FloorTexture floorTexture = roomType switch
+        {
+            RoomType.livingroom => FloorTexture.wood,
+            RoomType.kitchen => FloorTexture.tiledKitchen,
+            RoomType.bathroom => FloorTexture.tiledBathroom,
+            RoomType.bedroom => FloorTexture.carpet,
+            _ => FloorTexture.cement
+        };
+        shaderMaterial.SetShaderParameter(roomNames[roomNumber], floorTextures[floorTexture]);
+    }
     void Run()
     {
         GetMousePositions();
         GetTileAtlasPositionWeAreOver();
-  
+
     }
 
     void GetTileAtlasPositionWeAreOver()
     {
-        Main.RoomNumberMouseIsIn = GetCellSourceId(1,cellCoordinates);
+        Main.RoomNumberMouseIsIn = GetCellSourceId(1, cellCoordinates);
         Main.OverPlaceableTile = false;
 
-        
+
 
     }
     void GetMousePositions()

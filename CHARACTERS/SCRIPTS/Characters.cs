@@ -14,8 +14,8 @@ public partial class Characters : CharacterBody2D
     public int canReachTarget = 0;
     NavigationRegion2D navRegion;
     public NavigationAgent2D NavAgent = null;
-    public Node2D currentTarget;
-    public Node2D remoteTarget;
+    public Node2D accessTarget;
+    public Node2D useTarget;
     public bool completedJourney;
     public bool hasTarget;
     bool reachedPoint = false;
@@ -24,7 +24,7 @@ public partial class Characters : CharacterBody2D
     Vector2 direction;
     public bool foundRandomPlace = false;
     Vector2 myVelocity;
-    public float interactionDistance = 80;
+    public float interactionDistance = 30;
     public bool performedAction = false;
     int count = 0;
     float restAtPoint = 0;
@@ -142,14 +142,14 @@ public partial class Characters : CharacterBody2D
             Wander(); 
         else
         {
-            if (currentTarget == null)
+            if (accessTarget == null)
             {
                 FindTarget();
             }
             else
             {
                 if (usingTarget == null)
-                    MoveToTarget(currentTarget);
+                    MoveToTarget(accessTarget);
                 else
                     useItemArm.UseTarget();
             }
@@ -186,8 +186,8 @@ public partial class Characters : CharacterBody2D
     {
 
         // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
-        if (currentTarget != null)
-            happinessLabel.Text = $"{((Furniture)remoteTarget).objectData.name}";
+        if (accessTarget != null)
+            happinessLabel.Text = $"{((Furniture)useTarget).objectData.name}";
         if (alarm.Ended(TimerType.grumpy))
             grumpyIcon.Visible = false;
     }
@@ -198,32 +198,8 @@ public partial class Characters : CharacterBody2D
             wander = false;
         }
     }
-    public void UpdatePath(Vector2 targetPosition)
-    {
-        _path = _pathfinding.GetPath(GlobalPosition, targetPosition);
-        _pathIndex = 0;
-    }
 
-    void MoveToAStar()
-    {
-        if (_path != null && _pathIndex < _path.Length)
-        {
-            Vector2 direction = (_path[_pathIndex] - GlobalPosition).Normalized();
-            Velocity = direction * Speed;
-
-            if (GlobalPosition.DistanceTo(_path[_pathIndex]) < 5.0f)
-            {
-                _pathIndex++;
-            }
-        }
-        else
-        {
-            Velocity = Vector2.Zero;
-        }
-
-        MoveAndSlide();
-    }
-
+   
 
     Main.Object ChooseObjectFromList()
     {
@@ -325,21 +301,21 @@ public partial class Characters : CharacterBody2D
         {
             alarm.Start(TimerType.wander, 5, false, 0);
             wander = true;
-            currentTarget = null;
+            accessTarget = null;
         }
         else
         {
            
             if (highestValuedObject.useFromGroup== FurnitureGroup.chair)
             {
-                remoteTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
-                currentTarget = FindNearestOfGroupType(remoteTarget, this.GetTree(), null, "Object", highestValuedObject.useFromGroup, myFlatNumber);
+                useTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
+                accessTarget = FindNearestOfGroupType(useTarget, this.GetTree(), null, "Object", highestValuedObject.useFromGroup, myFlatNumber);
                 
             }
             else
             {
-                remoteTarget = null;
-                currentTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
+                useTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
+                accessTarget = useTarget;
             }
                 
         }
@@ -352,7 +328,7 @@ public partial class Characters : CharacterBody2D
 
     void MoveToTarget(Node2D target)
     {
-
+        Log("move to target", LogType.weird);
         ChangeApproachDistance(NavAgent, interactionDistance);
         // Log($"{name}  GOTO TARGET", LogType.game);
         var destination = target.GlobalPosition;
@@ -362,11 +338,12 @@ public partial class Characters : CharacterBody2D
 
     public void ReachTarget()
     {
-        if(remoteTarget!=null )
-        usingTarget = remoteTarget;
+        if(useTarget!=null )
+        usingTarget = useTarget;
         else
-        usingTarget = currentTarget;
+        usingTarget = accessTarget;
 
+        Log("reach target", LogType.weird);
         var furnitureObject = (Furniture)usingTarget;
         alarm.Start(TimerType.actionLength, furnitureObject.objectData.useLength, false, 0);
         Log("Reached target", LogType.step);

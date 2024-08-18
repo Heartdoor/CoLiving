@@ -83,8 +83,10 @@ public partial class Main : Node2D
                 this.roomTypes = new List<RoomType>();
                 this.flatWideEffect = flatWideEffect;
                 image_path = $"res://OBJECTS/SPRITES/{name}.png";
-                texture = (Texture2D)GetResource(image_path);
-                shadowTexture = (Texture2D)GetResource($"res://OBJECTS/SPRITES/{name}_s.png");
+                texture = GetTexture2D(image_path);
+                var temp_path = $"res://OBJECTS/SPRITES/{name}_s.png";
+
+                shadowTexture = GetTexture2D(temp_path);
                 useFromGroup = FurnitureGroup.none;
                 group = FurnitureGroup.none;
                 this.size = size;
@@ -131,8 +133,8 @@ public partial class Main : Node2D
             {
                 this.type = type;
                 image_path = $"res://CHARACTERS/SPRITES/{type}.png";
-                texture = (Texture2D)GetResource(image_path);
-                shadowTexture = (Texture2D)GetResource($"res://CHARACTERS/SPRITES/{type}_s.png");
+                texture = GetTexture2D(image_path);
+                shadowTexture = GetTexture2D($"res://CHARACTERS/SPRITES/{type}_s.png");
                 this.effectsList = new Dictionary<Effect, EffectProperties>(effectsList);
 
             }
@@ -643,52 +645,59 @@ public partial class Main : Node2D
 
         if (HeldObject == null) return;
 
-        var roomWeAreIn = flatsList[FlatNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
 
-        if (RoomNumberMouseIsIn>-1 && 
-            (HeldObject.type==FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type== HeldObject.roomTypes[0]) ) ||
-                (HeldObject.type != FurnitureType._core &&  HeldObject.roomTypes.Contains(roomWeAreIn.type)))
+        Room roomWeAreIn = null;
+        if(FlatNumberMouseIsIn > 0 && RoomNumberMouseIsIn>0)
+            roomWeAreIn= flatsList[FlatNumberMouseIsIn].rooms[RoomNumberMouseIsIn] ;
+       
+        
+
+        if ((RoomNumberMouseIsIn > -1 && roomWeAreIn!=null) &&
+            (HeldObject.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldObject.roomTypes[0])) ||
+                (HeldObject.type != FurnitureType._core && HeldObject.roomTypes.Contains(roomWeAreIn.type)))
             OverPlaceableTile = true;
         else
             OverPlaceableTile = false;
 
 
-        placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates* MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
+        placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates * MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
         placeItemImage.Texture = HeldObject.texture;
-        if(OverPlaceableTile)
+        if (OverPlaceableTile)
             ChangeColor(placeItemImage, ColorPlace);
         else
             ChangeColor(placeItemImage, ColorCantBePlaced);
 
-            var cost = HeldObject.price;
+        var cost = HeldObject.price;
         if ((KeyPressed("RightClick") && Money >= cost && OverPlaceableTile) || placeManually)
-            {
-                
-          
-                var newObject=Add2DNode("res://OBJECTS/SCENES/object.tscn",this);
-                var newObjectClass = (Furniture)newObject;
-                var newObjectData = newObjectClass.objectData;
-                newObjectData = HeldObject;
-                newObjectClass.objectData = newObjectData;
-                newObjectClass.myShadow.Texture = HeldObject.shadowTexture;
-                newObjectClass.mySprite.Texture = placeItemImage.Texture;
-                newObjectClass.flatIAmIn = FlatNumberMouseIsIn;
-                newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
-                newObjectClass.myRoom = roomWeAreIn;
-                if (newObjectData.floorObject)
-                    newObjectClass.mySprite.ZIndex = -3000;
+        {
+
+
+            var newObject = Add2DNode("res://OBJECTS/SCENES/object.tscn", this);
+            var newObjectClass = (Furniture)newObject;
+            var newObjectData = newObjectClass.objectData;
+            newObjectData = HeldObject;
+            newObjectClass.objectData = newObjectData;
+            newObjectClass.myShadow.Texture = HeldObject.shadowTexture;
+            newObjectClass.mySprite.Texture = placeItemImage.Texture;
+            newObjectClass.flatIAmIn = FlatNumberMouseIsIn;
+            newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
+            newObjectClass.myRoom = roomWeAreIn;
+            if (newObjectData.floorObject)
+                newObjectClass.mySprite.ZIndex = -2000;
 
             if (HeldObject.type == FurnitureType._core)
-                {
-                    roomWeAreIn.type = newObjectData.roomTypes[0];
-                }
-     
+            {
+                roomWeAreIn.type = newObjectData.roomTypes[0];
+                GameTileGrid.SetFloorMaterial(RoomNumberMouseIsIn, roomWeAreIn.type);
+            }
 
-                roomWeAreIn.objects.Add(newObject);
-                flatsList[FlatNumberMouseIsIn].objects.Add(newObject);
+
+            roomWeAreIn.objects.Add(newObject);
+            flatsList[FlatNumberMouseIsIn].objects.Add(newObject);
 
             newObjectClass.ChangeDimensions(newObjectData.size);
-                
+
+
 
             if (placeManually)
             {
@@ -701,25 +710,26 @@ public partial class Main : Node2D
             {
                 UnlockNewFurniture();
                 newObject.GlobalPosition = placeItemImage.GlobalPosition;
-              
-                    Money -= cost;
+
+                Money -= cost;
             }
-               
 
-                
 
-                if (placeManually == false)
+
+
+            if (placeManually == false)
                 if (HeldCharacter != null || HeldObject != null)
                 {
                     HoldNothing();
-                    
+
                     Destroy(Main.SelectionMenuOpen);
                     Main.SelectionMenuOpen = null;
 
                 }
-            }
-     }
-     
+        }
+    }
+
+
     void PlaceCharacter(ref Character heldCharacter, ref Object heldObject, bool placeManually, Vector2 position)
     {
         if (heldCharacter == null) return;

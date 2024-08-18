@@ -1,0 +1,12 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://by74r537rp22w"]
+
+[ext_resource type="Shader" path="res://WORLD/SHADER/floortexturer.gdshader" id="1_y85w8"]
+[ext_resource type="Texture2D" uid="uid://h45acog4dbmk" path="res://WORLD/FLOORS/cementFloor.png" id="2_xvly2"]
+
+[resource]
+shader = ExtResource("1_y85w8")
+shader_parameter/uv_scale = 0.005
+shader_parameter/floor_texture_red = ExtResource("2_xvly2")
+shader_parameter/floor_texture_green = ExtResource("2_xvly2")
+shader_parameter/floor_texture_blue = ExtResource("2_xvly2")
+shader_parameter/floor_texture_yellow = ExtResource("2_xvly2")

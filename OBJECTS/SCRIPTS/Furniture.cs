@@ -119,7 +119,7 @@ public partial class Furniture : StaticBody2D
         if (occupants.Count > 0 && inUse==false)
         {
             inUse = true;
-            var temp_texture = (Texture2D)GetResource($"res://OBJECTS/SPRITES/{objectData.name}_used.png");
+            var temp_texture = GetTexture2D($"res://OBJECTS/SPRITES/{objectData.name}_used.png");
             if (temp_texture != null)
             mySprite.Texture = temp_texture;
         }
@@ -127,7 +127,7 @@ public partial class Furniture : StaticBody2D
         if(inUse && occupants.Count==0)
         {
             inUse = false;
-            mySprite.Texture = (Texture2D)GetResource($"res://OBJECTS/SPRITES/{objectData.name}.png");
+            mySprite.Texture = GetTexture2D($"res://OBJECTS/SPRITES/{objectData.name}.png");
         }
 
 
@@ -174,15 +174,17 @@ public partial class Furniture : StaticBody2D
     {
         if (body is CharacterBody2D)
         {
+            Log("entered area", LogType.weird);
+
             var character = (Characters)body;
-            var target = (Furniture)character.currentTarget;
+            var target = (Furniture)character.accessTarget;
             var myType = target.objectData.type;
             var yourType = objectData.type;
-            if (character.currentTarget == this)
+            if (character.accessTarget == this)
             {
                 character.ReachTarget();
 
-                Log("CHAR ENTERED", LogType.game);
+                Log("CHAR ENTERED", LogType.weird);
 
             }
               

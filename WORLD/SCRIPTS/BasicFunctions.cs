@@ -1,4 +1,4 @@
-﻿                                                                                                                                                                                                                                                                                                                                                                                                                    using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,7 +28,7 @@ namespace Asriela
         {
             globalTimer += (float)delta;
 
-          
+
 
         }
         #endregion
@@ -74,13 +74,13 @@ namespace Asriela
         { LogType.ui,               BinaryBool(0)},
         { LogType.player,           BinaryBool(1)},
         { LogType.step,             BinaryBool(1)},
-        { LogType.weird,            BinaryBool(0)}
+        { LogType.weird,            BinaryBool(1)}
     };
 
 
         public static void Log(string text, LogType type)
         {
-            if (type == LogType.error || type== LogType.ui)
+            if (type == LogType.error || type == LogType.ui)
             {
                 text = "ERROR! " + text;
                 if (LogTypesOn[type] == true)
@@ -90,6 +90,13 @@ namespace Asriela
             if (type == LogType.step)
             {
                 text = "🐾 " + text;
+                if (LogTypesOn[type] == true)
+                    GD.Print(text);
+            }
+            else
+            if (type == LogType.weird)
+            {
+                text = "🎃 " + text;
                 if (LogTypesOn[type] == true)
                     GD.Print(text);
             }
@@ -130,19 +137,19 @@ namespace Asriela
             bed,
             guitar,
             painting
-     
+
 
 
         }
 
         public enum FurnitureType : short
         {
-           _core,
-           _object,
-           _decor
+            _core,
+            _object,
+            _decor
         }
 
-        public enum RoomType :short
+        public enum RoomType : short
         {
             none,
             kitchen,
@@ -189,7 +196,15 @@ namespace Asriela
             hug,
             talk
         }
-
+        public enum FloorTexture : short
+        {
+            none,
+            cement,
+            wood,
+            tiledKitchen,
+            tiledBathroom,
+            carpet
+        }
         public enum Direction : short
         {
             up,
@@ -198,7 +213,20 @@ namespace Asriela
             right
         }
 
+        public enum AccessPosition : short
+        {
+            centered,
+            down,
+            left,
+            right,
+            up,
+            centerLeft,
+            centerRight
+        }
+
+
         #endregion
+
 
         #region EMOJIS
 
@@ -1412,7 +1440,7 @@ namespace Asriela
         #region GET RESOURCES
         public static Texture2D GetTexture2D(string path)
         {
-            return (Texture2D)ResourceLoader.Load(path);
+            return ResourceLoader.Exists(path) ? (Texture2D)ResourceLoader.Load(path): null;
 
         }
 

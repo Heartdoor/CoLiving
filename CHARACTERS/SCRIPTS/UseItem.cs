@@ -14,8 +14,8 @@ public partial class UseItem : Node
     }
     public void UseTarget()
     {
-        var usingFromFurniture = (Furniture)myCharacter.currentTarget;
-        var usingFurniture = (Furniture)myCharacter.remoteTarget;
+        var usingFromFurniture = (Furniture)myCharacter.accessTarget;
+        var usingFurniture = (Furniture)myCharacter.useTarget;
 
         if (usingFromFurniture == null)
             usingFromFurniture = usingFurniture;
@@ -38,8 +38,8 @@ public partial class UseItem : Node
             else
             {
                 myCharacter.busyUsing = null;
-                myCharacter.currentTarget = null;
-                myCharacter.remoteTarget = null;
+                myCharacter.accessTarget = null;
+                myCharacter.useTarget = null;
             }
      
         if(usingFromFurniture.occupants.Count==2)
@@ -64,7 +64,7 @@ public partial class UseItem : Node
             }
             myCharacter.heatOfObjects[item] = 0;
             myCharacter.busyUsing = null;
-            myCharacter.currentTarget = null;
+            myCharacter.accessTarget = null;
             myCharacter.usingTarget = null;
 
 
