@@ -15,6 +15,7 @@ public partial class Characters : CharacterBody2D
     NavigationRegion2D navRegion;
     public NavigationAgent2D NavAgent = null;
     public Node2D accessTarget;
+    public Node2D accessNode;
     public Node2D useTarget;
     public bool completedJourney;
     public bool hasTarget;
@@ -24,7 +25,7 @@ public partial class Characters : CharacterBody2D
     Vector2 direction;
     public bool foundRandomPlace = false;
     Vector2 myVelocity;
-    public float interactionDistance = 30;
+    public float interactionDistance = 10;
     public bool performedAction = false;
     int count = 0;
     float restAtPoint = 0;
@@ -50,7 +51,7 @@ public partial class Characters : CharacterBody2D
     public Sprite2D grumpyIcon;
     public Main.Character characterData;
     public UseItem useItemArm;
-    Label happinessLabel;
+    Label mainLabel;
     Label bleedLabel;
     #endregion
 
@@ -81,7 +82,7 @@ public partial class Characters : CharacterBody2D
     {
         navRegion = null;// GetParent().GetParent().GetParent().GetParent().GetNode<NavigationRegion2D>("MainNavRegion"); 
         SetupNavAgent(this, ref NavAgent, interactionDistance);
-        //NavAgent.TargetReached += ReachTarget;
+        NavAgent.TargetReached += ReachTarget;
         NavAgent.VelocityComputed += VelocityComputedSignal;
     }
 
@@ -95,7 +96,7 @@ public partial class Characters : CharacterBody2D
     {
         mySprite = GetNode<Sprite2D>("Sprite2D");
         myShadow = GetNode<Sprite2D>("Shadow");
-        happinessLabel = GetNode<Label>("HappinessLabel");
+        mainLabel = GetNode<Label>("HappinessLabel");
 
         bleedLabel= GetNode<Label>("BleedLabel");
         grumpyIcon = GetNode<Sprite2D>("Grumpy");
@@ -186,8 +187,8 @@ public partial class Characters : CharacterBody2D
     {
 
         // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
-        if (accessTarget != null)
-            happinessLabel.Text = $"{((Furniture)useTarget).objectData.name}";
+        if (accessTarget != null && Settings.characterTargetNameLabel)
+            mainLabel.Text = $"{((Furniture)useTarget).objectData.name}";
         if (alarm.Ended(TimerType.grumpy))
             grumpyIcon.Visible = false;
     }
@@ -310,12 +311,13 @@ public partial class Characters : CharacterBody2D
             {
                 useTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
                 accessTarget = FindNearestOfGroupType(useTarget, this.GetTree(), null, "Object", highestValuedObject.useFromGroup, myFlatNumber);
-                
+                accessNode = FindNearestAccessNode(this, accessTarget);
             }
             else
             {
                 useTarget = FindNearest(this, this.GetTree(), null, "Object", highestValuedObject.name, myFlatNumber);
                 accessTarget = useTarget;
+                accessNode = FindNearestAccessNode(this, accessTarget);
             }
                 
         }
@@ -331,7 +333,7 @@ public partial class Characters : CharacterBody2D
         Log("move to target", LogType.weird);
         ChangeApproachDistance(NavAgent, interactionDistance);
         // Log($"{name}  GOTO TARGET", LogType.game);
-        var destination = target.GlobalPosition;
+        var destination = accessNode.GlobalPosition;
         // GotoPointAndAvoid(this, NavAgent, speed, friction, accel, delta, destination, completedJourney);
         GotoPoint(this, NavAgent, speed, accel, delta, destination);
     }
@@ -358,6 +360,8 @@ public partial class Characters : CharacterBody2D
 
     public Texture2D ChangeSprite(string addedText)
     {
+        if (addedText == "stand") addedText = "";
+        addedText = Capitalize(addedText);
         return GetTexture2D($"res://CHARACTERS/SPRITES/{characterData.type}{addedText}.png");
     }
 

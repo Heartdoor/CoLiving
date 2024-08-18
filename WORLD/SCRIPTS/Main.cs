@@ -75,6 +75,12 @@ public partial class Main : Node2D
             public FurnitureGroup group { get; set; }
 
             public FurnitureGroup useFromGroup { get; set; }
+            public Direction rotation { get; set; }
+
+            public bool ontopUsePosition { get; set; }
+            public List<AccessPosition> accessPositions { get; set; }
+
+            public UseAnimation useAnimation { get; set; }
 
         public Object(FurnitureName name,  bool flatWideEffect = false,  int size=1,int price=0,  float useLength = 10f) 
             {
@@ -89,6 +95,10 @@ public partial class Main : Node2D
                 shadowTexture = GetTexture2D(temp_path);
                 useFromGroup = FurnitureGroup.none;
                 group = FurnitureGroup.none;
+                rotation = Direction.down;
+                accessPositions = new List<AccessPosition>();
+                ontopUsePosition = false;
+                useAnimation = UseAnimation.sit;
                 this.size = size;
                 this.price = price;
                 this.usePosition =   new Vector2(0, 0);
@@ -220,11 +230,15 @@ public partial class Main : Node2D
         AddNewObject(FurnitureName.couch);
         o.type = FurnitureType._core;
         o.group = FurnitureGroup.chair;
-        o.roomTypes.Add(RoomType.livingroom); 
+        o.roomTypes.Add(RoomType.livingroom);
         o.flatWideEffect = false;
         o.size = 2;
         o.price = 100;
         o.useLength = 10;
+        o.ontopUsePosition = true;
+        o.rotation = Direction.down;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
+        o.useAnimation = UseAnimation.sit;
         o.usedEffects.Add(Effect.comfort, 1);
 
 
@@ -236,6 +250,9 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 200;
         o.useLength = 10;
+        o.rotation = Direction.down;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
+        o.useAnimation = UseAnimation.strumGuitar;
         o.usedEffects.Add(Effect.music, 3);
         o.usedEffects.Add(Effect.noise, 3);
         o.usedEffects.Add(Effect.grunge, 2);
@@ -247,9 +264,11 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.down;
+        o.useAnimation = UseAnimation.sit;
         o.usedEffects.Add(Effect.music, 3);
         o.usedEffects.Add(Effect.vintage, 3);
- 
+
 
         AddNewObject(FurnitureName.stove);
         o.type = FurnitureType._core;
@@ -258,8 +277,11 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 200;
         o.useLength = 10;
+        o.rotation = Direction.up;
+        o.useAnimation = UseAnimation.stand;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.food, 4);
-        o.usedEffects.Add(Effect.cozy,2);
+        o.usedEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.fridge);
         o.type = FurnitureType._core;
@@ -267,7 +289,10 @@ public partial class Main : Node2D
         o.flatWideEffect = false;
         o.size = 1;
         o.price = 200;
-        o.useLength = 10; 
+        o.useLength = 10;
+        o.rotation = Direction.right;
+        o.useAnimation = UseAnimation.stand;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.food, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
@@ -278,18 +303,13 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.down;
+        o.useAnimation = UseAnimation.stand;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.food, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
-        AddNewObject(FurnitureName.sideCountertop);
-        o.type = FurnitureType._core;
-        o.roomTypes.Add(RoomType.kitchen);
-        o.flatWideEffect = false;
-        o.size = 1;
-        o.price = 100;
-        o.useLength = 10;
-        o.usedEffects.Add(Effect.food, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+
 
         AddNewObject(FurnitureName.rockingChair);
         o.type = FurnitureType._object;
@@ -299,6 +319,10 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.ontopUsePosition = true;
+        o.rotation = Direction.left;
+        o.useAnimation = UseAnimation.sit;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
@@ -313,6 +337,7 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.down;
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
@@ -325,6 +350,8 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.up;
+        o.useAnimation = UseAnimation.sit;
         o.usedEffects.Add(Effect.entertainment, 5);
         o.usedEffects.Add(Effect.cozy, 2);
 
@@ -337,6 +364,8 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.down;
+        o.useAnimation = UseAnimation.sitAndKnitt;
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
@@ -348,6 +377,9 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.down;
+        o.useAnimation = UseAnimation.stand;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
@@ -359,6 +391,10 @@ public partial class Main : Node2D
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
+        o.rotation = Direction.down;
+        o.ontopUsePosition = true;
+        o.useAnimation = UseAnimation.roar;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 

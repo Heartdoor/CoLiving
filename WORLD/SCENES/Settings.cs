@@ -6,10 +6,11 @@ using static Asriela.BasicFunctions;
 public partial class Settings : Node
 {
 
-    public static bool furnitureUnlocked =  Toggle(1);
-    public static bool charactersUnlocked = Toggle(1);
-    public static bool infinateMoney      = Toggle(1);
-
+    public static bool furnitureUnlocked =      Toggle(1);
+    public static bool charactersUnlocked =     Toggle(1);
+    public static bool infinateMoney      =     Toggle(1);
+    public static bool objectsRoomTypeLabel=    Toggle(1);
+    public static bool characterTargetNameLabel = Toggle(1);
 
     void Start()
     {

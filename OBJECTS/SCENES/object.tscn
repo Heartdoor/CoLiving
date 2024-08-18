@@ -51,7 +51,6 @@ offset_top = 22.0
 offset_right = 34.0
 offset_bottom = 45.0
 scale = Vector2(0.5, 0.5)
-text = "hi"
 label_settings = SubResource("LabelSettings_5h38g")
 horizontal_alignment = 1
 justification_flags = 160
@@ -60,5 +59,3 @@ justification_flags = 160
 unique_name_in_owner = true
 z_index = -2000
 texture = ExtResource("3_wdunq")
-
-[connection signal="body_entered" from="Area2D" to="." method="OnBodyEntered"]

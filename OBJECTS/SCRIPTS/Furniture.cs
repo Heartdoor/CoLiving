@@ -35,6 +35,8 @@ public partial class Furniture : StaticBody2D
     public Sprite2D mySprite;
     public Sprite2D myShadow;
     public Label myLabel;
+    public Dictionary<AccessPosition, Area2D> myAccessNodes = new Dictionary<AccessPosition, Area2D>();
+
     #endregion
 
     private void PlaceTilesToCoverShape(Rect2 shapeRect)
@@ -114,7 +116,7 @@ public partial class Furniture : StaticBody2D
 
         ShowFurnitureGroupArea();
 
-
+        if(Settings.objectsRoomTypeLabel)
             myLabel.Text = $"{ myRoom.type}";
         if (occupants.Count > 0 && inUse==false)
         {
@@ -154,44 +156,98 @@ public partial class Furniture : StaticBody2D
         }
         */
     }
+    void CreateAccessNode(AccessPosition position)
+    {
+        myAccessNodes.Add(position, (Area2D)Add2DNode("res://OBJECTS/SCENES/access_node.tscn", this));
+        var node = (AccessNode)myAccessNodes[position];
+        node.myObject = this;
+
+    }
+
+    void PlaceAccessNodes()
+    {
+        foreach (KeyValuePair<AccessPosition, Area2D> node in myAccessNodes)
+        {
+            var newPosition = node.Key;
+            var areaNode = node.Value;
+            var shiftAwayX = 30;
+            var shiftAwayY = 30;
+            switch (objectData.rotation)
+            {
+                case Direction.up:
+                    if (newPosition == AccessPosition.up) newPosition = AccessPosition.down;
+                    else
+                    if (newPosition == AccessPosition.down) newPosition = AccessPosition.up;
+                    else
+                    if (newPosition == AccessPosition.left) newPosition = AccessPosition.right;
+                    else
+                    if (newPosition == AccessPosition.right) newPosition = AccessPosition.left;
+                    break;
+                case Direction.left:
+                    if (newPosition == AccessPosition.up) newPosition = AccessPosition.right;
+                    else
+                    if (newPosition == AccessPosition.down) newPosition = AccessPosition.left;
+                    else
+                    if (newPosition == AccessPosition.left) newPosition = AccessPosition.up;
+                    else
+                    if (newPosition == AccessPosition.right) newPosition = AccessPosition.down;
+                    break;
+                case Direction.right:
+                    if (newPosition == AccessPosition.up) newPosition = AccessPosition.left;
+                    else
+                    if (newPosition == AccessPosition.down) newPosition = AccessPosition.right;
+                    else
+                    if (newPosition == AccessPosition.left) newPosition = AccessPosition.down;
+                    else
+                    if (newPosition == AccessPosition.right) newPosition = AccessPosition.up;
+                    break;
+            }
+
+            switch (newPosition)
+            {
+                case AccessPosition.up:
+                    areaNode.Position = new Vector2(0, -shiftAwayY);
+                    break;
+                case AccessPosition.down:
+                    areaNode.Position = new Vector2(0, shiftAwayY);
+                    break;
+                case AccessPosition.left:
+                    areaNode.Position = new Vector2(-shiftAwayX, 0);
+                    break;
+                case AccessPosition.right:
+                    areaNode.Position = new Vector2(shiftAwayX, 0);
+                    break;
+            }
+        }
+    }
     public void ChangeDimensions(int size)
     {
         switch (size)
         {
             case 1:
-                
+
+
                 break;
             case 2:
-                myArea.Scale = new Vector2(2,1) ;
+
                 myCollision.Scale = new Vector2(6, 1);
-                myUseLocation1.Position= new Vector2(-19, 14);
-                myUseLocation2.Position = new Vector2(19, 14);
+                if (objectData.ontopUsePosition)
+                {
+                    myUseLocation1.Position = new Vector2(-19, 14);
+                    myUseLocation2.Position = new Vector2(19, 14);
+                }
+
                 break;
         }
-    }
-
-    private void OnBodyEntered(Node body)
-    {
-        if (body is CharacterBody2D)
+        foreach (AccessPosition position in objectData.accessPositions)
         {
-            Log("entered area", LogType.weird);
-
-            var character = (Characters)body;
-            var target = (Furniture)character.accessTarget;
-            var myType = target.objectData.type;
-            var yourType = objectData.type;
-            if (character.accessTarget == this)
-            {
-                character.ReachTarget();
-
-                Log("CHAR ENTERED", LogType.weird);
-
-            }
-              
-           
+             CreateAccessNode(position);
         }
-        Log("BODY ENTERED", LogType.game);
+         PlaceAccessNodes();
     }
+
+
+    
 
 
     #region OLD

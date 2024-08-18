@@ -14,24 +14,24 @@ public partial class UseItem : Node
     }
     public void UseTarget()
     {
-        var usingFromFurniture = (Furniture)myCharacter.accessTarget;
-        var usingFurniture = (Furniture)myCharacter.useTarget;
+        var accessObject = (Furniture)myCharacter.accessTarget;
+        var useObject = (Furniture)myCharacter.useTarget;
 
-        if (usingFromFurniture == null)
-            usingFromFurniture = usingFurniture;
+        if (accessObject == null)
+            accessObject = useObject;
             //START USING
         if (myCharacter.busyUsing == null)
         {
-            if(usingFromFurniture.occupants.Count < usingFromFurniture.objectData.size) 
+            if(accessObject.occupants.Count < accessObject.objectData.size) 
             { 
-                myCharacter.busyUsing = usingFurniture;
+                myCharacter.busyUsing = useObject;
                 //MAKE A FLAT WIDE EFFECT HAPPEN
-                if(usingFurniture.objectData.flatWideEffect)
-                EffectEntireFlat(usingFurniture.objectData);
+                if(useObject.objectData.flatWideEffect)
+                EffectEntireFlat(useObject.objectData);
 
-                usingFurniture.occupants.Add(myCharacter);
-                if(usingFromFurniture!= usingFurniture)
-                usingFromFurniture.occupants.Add(myCharacter);
+                useObject.occupants.Add(myCharacter);
+                if(accessObject!= useObject)
+                accessObject.occupants.Add(myCharacter);
 
          
             }
@@ -41,12 +41,16 @@ public partial class UseItem : Node
                 myCharacter.accessTarget = null;
                 myCharacter.useTarget = null;
             }
-     
-        if(usingFromFurniture.occupants.Count==2)
-            myCharacter.GlobalPosition = usingFromFurniture.myUseLocation2.GlobalPosition;
+            if (!accessObject.objectData.ontopUsePosition)
+            {
+                myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
+            }
+            else
+        if(accessObject.occupants.Count==2)
+            myCharacter.GlobalPosition = accessObject.myUseLocation2.GlobalPosition;
         else
-            myCharacter.GlobalPosition = usingFromFurniture.myUseLocation1.GlobalPosition;
-            myCharacter.mySprite.Texture = myCharacter.ChangeSprite("Sit");
+            myCharacter.GlobalPosition = accessObject.myUseLocation1.GlobalPosition;
+            myCharacter.mySprite.Texture = myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
         }
         //Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
         if (myCharacter.alarm.Ended(TimerType.actionLength))
@@ -54,7 +58,7 @@ public partial class UseItem : Node
 
             Log("DONE USING ITEM", LogType.step);
             myCharacter.mySprite.Texture = myCharacter.ChangeSprite("");
-            var item = usingFurniture.objectData;
+            var item = useObject.objectData;
             // Update heat values after task completion 
             foreach (var key in myCharacter.heatOfObjects.Keys.ToList())
             {
@@ -72,9 +76,9 @@ public partial class UseItem : Node
             var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, out float sum);
             GetMoneyEffected(sum, effectsBreakdown);
 
-            usingFurniture.occupants.Remove(myCharacter);
-            if (usingFromFurniture != usingFurniture)
-                usingFromFurniture.occupants.Remove(myCharacter);
+            useObject.occupants.Remove(myCharacter);
+            if (accessObject != useObject)
+                accessObject.occupants.Remove(myCharacter);
 
 
         }

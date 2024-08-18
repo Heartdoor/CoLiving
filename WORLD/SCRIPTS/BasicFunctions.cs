@@ -43,6 +43,14 @@ namespace Asriela
         {
             return binary == 0 ? false : true;
         }
+
+        public static string Capitalize(string addedText)
+        {
+            if (addedText != "")
+                return char.ToUpper(addedText[0]) + addedText.Substring(1);
+            else
+                return addedText;
+        }
         #endregion
         #region LOG
         public enum LogType : short
@@ -222,6 +230,16 @@ namespace Asriela
             up,
             centerLeft,
             centerRight
+        }
+
+        public enum UseAnimation : short
+        {
+            sit,
+            stand,
+            standBusyHands,
+            strumGuitar,
+            sitAndKnitt,
+            roar
         }
 
 
@@ -493,6 +511,25 @@ namespace Asriela
             return nearestObject;
         }
 
+        public static Node2D FindNearestAccessNode(Node2D subject, Node2D target)
+        {
+            Node2D nearestNode = null;
+            var furnitureItem = (Furniture)target;
+            float nearestDistance = 99999999999999;
+            foreach (KeyValuePair<AccessPosition, Area2D> node in furnitureItem.myAccessNodes)
+            {
+                var area = node.Value;
+                float distance = MeasureDistanceBetweenNodes(subject, area);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestNode = area;
+
+                }
+            }
+            return nearestNode;
+        }
+
         /* public static Node2D FindNearestWithTags(Node2D subject, SceneTree tree, List<Tag> objectTypeTags, Node2D mayNotBe, string groupName, Vector2 pointToMeasureFrom, float maxDistance, ref float theDistanceToTarget)
             {
                 Log($"Starting search for nearest with tags", LogType.nearest);
@@ -572,7 +609,23 @@ namespace Asriela
                     }
 
             // Return a default value or handle the case where nodes are not valid
-            return 0f;
+            return 9999999f;
+        }
+        public static float MeasureDistanceBetweenNodes(Node2D subjectNode, Node2D objNode)
+        {
+            if (subjectNode != null && objNode != null)
+            {
+                Vector2 subjectPosition = subjectNode.GlobalPosition;
+                Vector2 objPosition = objNode.GlobalPosition;
+
+                // Calculate the distance between positions
+                float distance = subjectPosition.DistanceTo(objPosition);
+
+                return distance;
+            }
+
+            // Return a default value or handle the case where nodes are not valid
+            return 9999999f;
         }
 
         public static bool HasTag(List<Tag> Tags, Tag tag )
