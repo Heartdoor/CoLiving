@@ -54,6 +54,9 @@ func _process(delta):
 		
 		position.x = clamp(position.x, 0, 10000)
 		position.y = clamp(position.y, 0, 100000)
+		
+		position.x= roundi(position.x)
+		position.y= roundi(position.y)
 	
 func _physics_process(delta: float) -> void:
 	zoom = lerp(zoom, _target_zoom * Vector2.ONE, ZOOM_RATE * delta)
@@ -75,11 +78,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func zoom_in() -> void:
 	_target_zoom = max(_target_zoom - ZOOM_INCREMENT, MIN_ZOOM)
+	_target_zoom = roundi(_target_zoom)
 	set_physics_process(true)
 
 
 func zoom_out() -> void:
 	_target_zoom = min(_target_zoom + ZOOM_INCREMENT, MAX_ZOOM)
+	_target_zoom = roundi(_target_zoom)
 	set_physics_process(true)
 
 

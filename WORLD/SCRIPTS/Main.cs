@@ -1,11 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq;
-using System.Xml.Linq;
 using static Asriela.BasicFunctions;
-using static Main;
 
 public partial class Main : Node2D
 {
@@ -63,6 +60,7 @@ public partial class Main : Node2D
             public Texture2D texture { get; set; }
             public Texture2D shadowTexture { get; set; }
             public Dictionary<Effect, int> usedEffects { get; set; }
+            public Dictionary<Effect, int> usedRadiantEffects { get; set; }
             public Vector2 usePosition { get; set; }
             public float useLength { get; set; }
             public int size { get; set; }
@@ -104,6 +102,7 @@ public partial class Main : Node2D
                 this.usePosition =   new Vector2(0, 0);
                 this.useLength = useLength;
                 this.usedEffects = new Dictionary<Effect, int>();
+                this.usedRadiantEffects = new Dictionary<Effect, int>();
                 this.floorObject = false;
 
         }
@@ -117,10 +116,12 @@ public partial class Main : Node2D
             public float needBleedRate { get; set; }
             public float desireGrowRate { get; set; }
             public DesireAction action { get; set; }
+            
+            public float actionLength { get; set; }
 
             public bool syncDesireWithNeed { get; set; }
 
-        public EffectProperties( float strength, float needBleedRate, float desireGrowRate, DesireAction action = DesireAction.none, bool syncDesireWithNeed = false)
+        public EffectProperties( float strength, float needBleedRate, float desireGrowRate, DesireAction action = DesireAction.none, float actionLength = 5 , bool syncDesireWithNeed = false)
             {
    
                 this.strength = strength;
@@ -128,26 +129,50 @@ public partial class Main : Node2D
                 this.desireGrowRate = desireGrowRate;
                 this.action = action;
                 this.syncDesireWithNeed = syncDesireWithNeed;
+                this.actionLength = actionLength;
             }
         }
+
+        public class Relationship
+        {
+            public Dictionary<RelationshipType ,float> strength { get; set; } 
+            
+            public Relationship()
+            {
+                strength = new Dictionary<RelationshipType, float>();
+                strength[RelationshipType.friendship] = 0;
+                strength[RelationshipType.romantic] = 0; 
+            }
+
+    }
         public class Character
         {
-            public CharacterType type { get; set; }
-            public string image_path { get; set; }
+            public CharacterType name { get; set; }
+            public string image_path { get; set; } 
             public Texture2D texture { get; set; }
             public Texture2D shadowTexture { get; set; }
             public Dictionary<Effect,EffectProperties> effectsList { get; set; }
 
+            public Dictionary<Characters,Relationship> relationshipsList { get; set; }
 
-        public Character(CharacterType type, Dictionary<Effect, EffectProperties> effectsList)
+            public Dictionary<Effect, float> needs { get; set; }
+
+            public Dictionary<Effect, float> feelings { get; set; }
+            public Dictionary<Effect, float> desires { get; set; }
+
+            public Character(CharacterType name, Dictionary<Effect, EffectProperties> effectsList)
             {
-                this.type = type;
-                image_path = $"res://CHARACTERS/SPRITES/{type}.png";
+                this.name = name;
+                image_path = $"res://CHARACTERS/SPRITES/{name}.png";
                 texture = GetTexture2D(image_path);
-                shadowTexture = GetTexture2D($"res://CHARACTERS/SPRITES/{type}_s.png");
+                shadowTexture = GetTexture2D($"res://CHARACTERS/SPRITES/{name}_s.png");
                 this.effectsList = new Dictionary<Effect, EffectProperties>(effectsList);
-
-            }
+                relationshipsList = new Dictionary<Characters, Relationship>();
+                feelings = new Dictionary<Effect, float>();
+                feelings.Add(Effect.happiness,0);
+                needs  = new Dictionary<Effect, float>();
+                desires = new Dictionary<Effect, float>();
+        }
         }
         public static List<Character> charactersList = new List<Character>();
 
@@ -257,31 +282,37 @@ public partial class Main : Node2D
         o.usedEffects.Add(Effect.noise, 3);
         o.usedEffects.Add(Effect.grunge, 2);
 
+        o.usedRadiantEffects.Add(Effect.noise, 2);
+        o.usedRadiantEffects.Add(Effect.grunge, 2);
+
         AddNewObject(FurnitureName.recordPlayer);
         o.type = FurnitureType._object;
+        o.useFromGroup = FurnitureGroup.chair;
         o.roomTypes.Add(RoomType.livingroom);
         o.flatWideEffect = true;
         o.size = 1;
         o.price = 100;
         o.useLength = 10;
         o.rotation = Direction.down;
-        o.useAnimation = UseAnimation.sit;
-        o.usedEffects.Add(Effect.music, 3);
+        o.useAnimation = UseAnimation.listenToMusic;
+        o.usedEffects.Add(Effect.music, 4);
         o.usedEffects.Add(Effect.vintage, 3);
-
+        o.usedRadiantEffects.Add(Effect.music, 2);
+        o.usedRadiantEffects.Add(Effect.vintage, 1);
 
         AddNewObject(FurnitureName.stove);
         o.type = FurnitureType._core;
         o.roomTypes.Add(RoomType.kitchen);
-        o.flatWideEffect = false;
+        o.flatWideEffect = true;
         o.size = 1;
         o.price = 200;
         o.useLength = 10;
         o.rotation = Direction.up;
-        o.useAnimation = UseAnimation.stand;
+        o.useAnimation = UseAnimation.cook;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.food, 4);
         o.usedEffects.Add(Effect.cozy, 2);
+        o.usedRadiantEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.fridge);
         o.type = FurnitureType._core;
@@ -341,6 +372,18 @@ public partial class Main : Node2D
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
 
+        AddNewObject(FurnitureName.smallSideTable);
+        o.type = FurnitureType._decor;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.roomTypes.Add(RoomType.bedroom);
+        o.roomTypes.Add(RoomType.bathroom);
+        o.size = 1;
+        o.price = 50;
+        o.useLength = 10;
+        o.rotation = Direction.down;
+        o.usedEffects.Add(Effect.comfort, 4);
+        o.usedEffects.Add(Effect.cozy, 2);
+
         AddNewObject(FurnitureName.tv);
         o.type = FurnitureType._object;
         o.useFromGroup = FurnitureGroup.chair;
@@ -353,7 +396,7 @@ public partial class Main : Node2D
         o.rotation = Direction.up;
         o.useAnimation = UseAnimation.sit;
         o.usedEffects.Add(Effect.entertainment, 5);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.usedRadiantEffects.Add(Effect.entertainment, 2);
 
         AddNewObject(FurnitureName.yarnBasket);
         o.type = FurnitureType._object;
@@ -413,7 +456,7 @@ public partial class Main : Node2D
     void SetupCharacters()
     {
         #region setup
-        CharacterType type;
+        CharacterType name;
 
         Dictionary<Effect, EffectProperties> myEffects =new Dictionary<Effect, EffectProperties>();
 
@@ -448,7 +491,7 @@ public partial class Main : Node2D
         var socialR = 0.0001f;
         var desireR = 0.0001f;
 
-        type = CharacterType.granny;
+        name = CharacterType.granny;
         NewEffect(ref myEffects, Effect.food,           2, hungryR, 0);
         NewEffect(ref myEffects,Effect.sleep,           3, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,         3, hygieneR, 0);
@@ -459,19 +502,20 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.noise,          -3, 0, 0);
         NewEffect(ref myEffects,Effect.music,           2, 0, 0);
         NewEffect(ref myEffects,Effect.painting,         0, 0, 0);
-        NewEffect(ref myEffects,Effect.entertainment,    5, 0, 0);
+        NewEffect(ref myEffects,Effect.entertainment,    2, 0, 0);
         NewEffect(ref myEffects,Effect.grunge,         -3, 0, 0);
         NewEffect(ref myEffects,Effect.cozy,            5, 0, 0);
         NewEffect(ref myEffects,Effect.vintage,          3, 0, 0);
         NewEffect(ref myEffects,Effect.academic,        1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,          1, 0, 0);
+
         #region apply
-        var charInfo = new Character(type, myEffects);
+        var charInfo = new Character(name, myEffects);
         charactersList.Add(charInfo);
         ClearCharacterListData(ref myEffects);
         #endregion
 
-        type = CharacterType.punkRocker;
+        name = CharacterType.punkRocker;
         NewEffect(ref myEffects,Effect.food,         0, 0, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
@@ -482,7 +526,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.noise,        3, 0, 0);
         NewEffect(ref myEffects,Effect.music,        4, 0, 0);
         NewEffect(ref myEffects,Effect.painting,      0, 0, 0);
-        NewEffect(ref myEffects,Effect.entertainment, 1, 0, 0);
+        NewEffect(ref myEffects,Effect.entertainment, 3, 0, 0);
         NewEffect(ref myEffects,Effect.grunge,       5, 0, 0);
         NewEffect(ref myEffects,Effect.cozy,        -4, 0, 0);
         NewEffect(ref myEffects,Effect.vintage,       3, 0, 0);
@@ -490,11 +534,11 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.hunting,       0, 0, 0);
 
         #region apply
-        charactersList.Add(new Character(type, myEffects));
+        charactersList.Add(new Character(name, myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
-        type = CharacterType.yeti;
+        name = CharacterType.yeti;
         NewEffect(ref myEffects,Effect.food,         3, hungryR*2, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
@@ -512,7 +556,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,       2, 0, 0);
         #region apply
-        charactersList.Add(new Character(type, myEffects));
+        charactersList.Add(new Character(name, myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
@@ -674,7 +718,7 @@ public partial class Main : Node2D
 
         var furnitureItem = ChooseNewCharacterToUnlock();
         if (furnitureItem != null)
-            unlocksLabelClass.NewUnlock($"{furnitureItem.type}");
+            unlocksLabelClass.NewUnlock($"{furnitureItem.name}");
     }
     void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
     {
@@ -685,15 +729,15 @@ public partial class Main : Node2D
         Room roomWeAreIn = null;
         if(FlatNumberMouseIsIn > 0 && RoomNumberMouseIsIn>0)
             roomWeAreIn= flatsList[FlatNumberMouseIsIn].rooms[RoomNumberMouseIsIn] ;
-       
-        
 
-        if ((RoomNumberMouseIsIn > -1 && roomWeAreIn!=null) &&
-            (HeldObject.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldObject.roomTypes[0])) ||
+        OverPlaceableTile = false;
+
+        if (roomWeAreIn != null && FlatNumberMouseIsIn>0 && RoomNumberMouseIsIn > -1 )       
+          if  ((HeldObject.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldObject.roomTypes[0])) ||
                 (HeldObject.type != FurnitureType._core && HeldObject.roomTypes.Contains(roomWeAreIn.type)))
-            OverPlaceableTile = true;
-        else
-            OverPlaceableTile = false;
+            OverPlaceableTile = true; 
+        
+            
 
 
         placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates * MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
@@ -715,9 +759,10 @@ public partial class Main : Node2D
             newObjectClass.objectData = newObjectData;
             newObjectClass.myShadow.Texture = HeldObject.shadowTexture;
             newObjectClass.mySprite.Texture = placeItemImage.Texture;
-            newObjectClass.flatIAmIn = FlatNumberMouseIsIn;
+            newObjectClass.myFlatNumber = FlatNumberMouseIsIn;
             newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
             newObjectClass.myRoom = roomWeAreIn;
+
             if (newObjectData.floorObject)
                 newObjectClass.mySprite.ZIndex = -2000;
 
@@ -791,9 +836,11 @@ public partial class Main : Node2D
             var newCharacterClass = (Characters)newObject;
                 newCharacterClass.characterData = heldCharacter;
                 newCharacterClass.SetupBleedList();
-                newCharacterClass.mySprite.Texture = placeItemImage.Texture;
+                newCharacterClass.myAnimator.SpriteFrames = (SpriteFrames)GetResource($"res://CHARACTERS/ANIMATIONS/{newCharacterClass.characterData.name}Animations.tres");
+                newCharacterClass.myAnimator.Animation = "idle";
                 newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
                 newCharacterClass.myFlatNumber = FlatNumberMouseIsIn;
+                newCharacterClass.AddMyselfToEveryonesRelationshipsList();
                 flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newCharacterClass);
                 if(placeManually==false)
                 if (heldCharacter != null || heldObject != null)
@@ -862,9 +909,9 @@ public partial class Main : Node2D
         return correctObject;
     }
 
-    Character GetCharacterFromType(CharacterType type)
+    Character GetCharacterFromType(CharacterType name)
     {
-        var correctObject = charactersList.FirstOrDefault(obj => obj.type == type);
+        var correctObject = charactersList.FirstOrDefault(obj => obj.name == name);
         return correctObject;
     }
 

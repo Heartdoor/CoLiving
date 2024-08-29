@@ -57,5 +57,5 @@ justification_flags = 160
 
 [node name="Shadow" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-z_index = -2000
+z_index = -1800
 texture = ExtResource("3_wdunq")

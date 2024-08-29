@@ -128,14 +128,18 @@ namespace Asriela
             rockingChair,
             rug,
             tv,
-            sideCountertop,
             yarnBasket,
             stonePainting,
-            roarRock
+            roarRock,
+            smallSideTable
         }
 
 
-
+        public enum RelationshipType : short
+        {
+            friendship,
+            romantic
+        }
         public enum FurnitureGroup : short
         {
             none,
@@ -174,6 +178,7 @@ namespace Asriela
         }
         public enum Effect : short
         {
+            none,
             food,
             sleep,
             hygiene,
@@ -189,7 +194,8 @@ namespace Asriela
             cozy,
             vintage,
             academic,
-            hunting
+            hunting,
+            happiness
 
 
 
@@ -239,7 +245,9 @@ namespace Asriela
             standBusyHands,
             strumGuitar,
             sitAndKnitt,
-            roar
+            roar,
+            listenToMusic,
+            cook
         }
 
 
@@ -255,12 +263,12 @@ namespace Asriela
                 Effect.grunge => "💀",
                 Effect.music => "🎵",
                 Effect.noise => "📢",
-                Effect.vintage => "🎩",
+                Effect.vintage => "🧐",
                 Effect.comfort => "🛋",
                 Effect.food => "🍽",
                 Effect.cozy => "🌸",
                 Effect.entertainment => "🎭",
-                Effect.hygiene => "💧",
+                Effect.hygiene => "🚿",
                 Effect.romance => "💋",
                 Effect.safety => "🔑",
                 Effect.academic => "📕",
@@ -445,7 +453,7 @@ namespace Asriela
             ret = nearestDistance;
             return ret;
         }
-        public static Node2D FindNearest(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureName objectName, int flatNumber)
+        public static Node2D FindNearestFurniture(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, FurnitureName objectName, int flatNumber)
         {
             var allObjects = GetAllObjects(tree, groupName);
             List<Node2D> objectsWithMatchingTags = new List<Node2D>();
@@ -460,7 +468,7 @@ namespace Asriela
                 {
                     Furniture objectClass = (Furniture)obj;
 
-                    if(objectName == objectClass.objectData.name && objectClass.flatIAmIn == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if(objectName == objectClass.objectData.name && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -475,6 +483,38 @@ namespace Asriela
             }
 
            // Log($"   {nearestObject.Name} was the closest  ", LogType.nearest);
+            return nearestObject;
+        }
+        public static Node2D FindNearestCharacter(Node2D subject, SceneTree tree, Node2D mayNotBe, string groupName, CharacterType objectName, int flatNumber)
+        {
+            var allObjects = GetAllObjects(tree, groupName);
+            List<Node2D> objectsWithMatchingTags = new List<Node2D>();
+
+            float nearestDistance = 99999999999999;
+            Node2D nearestObject = null;
+
+            foreach (Node2D obj in allObjects)
+            {
+
+                if (subject != obj && (mayNotBe != obj))
+                {
+                    Characters characterClass = (Characters)obj;
+
+                    if (objectName == characterClass.characterData.name && characterClass.myFlatNumber == flatNumber && characterClass.interactingWithCharacter==null)
+                    {
+                        float distance = MeasureDistance(subject, obj);
+                        if (distance < nearestDistance)
+                        {
+                            nearestDistance = distance;
+                            nearestObject = obj;
+
+                        }
+                    }
+
+                }
+            }
+
+            // Log($"   {nearestObject.Name} was the closest  ", LogType.nearest);
             return nearestObject;
         }
 
@@ -493,7 +533,7 @@ namespace Asriela
                 {
                     Furniture objectClass = (Furniture)obj;
 
-                    if (objectGroup == objectClass.objectData.group && objectClass.flatIAmIn == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if (objectGroup == objectClass.objectData.group && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -1244,12 +1284,12 @@ namespace Asriela
             if (velocity.X != 0)
             {
                 // If moving right, set scale.x to positive value
-                animator.FlipH = true;
+                animator.FlipH = false;
             }
             if (velocity.X < 0)
             {
                 // If moving left, set scale.x to negative value
-                animator.FlipH = false;
+                animator.FlipH = true;
             }
 
         }

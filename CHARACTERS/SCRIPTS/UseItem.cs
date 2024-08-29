@@ -14,6 +14,17 @@ public partial class UseItem : Node
     }
     public void UseTarget()
     {
+        ChangeColor(myCharacter.stateSquare,ColorGreen);
+        if (myCharacter.stopCurrentAction)
+        {
+            StopUsingObject();
+            myCharacter.stopCurrentAction = false;
+            myCharacter.canPerformAction = false;
+            return;
+        }
+
+        myCharacter.isInInteraction = true;
+
         var accessObject = (Furniture)myCharacter.accessTarget;
         var useObject = (Furniture)myCharacter.useTarget;
 
@@ -50,14 +61,13 @@ public partial class UseItem : Node
             myCharacter.GlobalPosition = accessObject.myUseLocation2.GlobalPosition;
         else
             myCharacter.GlobalPosition = accessObject.myUseLocation1.GlobalPosition;
-            myCharacter.mySprite.Texture = myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
+            PlayAnimation(myCharacter.myAnimator, $"{useObject.objectData.useAnimation}");//myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
         }
         //Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
         if (myCharacter.alarm.Ended(TimerType.actionLength))
         {
 
-            Log("DONE USING ITEM", LogType.step);
-            myCharacter.mySprite.Texture = myCharacter.ChangeSprite("");
+
             var item = useObject.objectData;
             // Update heat values after task completion 
             foreach (var key in myCharacter.heatOfObjects.Keys.ToList())
@@ -67,23 +77,38 @@ public partial class UseItem : Node
                     myCharacter.heatOfObjects[key] += basePreferenceForObject;
             }
             myCharacter.heatOfObjects[item] = 0;
-            myCharacter.busyUsing = null;
-            myCharacter.accessTarget = null;
-            myCharacter.usingTarget = null;
+
 
 
             GetEffected(myCharacter.basePrefOfObjects[item]);
-            var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, out float sum);
+            var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, false, out float sum);
             GetMoneyEffected(sum, effectsBreakdown);
-
-            useObject.occupants.Remove(myCharacter);
-            if (accessObject != useObject)
-                accessObject.occupants.Remove(myCharacter);
-
+            StopUsingObject();
+            
 
         }
 
+   
 
+
+    }
+
+    void StopUsingObject()
+    {
+        var accessObject = (Furniture)myCharacter.accessTarget;
+        var useObject = (Furniture)myCharacter.useTarget;
+        myCharacter.busyUsing = null;
+        myCharacter.accessTarget = null;
+        myCharacter.usingTarget = null;
+
+
+        useObject.occupants.Remove(myCharacter);
+        if (accessObject != useObject)
+            accessObject.occupants.Remove(myCharacter);
+
+        Log("DONE USING ITEM", LogType.step);
+        
+        myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
     }
 
     public void EffectEntireFlat(Main.Object furnitureItem)
@@ -92,7 +117,7 @@ public partial class UseItem : Node
         {
             //calculate base preference for this object
              
-            var effectsBreakdown = CalculateBasePreference(tenant.characterData,furnitureItem, out float sum );
+            var effectsBreakdown = CalculateBasePreference(tenant.characterData,furnitureItem,true, out float sum );
             
             tenant.useItemArm.GetMoneyEffected(sum, effectsBreakdown);
 
@@ -100,11 +125,13 @@ public partial class UseItem : Node
                 
         }
     }
-    public Dictionary<Effect, float> CalculateBasePreference(Main.Character tenant, Main.Object furniture, out float sum)
+    public Dictionary<Effect, float> CalculateBasePreference(Main.Character tenant, Main.Object furniture, bool isRadiantEffect, out float sum)
     {
 
             Dictionary<Effect, float> effectsBreakdown = new Dictionary<Effect, float>();
+            
             var objE = furniture.usedEffects;
+            if (isRadiantEffect) objE = furniture.usedRadiantEffects;
             var charE = tenant.effectsList;
             Log($"CALCULATING {furniture.type}", LogType.step);
             // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
@@ -147,21 +174,24 @@ public partial class UseItem : Node
         if (effectValue < 0)
         {
             myCharacter.grumpyIcon.Visible = true;
-            myCharacter.mySprite.Texture = myCharacter.ChangeSprite("Angry");
+            myCharacter.stopCurrentAction = true;
+            myCharacter.isUpset = true;
+            PlayAnimation(myCharacter.myAnimator, $"upset");
             myCharacter.alarm.Start(TimerType.grumpy, 5, false, 0);
+
         }
 
-        
+        myCharacter.characterData.feelings[Effect.happiness]+= effectValue;
 
 
         int index=0;
         foreach (KeyValuePair<Effect, float> effect in effectBreakdown)
         {
             var effectLabel = (EffectLabel)AddUINode("res://UI/SCENES/effects_label.tscn", myCharacter);
-            effectLabel.GlobalPosition = ChangePosition(effectLabel.GlobalPosition, 0, -100);
+            effectLabel.GlobalPosition = ChangePosition(effectLabel.GlobalPosition, 0, -50);
 
-            if(myCharacter.bleedList.ContainsKey(effect.Key)) 
-            myCharacter.bleedList[effect.Key] += effect.Value;
+            if(myCharacter.characterData.needs.ContainsKey(effect.Key)) 
+            myCharacter.characterData.needs[effect.Key] += effect.Value;
 
 
             effectLabel.SetLabel( effect.Key , effect.Value<0 ? true : false,  index);

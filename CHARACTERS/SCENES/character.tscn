@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3 uid="uid://bj7bw5jnmx0nn"]
 
 [ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/Characters.cs" id="1_ofd6p"]
-[ext_resource type="Texture2D" uid="uid://bkslwjsonhndd" path="res://CHARACTERS/SPRITES/granny.png" id="2_lmt1e"]
-[ext_resource type="Texture2D" uid="uid://gq60cixma6cl" path="res://UI/SPRITES/grumpy.png" id="3_sh27w"]
+[ext_resource type="SpriteFrames" uid="uid://bkp5ae72qsdxb" path="res://CHARACTERS/ANIMATIONS/grannyAnimations.tres" id="2_yioed"]
 [ext_resource type="Texture2D" uid="uid://dqr11f2ca3cf2" path="res://CHARACTERS/SPRITES/granny_s.png" id="4_2ttrf"]
+[ext_resource type="Texture2D" uid="uid://blrxm36436cmi" path="res://UI/SPRITES/stateSquare.png" id="4_6kv68"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d43sc"]
 radius = 5.00009
@@ -31,10 +31,12 @@ motion_mode = 1
 wall_min_slide_angle = 0.0
 script = ExtResource("1_ofd6p")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Animation2D" type="AnimatedSprite2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(1, -21)
-texture = ExtResource("2_lmt1e")
+position = Vector2(1, -22)
+sprite_frames = ExtResource("2_yioed")
+animation = &"sitAndKnitt"
+speed_scale = 2.0
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 unique_name_in_owner = true
@@ -43,6 +45,7 @@ path_desired_distance = 0.1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_d43sc")
+disabled = true
 
 [node name="HappinessLabel" type="Label" parent="."]
 unique_name_in_owner = true
@@ -65,11 +68,15 @@ vertical_alignment = 1
 
 [node name="Grumpy" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(2, -107)
-texture = ExtResource("3_sh27w")
+position = Vector2(1, -71)
 
 [node name="Shadow" type="Sprite2D" parent="."]
 unique_name_in_owner = true
-z_index = -2000
+z_index = -1800
 position = Vector2(1, -21)
 texture = ExtResource("4_2ttrf")
+
+[node name="StateUI" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(-20, -45)
+texture = ExtResource("4_6kv68")

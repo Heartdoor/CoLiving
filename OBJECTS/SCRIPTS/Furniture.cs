@@ -13,7 +13,7 @@ public partial class Furniture : StaticBody2D
     public Node2D myUseLocation1;
     public Node2D myUseLocation2;
     public List<CharacterBody2D> occupants = new List<CharacterBody2D>();
-    public int flatIAmIn = 0;
+    public int myFlatNumber = 0;
     public int roomIAmIn = 0;
     
     public List<Furniture> myConnectedFurniture = new List<Furniture>();
