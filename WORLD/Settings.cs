@@ -12,11 +12,14 @@ public partial class Settings : Node
     public static bool objectsRoomTypeLabel=    Toggle(0);
     public static bool characterLabelHasTargetName = Toggle(0);
     public static bool characterLabelHasHappinessValue = Toggle(1);
+    public static bool characterLabelHasDesiresValues = Toggle(1);
     public static bool showCharacterStateSquare = Toggle(1);
     public static bool exitButton = Toggle(1);
 
 
     public static bool playerMode = Toggle(0);
+
+    public static float tweak_desireVSobjectValue = 120;//percentage to devide desire value to put it in the 0-10 range instead of 0-100 range
 
     void Start()
     {
@@ -35,6 +38,7 @@ public partial class Settings : Node
             charactersUnlocked = Toggle(0);
             furnitureUnlocked = Toggle(0);
             showCharacterStateSquare= Toggle(0);
+            characterLabelHasDesiresValues= Toggle(0);
         }
     }
 

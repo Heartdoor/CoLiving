@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using static Asriela.BasicFunctions;
@@ -12,7 +12,50 @@ public partial class UseItem : Node
     {
         this.myCharacter = myCharacter;
     }
-    public void UseTarget()
+
+    public void SocialInteractWithTarget()
+    {
+        ChangeColor(myCharacter.stateSquare, ColorPink);
+        if (myCharacter.stopCurrentAction)
+        {
+            StopSocializing();
+            myCharacter.stopCurrentAction = false;
+            myCharacter.canPerformAction = false;
+            return;
+        }
+        myCharacter.isInInteraction = true;
+
+        //setup access 
+        //Furniture accessObject =null;
+        //if(myCharacter.accessTarget!=null)
+        //accessObject  = (Furniture)myCharacter.accessTarget;
+        var socialTarget = (Characters)myCharacter.useTarget;
+
+        //start social interaction
+        if (myCharacter.interactingWith == null)
+        {
+
+            myCharacter.interactingWith=socialTarget;
+            //add flat wide effects later 
+
+            //set each other as in a social engagement
+            myCharacter.interactingWithCharacter= socialTarget;
+            socialTarget.interactingWithCharacter= myCharacter;
+
+            //play social interaction animation
+            PlayAnimation(myCharacter.myAnimator, $"{myCharacter.chosenInteractionWithCharacter}_{myCharacter.characterData.biggestEmotion}");
+
+        }
+
+        //end social interaction
+        if (myCharacter.alarm.Ended(TimerType.actionLength))
+        {
+            GetEffectedBySocial();
+            StopSocializing();
+        }
+
+    }
+    public void UseFunitureTarget()
     {
         ChangeColor(myCharacter.stateSquare,ColorGreen);
         if (myCharacter.stopCurrentAction)
@@ -31,11 +74,11 @@ public partial class UseItem : Node
         if (accessObject == null)
             accessObject = useObject;
             //START USING
-        if (myCharacter.busyUsing == null)
+        if (myCharacter.interactingWith == null)
         {
             if(accessObject.occupants.Count < accessObject.objectData.size) 
             { 
-                myCharacter.busyUsing = useObject;
+                myCharacter.interactingWith = useObject;
                 //MAKE A FLAT WIDE EFFECT HAPPEN
                 if(useObject.objectData.flatWideEffect)
                 EffectEntireFlat(useObject.objectData);
@@ -44,11 +87,13 @@ public partial class UseItem : Node
                 if(accessObject!= useObject)
                 accessObject.occupants.Add(myCharacter);
 
-         
+                PlayAnimation(myCharacter.myAnimator, $"{useObject.objectData.useAnimation}_{myCharacter.characterData.biggestEmotion}");//myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
+
+
             }
             else
             {
-                myCharacter.busyUsing = null;
+                myCharacter.interactingWith = null;
                 myCharacter.accessTarget = null;
                 myCharacter.useTarget = null;
             }
@@ -57,11 +102,11 @@ public partial class UseItem : Node
                 myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
             }
             else
-        if(accessObject.occupants.Count==2)
-            myCharacter.GlobalPosition = accessObject.myUseLocation2.GlobalPosition;
-        else
+            if(accessObject.occupants.Count==2)
+                myCharacter.GlobalPosition = accessObject.myUseLocation2.GlobalPosition;
+            else
             myCharacter.GlobalPosition = accessObject.myUseLocation1.GlobalPosition;
-            PlayAnimation(myCharacter.myAnimator, $"{useObject.objectData.useAnimation}");//myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
+
         }
         //Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
         if (myCharacter.alarm.Ended(TimerType.actionLength))
@@ -80,7 +125,7 @@ public partial class UseItem : Node
 
 
 
-            GetEffected(myCharacter.basePrefOfObjects[item]);
+            GetEffectedByFurniture(myCharacter.basePrefOfObjects[item]);
             var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, false, out float sum);
             GetMoneyEffected(sum, effectsBreakdown);
             StopUsingObject();
@@ -97,7 +142,7 @@ public partial class UseItem : Node
     {
         var accessObject = (Furniture)myCharacter.accessTarget;
         var useObject = (Furniture)myCharacter.useTarget;
-        myCharacter.busyUsing = null;
+        myCharacter.interactingWith = null;
         myCharacter.accessTarget = null;
         myCharacter.usingTarget = null;
 
@@ -110,7 +155,22 @@ public partial class UseItem : Node
         
         myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
     }
+    void StopSocializing()
+    {
+        var accessObject = (Furniture)myCharacter.accessTarget;
+        var socialTarget = (Characters)myCharacter.useTarget;
+        myCharacter.interactingWith = null;
+        myCharacter.accessTarget = null;
+        myCharacter.usingTarget = null;
 
+
+        myCharacter.interactingWithCharacter = null;
+        socialTarget.interactingWithCharacter = null;
+
+        Log("✔DONE SOCIAL INTERACTION", LogType.step);
+
+        
+    }
     public void EffectEntireFlat(Main.Object furnitureItem)
     {
         foreach(Characters tenant in Main.flatsList[myCharacter.myFlatNumber].charactersInFlat)
@@ -155,11 +215,19 @@ public partial class UseItem : Node
         sum= products.Sum();
         return effectsBreakdown;
     }
-    public void GetEffected(float effectValue)
+    public void GetEffectedByFurniture(float effectValue)
     {
         if (Main.TestGameMode != Main.testGameMode.complex) return;
         myCharacter.happiness += effectValue;
     }
+
+    public void GetEffectedBySocial( )
+    {
+        var effect = myCharacter.chosenDesireToSocializeOn;
+        myCharacter.characterData.desires[effect] = ClampMin(0,myCharacter.characterData.desires[effect]-myCharacter.characterData.effectsList[effect].actionSatisfaction);
+        
+    }
+
     public void CalculateStaticHappiness()
     {
         if (Main.TestGameMode != Main.testGameMode.zooTycoon) return;

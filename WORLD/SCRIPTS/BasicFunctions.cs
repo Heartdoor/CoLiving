@@ -35,6 +35,12 @@ namespace Asriela
 
         #region TRICKS
 
+        public static float ClampMin(float clampValue, float inputValue)
+        {
+            if(inputValue< clampValue)
+                inputValue= clampValue;
+            return inputValue;
+        }
         public static bool BinaryBool(int binary)
         {
             return binary == 0 ? false : true;
@@ -204,6 +210,14 @@ namespace Asriela
 
         }
 
+        public enum Emotion: short
+        {
+            neutral,
+            happy,
+            sad,
+            angry,
+            flirty
+        }
         public enum DesireAction : short
         {
             none,
@@ -1432,6 +1446,7 @@ namespace Asriela
         public static readonly Color ColorBlue = new Color(0x0094FFff);
         public static readonly Color ColorRed = new Color(0xFF5B4Cff);
         public static readonly Color ColorGreen = new Color(0xAEFF4Cff);
+        public static readonly Color ColorPink = new Color(0xFF5EC6ff);
         public static readonly Color ColorYellow = new Color(0xFFCC4Cff);
         public static readonly Color ColorPurple = new Color(0xCC4CFFff);
         public static readonly Color ColorGrey = new Color(0xCCd3d3d3);

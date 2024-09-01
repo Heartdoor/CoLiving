@@ -35,7 +35,7 @@ script = ExtResource("1_ofd6p")
 unique_name_in_owner = true
 position = Vector2(1, -22)
 sprite_frames = ExtResource("2_yioed")
-animation = &"sitAndKnitt"
+animation = &"sitAndKnitt_neutral"
 speed_scale = 2.0
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]

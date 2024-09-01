@@ -73,7 +73,7 @@ public partial class Characters : CharacterBody2D
     #endregion
 
     #region ACTIONS
-    public Furniture busyUsing = null;
+    public Node2D interactingWith = null;
     public Characters interactingWithCharacter = null;
     public bool wander = false;
     public bool stopCurrentAction = false;
@@ -81,7 +81,7 @@ public partial class Characters : CharacterBody2D
     public bool isUpset=false;
     public bool isInInteraction=false;
     public DesireAction chosenInteractionWithCharacter = DesireAction.none;
-    public Effect chosenDesireToActOn = Effect.none;
+    public Effect chosenDesireToSocializeOn = Effect.none;
     public bool interpersonalInteraction = false;
     #endregion
 
@@ -170,7 +170,13 @@ public partial class Characters : CharacterBody2D
                     MoveToTarget(accessTarget);
                 else
                     if (canPerformAction)
-                    useItemArm.UseTarget();
+                    {
+                        if(interpersonalInteraction)
+                        useItemArm.SocialInteractWithTarget();
+                        else
+                        useItemArm.UseFunitureTarget();
+                    }
+                    
             }
         }
 
@@ -179,6 +185,7 @@ public partial class Characters : CharacterBody2D
 
         RunNeeds();
         RunDesires();
+        DetermineBiggestEmotion();
         StopBeingMad();
         MoveAndIdleAnimations();
     }
@@ -186,9 +193,9 @@ public partial class Characters : CharacterBody2D
     {
         if(isUpset || isInInteraction)
         return;
-        var changeValue =30;
+        
 
-        var idleAnimation = characterData.feelings[Effect.happiness]> changeValue ? "happy" : characterData.feelings[Effect.happiness] < -changeValue ? "angry" : "idle";
+        var idleAnimation = $"idle_{ characterData.biggestEmotion}";
 
         
 
@@ -233,6 +240,24 @@ public partial class Characters : CharacterBody2D
             }
         }
     }
+
+    void DetermineBiggestEmotion()
+    {
+        //add that needs drain happiness
+        characterData.biggestEmotion= Emotion.neutral;
+        var happiness= characterData.feelings[Effect.happiness];
+        var romance = characterData.feelings[Effect.romance];
+        var changeLimmit =30;
+       if(happiness  > changeLimmit)
+            characterData.biggestEmotion = Emotion.happy;
+       else if(happiness < -changeLimmit)
+            characterData.biggestEmotion = Emotion.angry;
+
+       if((happiness > 0 && romance>changeLimmit*2) || (happiness<0 && romance+ happiness> changeLimmit * 2))
+        {
+            characterData.biggestEmotion = Emotion.flirty;
+        }
+    }
     public void ManageIconsCharacterUI()
     {
         mainLabel.Text = ""; 
@@ -242,6 +267,16 @@ public partial class Characters : CharacterBody2D
 
         if ( Settings.characterLabelHasHappinessValue)
             mainLabel.Text += $"{characterData.feelings[Effect.happiness]}\n";
+
+        if (Settings.characterLabelHasDesiresValues)
+        {
+            foreach (KeyValuePair< Effect, float> desire in characterData.desires)
+            {
+                mainLabel.Text += $"{desire.Key} : {desire.Value.ToString("F2")}\n";
+            }
+
+            
+        }
     }
 
     void StopBeingMad()
@@ -261,6 +296,7 @@ public partial class Characters : CharacterBody2D
     }
     public void Wander()
     {
+        ChangeColor(stateSquare, ColorYellow);
         if (alarm.Ended(TimerType.wander))
         {
             wander = false;
@@ -383,20 +419,23 @@ public partial class Characters : CharacterBody2D
 
         foreach (Characters character in charactersInFlat)
         {
+            if(character != this) 
+            {
             //look at all possible interactions with this character, 
             //by looking at the desires we have 
-            chosenDesireToActOn=Effect.none;
-            chosenInteractionWithCharacter = DesireAction.none;
+            chosenDesireToSocializeOn=Effect.none;
+            
 
             foreach (KeyValuePair<Effect,float> desire in characterData.desires)
             {
                 if(highestValue< desire.Value)
                 {
                     highestValue= desire.Value;
-                    chosenDesireToActOn = desire.Key;
+                    chosenDesireToSocializeOn = desire.Key;
                     chosenInteractionWithCharacter = characterData.effectsList[desire.Key].action;
                     characterObject= character;
                 }
+            }
             }
         }
 
@@ -411,11 +450,17 @@ public partial class Characters : CharacterBody2D
         var valuedFurniture= mostValuedObject.furniture;
         var furnitureValue = mostValuedObject.value;
 
-        var mostValuedInterpersonal = ChooseFromCharacterList(); 
-        var valuedCharacter= mostValuedInterpersonal.character.characterData;
-        var characterValue = mostValuedInterpersonal.value;
+        var mostValuedInterpersonal = ChooseFromCharacterList();
+        Main.Character valuedCharacter=null;
+        var characterValue =0f;
+        if (mostValuedInterpersonal.character!= null)
+        {
+            valuedCharacter = mostValuedInterpersonal.character.characterData;
+            characterValue = mostValuedInterpersonal.value / Settings.tweak_desireVSobjectValue;
+        }
 
-        var interpersonalInteraction =false;
+
+     
         if (valuedFurniture == null && valuedCharacter == null)
         {
             alarm.Start(TimerType.wander, 5, false, 0);
@@ -456,7 +501,11 @@ public partial class Characters : CharacterBody2D
 
     void MoveToTarget(Node2D target)
     {
-        ChangeColor(stateSquare, ColorBlue);
+        if(interpersonalInteraction)
+        ChangeColor(stateSquare, ColorPurple);
+        else
+            ChangeColor(stateSquare, ColorBlue);
+
         Log("move to target", LogType.weird);
         ChangeApproachDistance(NavAgent, interactionDistance);
         // Log($"{name}  GOTO TARGET", LogType.game);
@@ -477,7 +526,7 @@ public partial class Characters : CharacterBody2D
         if (interpersonalInteraction) 
         {
             var characterObject = (Characters)usingTarget;
-            alarm.Start(TimerType.actionLength, characterObject.characterData.effectsList[chosenDesireToActOn].actionLength, false, 0);
+            alarm.Start(TimerType.actionLength, characterObject.characterData.effectsList[chosenDesireToSocializeOn].actionLength, false, 0);
         }
         else
         {

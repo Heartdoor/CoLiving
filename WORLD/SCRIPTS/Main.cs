@@ -119,9 +119,13 @@ public partial class Main : Node2D
             
             public float actionLength { get; set; }
 
+            public float actionSatisfaction { get; set; }
+
+        
+
             public bool syncDesireWithNeed { get; set; }
 
-        public EffectProperties( float strength, float needBleedRate, float desireGrowRate, DesireAction action = DesireAction.none, float actionLength = 5 , bool syncDesireWithNeed = false)
+        public EffectProperties( float strength, float needBleedRate, float desireGrowRate, DesireAction action, float actionLength, float actionSatisfaction, bool syncDesireWithNeed )
             {
    
                 this.strength = strength;
@@ -130,6 +134,7 @@ public partial class Main : Node2D
                 this.action = action;
                 this.syncDesireWithNeed = syncDesireWithNeed;
                 this.actionLength = actionLength;
+                this.actionSatisfaction = actionSatisfaction;
             }
         }
 
@@ -160,7 +165,9 @@ public partial class Main : Node2D
             public Dictionary<Effect, float> feelings { get; set; }
             public Dictionary<Effect, float> desires { get; set; }
 
-            public Character(CharacterType name, Dictionary<Effect, EffectProperties> effectsList)
+            public Emotion biggestEmotion { get; set; }
+
+        public Character(CharacterType name, Dictionary<Effect, EffectProperties> effectsList)
             {
                 this.name = name;
                 image_path = $"res://CHARACTERS/SPRITES/{name}.png";
@@ -170,8 +177,10 @@ public partial class Main : Node2D
                 relationshipsList = new Dictionary<Characters, Relationship>();
                 feelings = new Dictionary<Effect, float>();
                 feelings.Add(Effect.happiness,0);
+                feelings.Add(Effect.romance, 0);
                 needs  = new Dictionary<Effect, float>();
                 desires = new Dictionary<Effect, float>();
+                biggestEmotion=Emotion.neutral;
         }
         }
         public static List<Character> charactersList = new List<Character>();
@@ -460,10 +469,10 @@ public partial class Main : Node2D
 
         Dictionary<Effect, EffectProperties> myEffects =new Dictionary<Effect, EffectProperties>();
 
-        void NewEffect(ref Dictionary<Effect, EffectProperties>  myEffects, Effect type, float strength, float needBleedRate, float desireGrowRate, DesireAction action = DesireAction.none, bool syncDesireWithNeed = false)
+        void NewEffect(ref Dictionary<Effect, EffectProperties>  myEffects, Effect type, float strength, float needBleedRate, float desireGrowRate,  DesireAction action = DesireAction.none, float actionLength = 10, float actionSatisfaction = 80, bool syncDesireWithNeed = false)
         {
 
-            myEffects.Add(type, new EffectProperties(strength, needBleedRate, desireGrowRate, action, syncDesireWithNeed));  
+            myEffects.Add(type, new EffectProperties(strength, needBleedRate, desireGrowRate, action, actionLength, actionSatisfaction,syncDesireWithNeed));  
         }
         #endregion
 
@@ -490,12 +499,13 @@ public partial class Main : Node2D
         var hygieneR = 0.001f;
         var socialR = 0.0001f;
         var desireR = 0.0001f;
-
+   
         name = CharacterType.granny;
+        //add a new effect of social, likes socializing by 1, bleeds as a need by socialR, grows a desire to act on social by social r, will do action talk when desire is high enough, do social action for length of?, then reduce the desire by amount after action
+        NewEffect(ref myEffects, Effect.social, 1, socialR, socialR, DesireAction.talk);
         NewEffect(ref myEffects, Effect.food,           2, hungryR, 0);
         NewEffect(ref myEffects,Effect.sleep,           3, sleepyR, 0);
-        NewEffect(ref myEffects,Effect.hygiene,         3, hygieneR, 0);
-        NewEffect(ref myEffects,Effect.social,           1, socialR, 0);
+        NewEffect(ref myEffects,Effect.hygiene,         3, hygieneR, 0);        
         NewEffect(ref myEffects,Effect.safety,           3, 0, 0);
         NewEffect(ref myEffects,Effect.comfort,         3, 0, 0);
         NewEffect(ref myEffects,Effect.romance,        0, 0, 0);
@@ -519,7 +529,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.food,         0, 0, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
-        NewEffect(ref myEffects,Effect.social,        1, socialR, 0);
+        NewEffect(ref myEffects,Effect.social,        1, socialR, socialR*10, DesireAction.talk);
         NewEffect(ref myEffects,Effect.safety,        0, 0, 0);
         NewEffect(ref myEffects,Effect.comfort,      1, 0, 0);
         NewEffect(ref myEffects,Effect.romance,     0, 0, 0);
@@ -542,7 +552,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.food,         3, hungryR*2, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
-        NewEffect(ref myEffects,Effect.social,        1, socialR, 0);
+        NewEffect(ref myEffects,Effect.social,        1, socialR, socialR, DesireAction.talk);
         NewEffect(ref myEffects,Effect.safety,        3, 0, 0);
         NewEffect(ref myEffects,Effect.comfort,      1, 0, 0);
         NewEffect(ref myEffects,Effect.romance,     0, 0, 0);
@@ -551,7 +561,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.painting,      2, 0, 0);
         NewEffect(ref myEffects,Effect.entertainment, 1, 0, 0);
         NewEffect(ref myEffects,Effect.grunge,       0, 0, 0);
-        NewEffect(ref myEffects,Effect.cozy,         3, 0, desireR, DesireAction.hug, false);
+        NewEffect(ref myEffects,Effect.cozy,         3, 0, desireR, DesireAction.hug);
         NewEffect(ref myEffects,Effect.vintage,       0, 0, 0);
         NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,       2, 0, 0);
@@ -837,7 +847,7 @@ public partial class Main : Node2D
                 newCharacterClass.characterData = heldCharacter;
                 newCharacterClass.SetupBleedList();
                 newCharacterClass.myAnimator.SpriteFrames = (SpriteFrames)GetResource($"res://CHARACTERS/ANIMATIONS/{newCharacterClass.characterData.name}Animations.tres");
-                newCharacterClass.myAnimator.Animation = "idle";
+                newCharacterClass.myAnimator.Animation = "idle_neutral";
                 newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
                 newCharacterClass.myFlatNumber = FlatNumberMouseIsIn;
                 newCharacterClass.AddMyselfToEveryonesRelationshipsList();
