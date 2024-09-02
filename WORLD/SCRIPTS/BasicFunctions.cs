@@ -77,7 +77,7 @@ namespace Asriela
 
         private static Dictionary<LogType, bool> LogTypesOn = new Dictionary<LogType, bool>()
     {
-        { LogType.alarms,           BinaryBool(1)},
+        { LogType.alarms,           BinaryBool(0)},
         { LogType.nearest,          BinaryBool(0)},
         { LogType.action,           BinaryBool(0)},
         { LogType.timedFunction,    BinaryBool(0)},
@@ -87,7 +87,7 @@ namespace Asriela
         { LogType.error,            BinaryBool(1)},
         { LogType.ui,               BinaryBool(0)},
         { LogType.player,           BinaryBool(1)},
-        { LogType.step,             BinaryBool(1)},
+        { LogType.step,             BinaryBool(0)},
         { LogType.weird,            BinaryBool(1)}
     };
 
@@ -125,6 +125,7 @@ namespace Asriela
         public enum FurnitureName : short
         {
             none,
+            debug1,
             couch,
             recordPlayer,
             electricGuitar,
@@ -201,7 +202,9 @@ namespace Asriela
             vintage,
             academic,
             hunting,
-            happiness
+            happiness,
+            anger,
+            debug1
 
 
 
@@ -254,8 +257,8 @@ namespace Asriela
 
         public enum UseAnimation : short
         {
+            idle,
             sit,
-            stand,
             standBusyHands,
             strumGuitar,
             sitAndKnitt,
@@ -1481,10 +1484,28 @@ namespace Asriela
             modulateColor.A += value;
             myLabel.SelfModulate = modulateColor;
         }
-
+        public static void ChangeSpriteAlpha(Sprite2D sprite, float value)
+        {
+            Color modulateColor = sprite.SelfModulate;
+            modulateColor.A += value;
+            sprite.SelfModulate = modulateColor;
+        }
+        public static void SetSpriteAlpha(Sprite2D sprite, float value)
+        {
+            Color modulateColor = sprite.SelfModulate;
+            modulateColor.A = value;
+            sprite.SelfModulate = modulateColor;
+        }
         public static float GetAlpha(Control myLabel)
         {
             Color modulateColor = myLabel.SelfModulate;
+            return modulateColor.A;
+
+        }
+
+        public static float GetSpriteAlpha(Sprite2D sprite)
+        {
+            Color modulateColor = sprite.SelfModulate;
             return modulateColor.A;
 
         }

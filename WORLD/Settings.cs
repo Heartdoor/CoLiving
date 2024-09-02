@@ -19,8 +19,16 @@ public partial class Settings : Node
 
     public static bool playerMode = Toggle(0);
 
-    public static float tweak_desireVSobjectValue = 120;//percentage to devide desire value to put it in the 0-10 range instead of 0-100 range
+    public static float tweak_desireVSobjectValue = 1;//percentage to devide desire value to put it in the 0-10 range instead of 0-100 range
+    public static float tweak_negativeFlatEffectsBoost = 3;
 
+    public static Color stateColorBeingSocializedWithAndNotUsingFurniture = ColorYellow;
+    public static Color stateColorInactive = ColorGrey;
+    public static Color stateColorMovingToFurniture = ColorBlue;
+    public static Color stateColorMovingToSocialTarget = ColorPurple;
+    public static Color stateColorSocializing = ColorPink;
+    public static Color stateColorUsingFurniture = ColorGreen;
+    public static Color stateColorUpset = ColorRed;
     void Start()
     {
         if (infinateMoney)

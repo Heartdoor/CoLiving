@@ -61,7 +61,7 @@ public partial class Furniture : StaticBody2D
             }
         }
 
-        Log($"{count}", LogType.game);
+       // Log($"{count}", LogType.game);
 
     }
 

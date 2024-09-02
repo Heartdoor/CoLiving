@@ -15,7 +15,7 @@ public partial class UseItem : Node
 
     public void SocialInteractWithTarget()
     {
-        ChangeColor(myCharacter.stateSquare, ColorPink);
+        ChangeColor(myCharacter.stateSquare, Settings.stateColorSocializing);
         if (myCharacter.stopCurrentAction)
         {
             StopSocializing();
@@ -57,7 +57,7 @@ public partial class UseItem : Node
     }
     public void UseFunitureTarget()
     {
-        ChangeColor(myCharacter.stateSquare,ColorGreen);
+        ChangeColor(myCharacter.stateSquare,Settings.stateColorUsingFurniture);
         if (myCharacter.stopCurrentAction)
         {
             StopUsingObject();
@@ -89,6 +89,12 @@ public partial class UseItem : Node
 
                 PlayAnimation(myCharacter.myAnimator, $"{useObject.objectData.useAnimation}_{myCharacter.characterData.biggestEmotion}");//myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
 
+                if (!accessObject.objectData.ontopUsePosition)
+                {
+                    myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
+                }
+                else
+                    myCharacter.GlobalPosition = accessObject.occupants.IndexOf(myCharacter) == 0 ? accessObject.myUseLocation1.GlobalPosition : accessObject.myUseLocation2.GlobalPosition;
 
             }
             else
@@ -97,15 +103,7 @@ public partial class UseItem : Node
                 myCharacter.accessTarget = null;
                 myCharacter.useTarget = null;
             }
-            if (!accessObject.objectData.ontopUsePosition)
-            {
-                myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
-            }
-            else
-            if(accessObject.occupants.Count==2)
-                myCharacter.GlobalPosition = accessObject.myUseLocation2.GlobalPosition;
-            else
-            myCharacter.GlobalPosition = accessObject.myUseLocation1.GlobalPosition;
+
 
         }
         //Log($"TIME LEFT: {alarm.Total(TimerType.actionLength)} / {alarm.Left(TimerType.actionLength)} | {alarm.Global()}", LogType.step );
@@ -144,7 +142,7 @@ public partial class UseItem : Node
         var useObject = (Furniture)myCharacter.useTarget;
         myCharacter.interactingWith = null;
         myCharacter.accessTarget = null;
-        myCharacter.usingTarget = null;
+        myCharacter.interactingWithTarget = null;
 
 
         useObject.occupants.Remove(myCharacter);
@@ -157,11 +155,11 @@ public partial class UseItem : Node
     }
     void StopSocializing()
     {
-        var accessObject = (Furniture)myCharacter.accessTarget;
+       // var accessObject = (Furniture)myCharacter.accessTarget;
         var socialTarget = (Characters)myCharacter.useTarget;
         myCharacter.interactingWith = null;
         myCharacter.accessTarget = null;
-        myCharacter.usingTarget = null;
+        myCharacter.interactingWithTarget = null;
 
 
         myCharacter.interactingWithCharacter = null;
@@ -246,9 +244,10 @@ public partial class UseItem : Node
             myCharacter.isUpset = true;
             PlayAnimation(myCharacter.myAnimator, $"upset");
             myCharacter.alarm.Start(TimerType.grumpy, 5, false, 0);
+            myCharacter.characterData.feelings[Effect.happiness] += effectValue*Settings.tweak_negativeFlatEffectsBoost;
 
         }
-
+        else
         myCharacter.characterData.feelings[Effect.happiness]+= effectValue;
 
 

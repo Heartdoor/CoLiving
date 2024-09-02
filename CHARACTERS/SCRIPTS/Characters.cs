@@ -36,7 +36,7 @@ public partial class Characters : CharacterBody2D
     public float speed = 40;
     public float friction = 1300f;
 
-    public Node2D usingTarget = null;
+    public Node2D interactingWithTarget = null;
     #endregion
     #region A STAR
     [Export] private NodePath _pathfindingNodePath;
@@ -49,6 +49,7 @@ public partial class Characters : CharacterBody2D
 
     public Sprite2D myShadow;
     public Sprite2D stateSquare;
+    public Sprite2D actionSquare;
     public Sprite2D grumpyIcon;
     public Main.Character characterData;
     public AnimatedSprite2D myAnimator;
@@ -108,6 +109,7 @@ public partial class Characters : CharacterBody2D
         myAnimator = GetNode<AnimatedSprite2D>("Animation2D");
         myShadow = GetNode<Sprite2D>("Shadow");
         stateSquare = GetNode<Sprite2D>("StateUI");
+        actionSquare = GetNode<Sprite2D>("ActionUI");
         mainLabel = GetNode<Label>("HappinessLabel");
 
         bleedLabel = GetNode<Label>("BleedLabel");
@@ -116,17 +118,7 @@ public partial class Characters : CharacterBody2D
         useItemArm = new UseItem(this);
     }
 
-    void SetupAStar()
-    {
 
-        _pathfinding = GetParent().GetNode<Pathfinding>("Pathfinding");
-
-        Log($"PATH {_pathfinding}", LogType.error);
-
-        // Set your target position here
-
-
-    }
 
     public void SetupBleedList()
     {
@@ -151,7 +143,7 @@ public partial class Characters : CharacterBody2D
     
         stateSquare.Visible = Settings.showCharacterStateSquare;
 
-        ChangeColor(stateSquare, ColorGrey);
+        ChangeColor(stateSquare, Settings.stateColorInactive);
         isInInteraction =false;
         ZIndex = (int)GlobalPosition.Y;
         FlipAnimatedSprite(myAnimator, Velocity);
@@ -160,13 +152,16 @@ public partial class Characters : CharacterBody2D
             Wander();
         else
         {
-            if (accessTarget == null)
+            if (accessTarget == null && interactingWithCharacter ==null)
             {
                 FindTarget();
             }
             else
             {
-                if (usingTarget == null)
+                if (interactingWithCharacter != null)
+                    ChangeColor(stateSquare, Settings.stateColorBeingSocializedWithAndNotUsingFurniture);
+
+                if (interactingWithTarget == null)
                     MoveToTarget(accessTarget);
                 else
                     if (canPerformAction)
@@ -177,6 +172,8 @@ public partial class Characters : CharacterBody2D
                         useItemArm.UseFunitureTarget();
                     }
                     
+
+
             }
         }
 
@@ -188,6 +185,12 @@ public partial class Characters : CharacterBody2D
         DetermineBiggestEmotion();
         StopBeingMad();
         MoveAndIdleAnimations();
+        FadeActionSquare();
+    }
+    void FadeActionSquare()
+    {
+        if(GetSpriteAlpha(actionSquare)>0)
+        ChangeSpriteAlpha(actionSquare,-0.01f);
     }
     void MoveAndIdleAnimations()
     {
@@ -296,7 +299,7 @@ public partial class Characters : CharacterBody2D
     }
     public void Wander()
     {
-        ChangeColor(stateSquare, ColorYellow);
+        ChangeColor(stateSquare, Settings.stateColorInactive);
         if (alarm.Ended(TimerType.wander))
         {
             wander = false;
@@ -370,7 +373,7 @@ public partial class Characters : CharacterBody2D
         // Add critical items to the queue in order 
         foreach (var item in sortedItems)
         {
-            if (heatOfObjects[item] > 0 && !objectQueue.Contains(item))
+            if (heatOfObjects[item] >= 0 && !objectQueue.Contains(item))
             {
                 objectQueue.Enqueue(item);        // add item to queue if it's not already in the queue 
                                                      // Assume queue length is limited to n 
@@ -403,8 +406,8 @@ public partial class Characters : CharacterBody2D
             highestHeat= heatOfObjects[mostValuedObject];
 
             //var mostValuedObject = myListOfObjects.Aggregate((l, r) => l.Value > r.Value ? l : r).Key;
-
-            Log($"CHOSE {mostValuedObject.name}", LogType.game);
+            if(mostValuedObject!=null)
+            Log($"{characterData.emoji} WANTS TO USE [{mostValuedObject.name}] AT VALUE [{highestHeat}]", LogType.game);
        
         }
 
@@ -414,9 +417,11 @@ public partial class Characters : CharacterBody2D
     {
         chosenInteractionWithCharacter = DesireAction.none;
         Characters characterObject = null;
-        var charactersInFlat=Main.flatsList[Main.FlatNumberMouseIsIn].charactersInFlat;
         var highestValue = 0f;
+        var charactersInFlat=Main.flatsList[Main.FlatNumberMouseIsIn].charactersInFlat;
+        if (charactersInFlat.Count < 2) return (null, 0f);
 
+        
         foreach (Characters character in charactersInFlat)
         {
             if(character != this) 
@@ -438,7 +443,9 @@ public partial class Characters : CharacterBody2D
             }
             }
         }
-
+        highestValue /= Settings.tweak_desireVSobjectValue;
+        if(characterObject!=null)
+        Log($"{characterData.emoji} WANTS TO [{chosenInteractionWithCharacter}] WITH [{characterObject.characterData.emoji}] AT VALUE [{highestValue}]", LogType.game);
         return (characterObject,highestValue); 
     }
 
@@ -446,6 +453,7 @@ public partial class Characters : CharacterBody2D
     void FindTarget()
     {
 
+        PulseActionDebugSquare(Settings.stateColorUpset);
         var mostValuedObject = ChooseObjectFromList();
         var valuedFurniture= mostValuedObject.furniture;
         var furnitureValue = mostValuedObject.value;
@@ -456,7 +464,7 @@ public partial class Characters : CharacterBody2D
         if (mostValuedInterpersonal.character!= null)
         {
             valuedCharacter = mostValuedInterpersonal.character.characterData;
-            characterValue = mostValuedInterpersonal.value / Settings.tweak_desireVSobjectValue;
+            characterValue = mostValuedInterpersonal.value;
         }
 
 
@@ -468,7 +476,7 @@ public partial class Characters : CharacterBody2D
             accessTarget = null;
         }
         else
-        if(furnitureValue> characterValue)
+        if(furnitureValue>= characterValue)
         {
             interpersonalInteraction= false;
             if (valuedFurniture.useFromGroup== FurnitureGroup.chair)
@@ -490,6 +498,7 @@ public partial class Characters : CharacterBody2D
             interpersonalInteraction=true;
             useTarget = FindNearestCharacter(this, this.GetTree(), null, "Character", valuedCharacter.name, myFlatNumber);  
             accessTarget = useTarget;
+            accessNode= accessTarget;
 
         }
             
@@ -501,12 +510,13 @@ public partial class Characters : CharacterBody2D
 
     void MoveToTarget(Node2D target)
     {
-        if(interpersonalInteraction)
-        ChangeColor(stateSquare, ColorPurple);
+        
+        if (interpersonalInteraction)
+        ChangeColor(stateSquare, Settings.stateColorMovingToSocialTarget);
         else
-            ChangeColor(stateSquare, ColorBlue);
+            ChangeColor(stateSquare, Settings.stateColorMovingToFurniture);
 
-        Log("move to target", LogType.weird);
+
         ChangeApproachDistance(NavAgent, interactionDistance);
         // Log($"{name}  GOTO TARGET", LogType.game);
         var destination = accessNode.GlobalPosition;
@@ -516,21 +526,22 @@ public partial class Characters : CharacterBody2D
 
     public void ReachTarget()
     {
-        if(useTarget!=null )
-        usingTarget = useTarget;
+        PulseActionDebugSquare(Settings.stateColorMovingToSocialTarget);
+        if (useTarget!=null )
+        interactingWithTarget = useTarget;
         else
-        usingTarget = accessTarget;
+        interactingWithTarget = accessTarget;
 
-        Log("reach target", LogType.weird);
+
 
         if (interpersonalInteraction) 
         {
-            var characterObject = (Characters)usingTarget;
+            var characterObject = (Characters)interactingWithTarget;
             alarm.Start(TimerType.actionLength, characterObject.characterData.effectsList[chosenDesireToSocializeOn].actionLength, false, 0);
         }
         else
         {
-            var furnitureObject = (Furniture)usingTarget;
+            var furnitureObject = (Furniture)interactingWithTarget;
             alarm.Start(TimerType.actionLength, furnitureObject.objectData.useLength, false, 0);
         }
         Log("Reached target", LogType.step);
@@ -548,6 +559,12 @@ public partial class Characters : CharacterBody2D
         if (addedText == "stand") addedText = "";
         addedText = Capitalize(addedText);
         return GetTexture2D($"res://CHARACTERS/SPRITES/{characterData.name}{addedText}.png");
+    }
+
+    public void PulseActionDebugSquare(Color color)
+    {
+        ChangeColor(actionSquare, color);
+        SetSpriteAlpha(actionSquare, 1);
     }
 
 

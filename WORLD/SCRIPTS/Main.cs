@@ -1,4 +1,4 @@
-using Godot;
+﻿using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -167,7 +167,9 @@ public partial class Main : Node2D
 
             public Emotion biggestEmotion { get; set; }
 
-        public Character(CharacterType name, Dictionary<Effect, EffectProperties> effectsList)
+            public string emoji { get; set; }
+
+        public Character(CharacterType name, string emoji, Dictionary<Effect, EffectProperties> effectsList)
             {
                 this.name = name;
                 image_path = $"res://CHARACTERS/SPRITES/{name}.png";
@@ -181,6 +183,7 @@ public partial class Main : Node2D
                 needs  = new Dictionary<Effect, float>();
                 desires = new Dictionary<Effect, float>();
                 biggestEmotion=Emotion.neutral;
+                this.emoji =emoji;
         }
         }
         public static List<Character> charactersList = new List<Character>();
@@ -259,6 +262,17 @@ public partial class Main : Node2D
     void SetupObjects()
     {
 
+        AddNewObject(FurnitureName.debug1);
+        o.type = FurnitureType._core;
+        o.roomTypes.Add(RoomType.livingroom);
+        o.flatWideEffect = false;
+        o.size = 1;
+        o.price = 0;
+        o.useLength = 10;
+        o.rotation = Direction.down;
+        o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
+        o.useAnimation = UseAnimation.idle;
+        o.usedEffects.Add(Effect.debug1, 5);
 
 
         AddNewObject(FurnitureName.couch);
@@ -331,7 +345,7 @@ public partial class Main : Node2D
         o.price = 200;
         o.useLength = 10;
         o.rotation = Direction.right;
-        o.useAnimation = UseAnimation.stand;
+        o.useAnimation = UseAnimation.idle;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.food, 4);
         o.usedEffects.Add(Effect.cozy, 2);
@@ -344,7 +358,7 @@ public partial class Main : Node2D
         o.price = 100;
         o.useLength = 10;
         o.rotation = Direction.down;
-        o.useAnimation = UseAnimation.stand;
+        o.useAnimation = UseAnimation.idle;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.food, 4);
         o.usedEffects.Add(Effect.cozy, 2);
@@ -430,7 +444,7 @@ public partial class Main : Node2D
         o.price = 100;
         o.useLength = 10;
         o.rotation = Direction.down;
-        o.useAnimation = UseAnimation.stand;
+        o.useAnimation = UseAnimation.idle;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.usedEffects.Add(Effect.comfort, 4);
         o.usedEffects.Add(Effect.cozy, 2);
@@ -466,6 +480,7 @@ public partial class Main : Node2D
     {
         #region setup
         CharacterType name;
+        string emoji;
 
         Dictionary<Effect, EffectProperties> myEffects =new Dictionary<Effect, EffectProperties>();
 
@@ -501,6 +516,7 @@ public partial class Main : Node2D
         var desireR = 0.0001f;
    
         name = CharacterType.granny;
+        emoji = "👵";
         //add a new effect of social, likes socializing by 1, bleeds as a need by socialR, grows a desire to act on social by social r, will do action talk when desire is high enough, do social action for length of?, then reduce the desire by amount after action
         NewEffect(ref myEffects, Effect.social, 1, socialR, socialR, DesireAction.talk);
         NewEffect(ref myEffects, Effect.food,           2, hungryR, 0);
@@ -520,12 +536,13 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.hunting,          1, 0, 0);
 
         #region apply
-        var charInfo = new Character(name, myEffects);
+        var charInfo = new Character(name, emoji, myEffects);
         charactersList.Add(charInfo);
         ClearCharacterListData(ref myEffects);
         #endregion
 
         name = CharacterType.punkRocker;
+        emoji = "👩‍🎤";
         NewEffect(ref myEffects,Effect.food,         0, 0, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
@@ -542,13 +559,15 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.vintage,       3, 0, 0);
         NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,       0, 0, 0);
+        NewEffect(ref myEffects, Effect.debug1, 5, 0, 0);
 
         #region apply
-        charactersList.Add(new Character(name, myEffects));
+        charactersList.Add(new Character(name,emoji, myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
         name = CharacterType.yeti;
+        emoji = "❄🐵";
         NewEffect(ref myEffects,Effect.food,         3, hungryR*2, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
@@ -566,7 +585,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,       2, 0, 0);
         #region apply
-        charactersList.Add(new Character(name, myEffects));
+        charactersList.Add(new Character(name,emoji, myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
@@ -833,7 +852,7 @@ public partial class Main : Node2D
             {
             PlacedCharactersList.Add(heldCharacter);
 
-            Log("CHARACTER PLACED", LogType.game);
+      
 
             var newObject = Add2DNode("res://CHARACTERS/SCENES/character.tscn", this);
             if (placeManually)

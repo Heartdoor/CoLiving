@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 BasicFunctions="*res://WORLD/SCRIPTS/BasicFunctions.cs"
+Panku="*res://addons/panku_console/console.tscn"
 
 [display]
 
@@ -30,7 +31,7 @@ project/assembly_name="New"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
+enabled=PackedStringArray("res://addons/panku_console/plugin.cfg")
 
 [file_customization]
 

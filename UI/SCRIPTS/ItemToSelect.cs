@@ -12,7 +12,7 @@ public partial class ItemToSelect : Button
 
     void OnPressed()
     {
-        Log("HAS COUCH", LogType.game);
+
         if (MyObject != null)
         {
 
