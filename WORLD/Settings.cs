@@ -9,10 +9,15 @@ public partial class Settings : Node
     public static bool furnitureUnlocked =      Toggle(1);
     public static bool charactersUnlocked =     Toggle(1);
     public static bool infinateMoney      =     Toggle(1);
+    public static bool debugHotkeys_RoomQuickSetup = Toggle(1);
+    public static bool debugHotkeys_DesireControls = Toggle(1);
+
     public static bool objectsRoomTypeLabel=    Toggle(0);
     public static bool characterLabelHasTargetName = Toggle(0);
     public static bool characterLabelHasHappinessValue = Toggle(1);
     public static bool characterLabelHasDesiresValues = Toggle(1);
+    public static bool objectsLabelHasCoOrdinates = Toggle(1);
+
     public static bool showCharacterStateSquare = Toggle(1);
     public static bool exitButton = Toggle(1);
 
@@ -27,8 +32,10 @@ public partial class Settings : Node
     public static Color stateColorMovingToFurniture = ColorBlue;
     public static Color stateColorMovingToSocialTarget = ColorPurple;
     public static Color stateColorSocializing = ColorPink;
-    public static Color stateColorUsingFurniture = ColorGreen;
-    public static Color stateColorUpset = ColorRed;
+    public static Color stateColorUsingFurniture = ColorLime;
+    public static Color stateColorUpset = ColorMaroon;
+    public static Color stateColorFind = ColorRed;
+    public static Color stateColorArrive = ColorGreen;
     void Start()
     {
         if (infinateMoney)
@@ -47,6 +54,9 @@ public partial class Settings : Node
             furnitureUnlocked = Toggle(0);
             showCharacterStateSquare= Toggle(0);
             characterLabelHasDesiresValues= Toggle(0);
+            objectsLabelHasCoOrdinates = Toggle(0);
+            debugHotkeys_RoomQuickSetup= Toggle(0);
+            debugHotkeys_DesireControls = Toggle(0);
         }
     }
 

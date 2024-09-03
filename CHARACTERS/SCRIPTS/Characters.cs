@@ -46,7 +46,7 @@ public partial class Characters : CharacterBody2D
     public float Speed = 200.0f;
     #endregion
     #region BASIC OBJECT
-
+    public Sprite2D mySelectionBox;
     public Sprite2D myShadow;
     public Sprite2D stateSquare;
     public Sprite2D actionSquare;
@@ -66,7 +66,7 @@ public partial class Characters : CharacterBody2D
 
     int maxQueueLength = 20;
     public int lastMoneyEffect = 0;
-   
+
     /// <summary>
     /// 
     /// </summary>
@@ -79,8 +79,8 @@ public partial class Characters : CharacterBody2D
     public bool wander = false;
     public bool stopCurrentAction = false;
     public bool canPerformAction = true;
-    public bool isUpset=false;
-    public bool isInInteraction=false;
+    public bool isUpset = false;
+    public bool isInInteraction = false;
     public DesireAction chosenInteractionWithCharacter = DesireAction.none;
     public Effect chosenDesireToSocializeOn = Effect.none;
     public bool interpersonalInteraction = false;
@@ -108,6 +108,8 @@ public partial class Characters : CharacterBody2D
 
         myAnimator = GetNode<AnimatedSprite2D>("Animation2D");
         myShadow = GetNode<Sprite2D>("Shadow");
+        mySelectionBox = GetNode<Sprite2D>("Select");
+        mySelectionBox.Visible=false;
         stateSquare = GetNode<Sprite2D>("StateUI");
         actionSquare = GetNode<Sprite2D>("ActionUI");
         mainLabel = GetNode<Label>("HappinessLabel");
@@ -137,13 +139,36 @@ public partial class Characters : CharacterBody2D
         SetupObject();
 
     }
+    public void ChangeStateSquare(Sprite2D square, Color color)
+    {
+        ChangeColor(square, color);
+
+        if(color == Settings.stateColorInactive)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare.png");
+        if (color == Settings.stateColorBeingSocializedWithAndNotUsingFurniture)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_socialize.png");
+        if (color == Settings.stateColorSocializing)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_socialize.png");
+        if (color == Settings.stateColorUpset)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_upset.png");
+        if (color == Settings.stateColorUsingFurniture)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_use.png");
+        if (color == Settings.stateColorMovingToFurniture)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_goto.png");
+        if (color == Settings.stateColorMovingToSocialTarget )
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_goto.png");
+        if (color == Settings.stateColorFind)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_find.png");
+        if (color == Settings.stateColorArrive)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_arrive.png");
+    }
     //🏃‍
     void Run()
     {
     
         stateSquare.Visible = Settings.showCharacterStateSquare;
-
-        ChangeColor(stateSquare, Settings.stateColorInactive);
+        ChangeStateSquare(stateSquare, Settings.stateColorInactive);
+        
         isInInteraction =false;
         ZIndex = (int)GlobalPosition.Y;
         FlipAnimatedSprite(myAnimator, Velocity);
@@ -159,7 +184,7 @@ public partial class Characters : CharacterBody2D
             else
             {
                 if (interactingWithCharacter != null)
-                    ChangeColor(stateSquare, Settings.stateColorBeingSocializedWithAndNotUsingFurniture);
+                    ChangeStateSquare(stateSquare, Settings.stateColorBeingSocializedWithAndNotUsingFurniture);
 
                 if (interactingWithTarget == null)
                     MoveToTarget(accessTarget);
@@ -186,6 +211,13 @@ public partial class Characters : CharacterBody2D
         StopBeingMad();
         MoveAndIdleAnimations();
         FadeActionSquare();
+        CheckIfSelected();
+    }
+    void CheckIfSelected()
+    {
+        mySelectionBox.Visible = false;
+        if (Main.SelectedCharacter == this)
+            mySelectionBox.Visible = true;
     }
     void FadeActionSquare()
     {
@@ -294,12 +326,12 @@ public partial class Characters : CharacterBody2D
         else
         if(isUpset)
         {
-            ChangeColor(stateSquare, ColorRed);
+            ChangeStateSquare(stateSquare, Settings.stateColorUpset);
         }
     }
     public void Wander()
     {
-        ChangeColor(stateSquare, Settings.stateColorInactive);
+        ChangeStateSquare(stateSquare, Settings.stateColorInactive);
         if (alarm.Ended(TimerType.wander))
         {
             wander = false;
@@ -453,7 +485,7 @@ public partial class Characters : CharacterBody2D
     void FindTarget()
     {
 
-        PulseActionDebugSquare(Settings.stateColorUpset);
+        PulseActionDebugSquare(Settings.stateColorFind);
         var mostValuedObject = ChooseObjectFromList();
         var valuedFurniture= mostValuedObject.furniture;
         var furnitureValue = mostValuedObject.value;
@@ -512,9 +544,9 @@ public partial class Characters : CharacterBody2D
     {
         
         if (interpersonalInteraction)
-        ChangeColor(stateSquare, Settings.stateColorMovingToSocialTarget);
+            ChangeStateSquare(stateSquare, Settings.stateColorMovingToSocialTarget);
         else
-            ChangeColor(stateSquare, Settings.stateColorMovingToFurniture);
+            ChangeStateSquare(stateSquare, Settings.stateColorMovingToFurniture);
 
 
         ChangeApproachDistance(NavAgent, interactionDistance);
@@ -526,7 +558,7 @@ public partial class Characters : CharacterBody2D
 
     public void ReachTarget()
     {
-        PulseActionDebugSquare(Settings.stateColorMovingToSocialTarget);
+        PulseActionDebugSquare(Settings.stateColorArrive);
         if (useTarget!=null )
         interactingWithTarget = useTarget;
         else
@@ -563,12 +595,20 @@ public partial class Characters : CharacterBody2D
 
     public void PulseActionDebugSquare(Color color)
     {
-        ChangeColor(actionSquare, color);
+        ChangeStateSquare(actionSquare, color);
         SetSpriteAlpha(actionSquare, 1);
     }
 
 
+    public void SelectedCharacter(Node viewport, InputEvent inputEvent, int shapeIdx)
+     {
+        if (LeftMousePressed(inputEvent)) {
+            
+            Main.SelectedCharacter = this;
 
+            }
+
+       }
     #region OLD
     public override void _Ready()
     {

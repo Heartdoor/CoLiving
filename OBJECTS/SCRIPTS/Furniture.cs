@@ -15,7 +15,7 @@ public partial class Furniture : StaticBody2D
     public List<CharacterBody2D> occupants = new List<CharacterBody2D>();
     public int myFlatNumber = 0;
     public int roomIAmIn = 0;
-    
+
     public List<Furniture> myConnectedFurniture = new List<Furniture>();
     public int myLayer;
     public Main.Room myRoom;
@@ -46,7 +46,7 @@ public partial class Furniture : StaticBody2D
         Vector2 bottomRight = shapeRect.Position + shapeRect.Size + GlobalPosition;
 
         // Convert these coordinates to tile coordinates.
-        myCenterTile= Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(GlobalPosition));
+        myCenterTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(GlobalPosition));
         myTopLeftTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(topLeft));
         myBottomRightTile = Main.MyTileMap.LocalToMap(Main.MyTileMap.ToLocal(bottomRight));
 
@@ -57,11 +57,11 @@ public partial class Furniture : StaticBody2D
             for (int y = myTopLeftTile.Y; y <= myBottomRightTile.Y; y++)
             {
                 count++;
-               Main.MyTileMap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(0, 2) );
+                Main.MyTileMap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(0, 2));
             }
         }
 
-       // Log($"{count}", LogType.game);
+        // Log($"{count}", LogType.game);
 
     }
 
@@ -83,21 +83,21 @@ public partial class Furniture : StaticBody2D
     {
         mySprite = GetNode<Sprite2D>("Sprite2D");
         myShadow = GetNode<Sprite2D>("Shadow");
-        
+
         myLabel = GetNode<Label>("Label");
         myUseLocation1 = GetNode<Node2D>("UseLocation1");
         myUseLocation2 = GetNode<Node2D>("UseLocation2");
-        Area2D areaParent= GetNode<Area2D>("Area2D");
+        Area2D areaParent = GetNode<Area2D>("Area2D");
         myArea = areaParent.GetNode<CollisionShape2D>("AreaShape");
-        myCollision= GetNode<CollisionShape2D>("CollisionShape");
+        myCollision = GetNode<CollisionShape2D>("CollisionShape");
 
 
     }
     void Start()
     {
-       
+
         SetupObject();
-        
+
     }
 
     void Run() {
@@ -107,7 +107,7 @@ public partial class Furniture : StaticBody2D
         {
             PlaceOnTileMap();
             firstRun = false;
-   
+
         }
         if (KeyPressed("RightClick"))
         {
@@ -116,17 +116,16 @@ public partial class Furniture : StaticBody2D
 
         ShowFurnitureGroupArea();
 
-        if(Settings.objectsRoomTypeLabel)
-            myLabel.Text = $"{ myRoom.type}";
-        if (occupants.Count > 0 && inUse==false)
+        SetFurnitureLabel();
+        if (occupants.Count > 0 && inUse == false)
         {
             inUse = true;
             var temp_texture = GetTexture2D($"res://OBJECTS/SPRITES/{objectData.name}_used.png");
             if (temp_texture != null)
-            mySprite.Texture = temp_texture;
+                mySprite.Texture = temp_texture;
         }
         else
-        if(inUse && occupants.Count==0)
+        if (inUse && occupants.Count == 0)
         {
             inUse = false;
             mySprite.Texture = GetTexture2D($"res://OBJECTS/SPRITES/{objectData.name}.png");
@@ -134,7 +133,14 @@ public partial class Furniture : StaticBody2D
 
 
     }
-
+    void SetFurnitureLabel()
+    {
+        myLabel.Text="";
+        if (Settings.objectsRoomTypeLabel)
+          myLabel.Text += $"{ myRoom.type} \n";
+        if (Settings.objectsLabelHasCoOrdinates)
+            myLabel.Text += $"X:{GlobalPosition.X} Y:{GlobalPosition.Y}\n";
+    }
     public void ShowFurnitureGroupArea()
     {
         /*

@@ -15,7 +15,7 @@ public partial class UseItem : Node
 
     public void SocialInteractWithTarget()
     {
-        ChangeColor(myCharacter.stateSquare, Settings.stateColorSocializing);
+        myCharacter.ChangeStateSquare(myCharacter.stateSquare, Settings.stateColorSocializing);
         if (myCharacter.stopCurrentAction)
         {
             StopSocializing();
@@ -57,7 +57,7 @@ public partial class UseItem : Node
     }
     public void UseFunitureTarget()
     {
-        ChangeColor(myCharacter.stateSquare,Settings.stateColorUsingFurniture);
+        myCharacter.ChangeStateSquare(myCharacter.stateSquare, Settings.stateColorUsingFurniture);
         if (myCharacter.stopCurrentAction)
         {
             StopUsingObject();

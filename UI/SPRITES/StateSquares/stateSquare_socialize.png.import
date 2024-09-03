@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blrxm36436cmi"
-path="res://.godot/imported/stateSquare.png-cbda51490db6d6cbac5a0b9988ec92b4.ctex"
+uid="uid://cva4f6gxpc2fp"
+path="res://.godot/imported/stateSquare_socialize.png-6b3514462535a90fd5f2b7784c423e37.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://UI/SPRITES/stateSquare.png"
-dest_files=["res://.godot/imported/stateSquare.png-cbda51490db6d6cbac5a0b9988ec92b4.ctex"]
+source_file="res://UI/SPRITES/StateSquares/stateSquare_socialize.png"
+dest_files=["res://.godot/imported/stateSquare_socialize.png-6b3514462535a90fd5f2b7784c423e37.ctex"]
 
 [params]
 

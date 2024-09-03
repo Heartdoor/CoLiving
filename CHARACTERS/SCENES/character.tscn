@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://bj7bw5jnmx0nn"]
+[gd_scene load_steps=11 format=3 uid="uid://bj7bw5jnmx0nn"]
 
 [ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/Characters.cs" id="1_ofd6p"]
 [ext_resource type="SpriteFrames" uid="uid://bkp5ae72qsdxb" path="res://CHARACTERS/ANIMATIONS/grannyAnimations.tres" id="2_yioed"]
 [ext_resource type="Texture2D" uid="uid://dqr11f2ca3cf2" path="res://CHARACTERS/SPRITES/granny_s.png" id="4_2ttrf"]
-[ext_resource type="Texture2D" uid="uid://blrxm36436cmi" path="res://UI/SPRITES/stateSquare.png" id="4_6kv68"]
+[ext_resource type="Texture2D" uid="uid://blrxm36436cmi" path="res://UI/SPRITES/StateSquares/stateSquare.png" id="4_6kv68"]
+[ext_resource type="Texture2D" uid="uid://d4jlrvoonwg1v" path="res://UI/SPRITES/Selection/characterSelect.png" id="5_wbj8j"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d43sc"]
 radius = 5.00009
@@ -25,6 +26,9 @@ corner_radius_bottom_left = 10
 
 [sub_resource type="Theme" id="Theme_dhth7"]
 Label/styles/normal = SubResource("StyleBoxFlat_5mf7c")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fkjhu"]
+size = Vector2(37, 68)
 
 [node name="Character" type="CharacterBody2D" groups=["Character"]]
 z_index = -1
@@ -88,3 +92,16 @@ texture = ExtResource("4_6kv68")
 unique_name_in_owner = true
 position = Vector2(-20, -36)
 texture = ExtResource("4_6kv68")
+
+[node name="Select" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(1, -23)
+texture = ExtResource("5_wbj8j")
+
+[node name="SelectionArea" type="Area2D" parent="."]
+
+[node name="SelectionShape" type="CollisionShape2D" parent="SelectionArea"]
+position = Vector2(-0.5, -21)
+shape = SubResource("RectangleShape2D_fkjhu")
+
+[connection signal="input_event" from="SelectionArea" to="." method="SelectedCharacter"]

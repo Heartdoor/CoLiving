@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://bvj56a8xici12"]
+[gd_scene load_steps=33 format=3 uid="uid://bvj56a8xici12"]
 
 [ext_resource type="Script" path="res://WORLD/SCRIPTS/Main.cs" id="1_b17qk"]
 [ext_resource type="Script" path="res://WORLD/Settings.cs" id="2_4yrta"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://cpq4ft00cf2ha" path="res://WORLD/SCENES/place_item_image.tscn" id="9_wda4i"]
 [ext_resource type="Script" path="res://UI/SCRIPTS/FlatWeAreInLabel.cs" id="10_lxq2t"]
 [ext_resource type="Script" path="res://UI/UnlocksLabel.cs" id="11_ps41o"]
+[ext_resource type="Script" path="res://WORLD/SCENES/DebugEffectOnMouse.cs" id="17_nxhdi"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_kiien"]
 vertices = PackedVector2Array(5, 5, -5, 5, -5, -5, 5, -5)
@@ -212,6 +213,11 @@ offset_bottom = 42.0
 theme_type_variation = &"HeaderLarge"
 horizontal_alignment = 1
 script = ExtResource("10_lxq2t")
+
+[node name="Label" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 23.0
+script = ExtResource("17_nxhdi")
 
 [connection signal="timeout" from="Camera2D/Timer" to="Camera2D" method="_on_timer_timeout"]
 [connection signal="pressed" from="CanvasLayer/ButtonRooms" to="CanvasLayer/ButtonRooms" method="OnPressed"]

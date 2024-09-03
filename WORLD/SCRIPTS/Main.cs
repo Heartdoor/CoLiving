@@ -49,6 +49,11 @@ public partial class Main : Node2D
     public static testGameMode TestGameMode = testGameMode.flowingMoney;
     #endregion
 
+    #region STATICS
+    public static Characters SelectedCharacter = null;
+    public static string DebugEffectOnMouse = "";
+    #endregion
+
     #region CLASSES SETUP
     public static List<Object>  FurnitureUnlockedList = new List<Object>();
     public int startingAmountOfUnlockedFurniture;
@@ -249,6 +254,7 @@ public partial class Main : Node2D
 
     #region LOCAL SETUPS
     Object o;
+    DebugHotkeys debugHotkeys  = new DebugHotkeys();
     #endregion
 
     #region SETUPS
@@ -636,13 +642,17 @@ public partial class Main : Node2D
 
         PlaceObjects(ref theObject, true, new Vector2(656, 437));
         var theCharacter = GetCharacterFromType(CharacterType.granny);
-        PlaceCharacter(ref theCharacter , ref theObject, true, new Vector2(276, 237));
+        PlaceCharacter(ref theCharacter , true, new Vector2(276, 237));
     }
     #endregion
 
 
+    void SetupDebugHotkeys()
+    {
+        debugHotkeys.myMain = this;
+        debugHotkeys.Start();
+    }
 
- 
 
     void Start()
     {
@@ -652,7 +662,7 @@ public partial class Main : Node2D
         SetupCharacters();
         SetupFlats();
         SetupFirstFlat();
-
+        SetupDebugHotkeys();
         
 
 
@@ -663,12 +673,12 @@ public partial class Main : Node2D
     void Run()
     {
 
-        HotKeys();
+        RunDebugHotkeys();
 
         if (canPlace) 
         { 
             PlaceObjects(ref HeldObject, false, new Vector2(0,0));
-            PlaceCharacter(ref HeldCharacter, ref HeldObject, false, new Vector2(0, 0));
+            PlaceCharacter(ref HeldCharacter,  false, new Vector2(0, 0));
             
             if(HeldObject==null && HeldCharacter==null) 
                 placeItemImage.Texture = null;
@@ -749,7 +759,7 @@ public partial class Main : Node2D
         if (furnitureItem != null)
             unlocksLabelClass.NewUnlock($"{furnitureItem.name}");
     }
-    void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
+    public void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
     {
 
         if (HeldObject == null) return;
@@ -840,7 +850,7 @@ public partial class Main : Node2D
     }
 
 
-    void PlaceCharacter(ref Character heldCharacter, ref Object heldObject, bool placeManually, Vector2 position)
+    public void PlaceCharacter(ref Character heldCharacter, bool placeManually, Vector2 position)
     {
         if (heldCharacter == null) return;
 
@@ -872,7 +882,7 @@ public partial class Main : Node2D
                 newCharacterClass.AddMyselfToEveryonesRelationshipsList();
                 flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newCharacterClass);
                 if(placeManually==false)
-                if (heldCharacter != null || heldObject != null)
+                if (heldCharacter != null )
                 {
                     HoldNothing();
                     Destroy(Main.SelectionMenuOpen);
@@ -890,7 +900,7 @@ public partial class Main : Node2D
         HeldObject = null;
         HeldCharacter = null;
     }
-    void HotKeys()
+    void RunDebugHotkeys()
     {
         if(KeyPressed("Restart") && QuickRestart)
         {
@@ -904,6 +914,8 @@ public partial class Main : Node2D
         {
             UnlockNewFurniture();
         }
+
+        debugHotkeys.Run();
         
     }
 
@@ -932,13 +944,13 @@ public partial class Main : Node2D
         return newFlat;
     }
 
-    Object GetObjectFromType(FurnitureName name)
+    public static Object GetObjectFromType(FurnitureName name)
     {
         var correctObject = objectsList.FirstOrDefault(obj => obj.name == name);
         return correctObject;
     }
 
-    Character GetCharacterFromType(CharacterType name)
+    public static Character GetCharacterFromType(CharacterType name)
     {
         var correctObject = charactersList.FirstOrDefault(obj => obj.name == name);
         return correctObject;

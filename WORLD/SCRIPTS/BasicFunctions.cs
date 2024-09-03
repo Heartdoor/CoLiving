@@ -72,12 +72,14 @@ namespace Asriela
             ui,
             weird,
             player,
-            step
+            step,
+            test
         }
 
         private static Dictionary<LogType, bool> LogTypesOn = new Dictionary<LogType, bool>()
     {
         { LogType.alarms,           BinaryBool(0)},
+        { LogType.test,           BinaryBool(1)},
         { LogType.nearest,          BinaryBool(0)},
         { LogType.action,           BinaryBool(0)},
         { LogType.timedFunction,    BinaryBool(0)},
@@ -927,6 +929,18 @@ namespace Asriela
         #region BUTTON
 
 
+        public static bool LeftMousePressed(InputEvent inputEvent)
+        {
+            bool ret=false;
+            if (inputEvent is InputEventMouseButton mouseEvent)
+            {
+                if (mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left)
+                    ret = true;
+   
+
+            }
+            return ret;
+        }
         public static bool KeyPressed(string actionName)
         {
             return Input.IsActionJustPressed(actionName);
@@ -1448,7 +1462,9 @@ namespace Asriela
         #region COLOR
         public static readonly Color ColorBlue = new Color(0x0094FFff);
         public static readonly Color ColorRed = new Color(0xFF5B4Cff);
-        public static readonly Color ColorGreen = new Color(0xAEFF4Cff);
+        public static readonly Color ColorMaroon = new Color(0xC41000ff);
+        public static readonly Color ColorGreen = new Color(0x37F256ff);
+        public static readonly Color ColorLime = new Color(0xAEFF4Cff);
         public static readonly Color ColorPink = new Color(0xFF5EC6ff);
         public static readonly Color ColorYellow = new Color(0xFFCC4Cff);
         public static readonly Color ColorPurple = new Color(0xCC4CFFff);
