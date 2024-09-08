@@ -5,7 +5,7 @@ using static Asriela.BasicFunctions;
 
 public partial class Settings : Node
 {
-
+    public static bool autoSetupStart = Toggle(1);
     public static bool furnitureUnlocked =      Toggle(1);
     public static bool charactersUnlocked =     Toggle(1);
     public static bool infinateMoney      =     Toggle(1);
@@ -26,6 +26,8 @@ public partial class Settings : Node
 
     public static float tweak_desireVSobjectValue = 1;//percentage to devide desire value to put it in the 0-10 range instead of 0-100 range
     public static float tweak_negativeFlatEffectsBoost = 3;
+    public static float tweak_socializingDistance = 10*5;
+    public static float tweak_interactionDistance = 10;
 
     public static Color stateColorBeingSocializedWithAndNotUsingFurniture = ColorYellow;
     public static Color stateColorInactive = ColorGrey;
@@ -45,6 +47,7 @@ public partial class Settings : Node
 
         if(playerMode)
         {
+            autoSetupStart= Toggle(0);
             exitButton = Toggle(0);
             characterLabelHasTargetName = Toggle(0);
             characterLabelHasHappinessValue = Toggle(0);

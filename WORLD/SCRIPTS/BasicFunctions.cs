@@ -1421,7 +1421,16 @@ namespace Asriela
             position.Y += yAdd;
             return position;
         }
+        public static Vector2 ChangePositionByAngle(Vector2 position, float angle, float distance)
+        {
+            Vector2 offset = new Vector2(Mathf.Cos(angle)* distance, Mathf.Sin(angle) * distance);
 
+            position += offset;
+
+            return position;
+        }
+
+        
         public static void Add3DX(Node3D subject, float amount)
         {
             var subPos = subject.GlobalPosition;
@@ -1585,7 +1594,17 @@ namespace Asriela
         #region GET RESOURCES
         public static Texture2D GetTexture2D(string path)
         {
-            return ResourceLoader.Exists(path) ? (Texture2D)ResourceLoader.Load(path): null;
+            Texture2D ret = null;
+            if (ResourceLoader.Exists(path))
+            {
+                ret = (Texture2D)ResourceLoader.Load(path);
+
+                
+
+            }
+            else Log($"BROKEN PATH {path}", LogType.error);
+
+            return ret; 
 
         }
 

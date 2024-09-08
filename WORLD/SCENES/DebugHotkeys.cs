@@ -10,11 +10,21 @@ public partial class DebugHotkeys : Node
     float rate =10;
     public Main myMain;
 
+    bool action1 = false;
+    bool action2 = false;
+
     public void Start()
     {
         listOfEffects.Add(Effect.social);
         listOfEffects.Add(Effect.happiness);
         listOfEffects.Add(Effect.anger);
+
+        if (Settings.autoSetupStart)
+        {
+            action1=true;
+            action2=true;
+
+        }
     }
     public void Run()
     {
@@ -29,9 +39,10 @@ public partial class DebugHotkeys : Node
     {
         Main.Object furniture;
         Main.Character character;
-        if (KeyPressed("debug_1"))
+        Characters newCharacter;
+        if (KeyPressed("debug_1") || action1)
         {
-     
+            action1=false;
             furniture = Main.GetObjectFromType(FurnitureName.couch);
             Main.RoomNumberMouseIsIn = 1;
             myMain.PlaceObjects(ref furniture, true, new Vector2(265, 255));
@@ -41,12 +52,16 @@ public partial class DebugHotkeys : Node
 
         }
 
-        if (KeyPressed("debug_2"))
+        if (KeyPressed("debug_2") || action2) 
         {
+            action2= false;
             character = Main.GetCharacterFromType(CharacterType.punkRocker);
-            myMain.PlaceCharacter(ref character, true, new Vector2(115, 205));
+            newCharacter=myMain.PlaceCharacter(ref character, true, new Vector2(115, 205));
+            newCharacter.characterData.desires[Effect.social]=10;
+
             character = Main.GetCharacterFromType(CharacterType.granny);
-            myMain.PlaceCharacter(ref character, true, new Vector2(135, 355));
+            newCharacter=myMain.PlaceCharacter(ref character, true, new Vector2(135, 355));
+
 
 
         }

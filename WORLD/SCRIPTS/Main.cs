@@ -170,7 +170,7 @@ public partial class Main : Node2D
             public Dictionary<Effect, float> feelings { get; set; }
             public Dictionary<Effect, float> desires { get; set; }
 
-            public Emotion biggestEmotion { get; set; }
+            public Emotion mainEmotion { get; set; }
 
             public string emoji { get; set; }
 
@@ -187,7 +187,7 @@ public partial class Main : Node2D
                 feelings.Add(Effect.romance, 0);
                 needs  = new Dictionary<Effect, float>();
                 desires = new Dictionary<Effect, float>();
-                biggestEmotion=Emotion.neutral;
+                mainEmotion=Emotion.neutral;
                 this.emoji =emoji;
         }
         }
@@ -850,12 +850,12 @@ public partial class Main : Node2D
     }
 
 
-    public void PlaceCharacter(ref Character heldCharacter, bool placeManually, Vector2 position)
+    public Characters PlaceCharacter(ref Character heldCharacter, bool placeManually, Vector2 position)
     {
-        if (heldCharacter == null) return;
+        if (heldCharacter == null) return null;
 
-
-            placeItemImage.GlobalPosition = GetGlobalMousePosition();
+        Characters newCharacterClass = null;
+        placeItemImage.GlobalPosition = GetGlobalMousePosition();
         placeItemImage.Texture = heldCharacter.texture;
 
             if (KeyPressed("RightClick") || placeManually)
@@ -872,7 +872,7 @@ public partial class Main : Node2D
             var character = heldCharacter;
             Main.CharactersAvailableToPlayerList = Main.CharactersAvailableToPlayerList.Where(x => x != character).ToList();
 
-            var newCharacterClass = (Characters)newObject;
+            newCharacterClass = (Characters)newObject;
                 newCharacterClass.characterData = heldCharacter;
                 newCharacterClass.SetupBleedList();
                 newCharacterClass.myAnimator.SpriteFrames = (SpriteFrames)GetResource($"res://CHARACTERS/ANIMATIONS/{newCharacterClass.characterData.name}Animations.tres");
@@ -890,7 +890,9 @@ public partial class Main : Node2D
 
                 }
                 }
-        
+            return newCharacterClass;
+
+
     }   
 
 

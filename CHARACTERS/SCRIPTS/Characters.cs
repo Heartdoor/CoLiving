@@ -25,7 +25,7 @@ public partial class Characters : CharacterBody2D
     Vector2 direction;
     public bool foundRandomPlace = false;
     Vector2 myVelocity;
-    public float interactionDistance = 10;
+
     public bool performedAction = false;
     int count = 0;
     float restAtPoint = 0;
@@ -53,7 +53,7 @@ public partial class Characters : CharacterBody2D
     public Sprite2D grumpyIcon;
     public Main.Character characterData;
     public AnimatedSprite2D myAnimator;
-    public UseItem useItemArm;
+    public Interact useItemArm;
     Label mainLabel;
     Label bleedLabel;
     #endregion
@@ -84,6 +84,7 @@ public partial class Characters : CharacterBody2D
     public DesireAction chosenInteractionWithCharacter = DesireAction.none;
     public Effect chosenDesireToSocializeOn = Effect.none;
     public bool interpersonalInteraction = false;
+    public int mySeatingIndex =0;
     #endregion
 
     #region DATA
@@ -92,7 +93,7 @@ public partial class Characters : CharacterBody2D
     void SetupNavigation()
     {
         navRegion = null;// GetParent().GetParent().GetParent().GetParent().GetNode<NavigationRegion2D>("MainNavRegion"); 
-        SetupNavAgent(this, ref NavAgent, interactionDistance);
+        SetupNavAgent(this, ref NavAgent, Settings.tweak_interactionDistance); 
         NavAgent.TargetReached += ReachTarget;
         NavAgent.VelocityComputed += VelocityComputedSignal;
     }
@@ -117,7 +118,7 @@ public partial class Characters : CharacterBody2D
         bleedLabel = GetNode<Label>("BleedLabel");
         grumpyIcon = GetNode<Sprite2D>("Grumpy");
         grumpyIcon.Visible = false;
-        useItemArm = new UseItem(this);
+        useItemArm = new Interact(this);
     }
 
 
@@ -186,7 +187,7 @@ public partial class Characters : CharacterBody2D
                 if (interactingWithCharacter != null)
                     ChangeStateSquare(stateSquare, Settings.stateColorBeingSocializedWithAndNotUsingFurniture);
 
-                if (interactingWithTarget == null)
+                if (interactingWithTarget == null )
                     MoveToTarget(accessTarget);
                 else
                     if (canPerformAction)
@@ -230,7 +231,7 @@ public partial class Characters : CharacterBody2D
         return;
         
 
-        var idleAnimation = $"idle_{ characterData.biggestEmotion}";
+        var idleAnimation = $"idle_{ characterData.mainEmotion}";
 
         
 
@@ -279,18 +280,18 @@ public partial class Characters : CharacterBody2D
     void DetermineBiggestEmotion()
     {
         //add that needs drain happiness
-        characterData.biggestEmotion= Emotion.neutral;
+        characterData.mainEmotion= Emotion.neutral;
         var happiness= characterData.feelings[Effect.happiness];
         var romance = characterData.feelings[Effect.romance];
         var changeLimmit =30;
        if(happiness  > changeLimmit)
-            characterData.biggestEmotion = Emotion.happy;
+            characterData.mainEmotion = Emotion.happy;
        else if(happiness < -changeLimmit)
-            characterData.biggestEmotion = Emotion.angry;
+            characterData.mainEmotion = Emotion.angry;
 
        if((happiness > 0 && romance>changeLimmit*2) || (happiness<0 && romance+ happiness> changeLimmit * 2))
         {
-            characterData.biggestEmotion = Emotion.flirty;
+            characterData.mainEmotion = Emotion.flirty;
         }
     }
     public void ManageIconsCharacterUI()
@@ -542,14 +543,22 @@ public partial class Characters : CharacterBody2D
 
     void MoveToTarget(Node2D target)
     {
-        
+        if(interactingWithCharacter != null)return;
         if (interpersonalInteraction)
+        {
+            ChangeApproachDistance(NavAgent, Settings.tweak_socializingDistance);
             ChangeStateSquare(stateSquare, Settings.stateColorMovingToSocialTarget);
+        }
+            
         else
+        {
             ChangeStateSquare(stateSquare, Settings.stateColorMovingToFurniture);
+            ChangeApproachDistance(NavAgent, Settings.tweak_interactionDistance);
+        }
+            
 
 
-        ChangeApproachDistance(NavAgent, interactionDistance);
+        
         // Log($"{name}  GOTO TARGET", LogType.game);
         var destination = accessNode.GlobalPosition;
         // GotoPointAndAvoid(this, NavAgent, speed, friction, accel, delta, destination, completedJourney);
@@ -558,6 +567,13 @@ public partial class Characters : CharacterBody2D
 
     public void ReachTarget()
     {
+        //MAKE SURE WE ARNT TOO CLOSE FOR A SOCIAL INTERACTION
+        if(interpersonalInteraction && DistanceBetweenObjects(this, useTarget) < Settings.tweak_socializingDistance-10) {
+            var destination = ChangePositionByAngle(useTarget.GlobalPosition, PointDirection((CharacterBody2D)useTarget,this), Settings.tweak_socializingDistance);
+            GotoPoint(this, NavAgent, speed, accel, delta, destination);
+            return;
+        }
+
         PulseActionDebugSquare(Settings.stateColorArrive);
         if (useTarget!=null )
         interactingWithTarget = useTarget;
