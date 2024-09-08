@@ -3,20 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\world\\scripts\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:world\\scripts\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\characters\\scripts\\interact.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:characters\\scripts\\interact.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\characters\\scripts\\characters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:characters\\scripts\\characters.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|c:\\users\\admin\\documents\\godot\\coliving\\characters\\scripts\\interact.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:characters\\scripts\\interact.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\world\\scripts\\basicfunctions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:world\\scripts\\basicfunctions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|c:\\users\\admin\\documents\\godot\\coliving\\world\\scripts\\basicfunctions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:world\\scripts\\basicfunctions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|c:\\users\\admin\\documents\\godot\\coliving\\world\\scripts\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:world\\scripts\\main.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|c:\\users\\admin\\documents\\godot\\coliving\\world\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3D100E56-0DF9-4F7C-B66E-FF7C1D037040}|New.csproj|solutionrelative:world\\settings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,7 +30,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 227,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,39 +38,52 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
+              "Title": "Settings.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\WORLD\\Settings.cs",
+              "RelativeDocumentMoniker": "WORLD\\Settings.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\WORLD\\Settings.cs",
+              "RelativeToolTip": "WORLD\\Settings.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAwAAAAxAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-08T19:04:38.847Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "BasicFunctions.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\WORLD\\SCRIPTS\\BasicFunctions.cs",
               "RelativeDocumentMoniker": "WORLD\\SCRIPTS\\BasicFunctions.cs",
               "ToolTip": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\WORLD\\SCRIPTS\\BasicFunctions.cs",
               "RelativeToolTip": "WORLD\\SCRIPTS\\BasicFunctions.cs",
-              "ViewState": "AQIAAAEGAAAAAAAAAAAgwEEGAAAQAAAA",
+              "ViewState": "AQIAABIFAAAAAAAAAAAcwCIFAAAEAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-08T16:27:00.086Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "Main.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\WORLD\\SCRIPTS\\Main.cs",
               "RelativeDocumentMoniker": "WORLD\\SCRIPTS\\Main.cs",
               "ToolTip": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\WORLD\\SCRIPTS\\Main.cs",
               "RelativeToolTip": "WORLD\\SCRIPTS\\Main.cs",
-              "ViewState": "AQIAAKkAAAAAAAAAAAA4wK0AAAAAAAAA",
+              "ViewState": "AQIAAKMAAAAAAAAAAAAkwKkAAAAtAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-07T15:56:15.088Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "Interact.cs",
               "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\CHARACTERS\\SCRIPTS\\Interact.cs",
               "RelativeDocumentMoniker": "CHARACTERS\\SCRIPTS\\Interact.cs",
               "ToolTip": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\CHARACTERS\\SCRIPTS\\Interact.cs",
               "RelativeToolTip": "CHARACTERS\\SCRIPTS\\Interact.cs",
-              "ViewState": "AQIAAFwAAAAAAAAAAAAIwGgAAAACAAAA",
+              "ViewState": "AQIAACUAAAAAAAAAAAAUwDUAAAA0AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-07T15:39:11.046Z",
               "EditorCaption": ""
@@ -79,7 +96,7 @@
               "RelativeDocumentMoniker": "CHARACTERS\\SCRIPTS\\Characters.cs",
               "ToolTip": "C:\\Users\\Admin\\Documents\\GODOT\\CoLiving\\CHARACTERS\\SCRIPTS\\Characters.cs",
               "RelativeToolTip": "CHARACTERS\\SCRIPTS\\Characters.cs",
-              "ViewState": "AQIAAFcCAAAAAAAAAAAjwGACAAA3AAAA",
+              "ViewState": "AQIAAKcAAAAAAAAAAAAQwLIAAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-07T14:34:18.233Z",
               "EditorCaption": ""

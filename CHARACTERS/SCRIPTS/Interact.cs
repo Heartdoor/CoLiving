@@ -42,8 +42,17 @@ public partial class Interact : Node
             //set each other as in a social engagement
             myCharacter.interactingWithCharacter= socialTarget;
             socialTarget.interactingWithCharacter= myCharacter;
-
-            
+            var lastPosition = myCharacter.GlobalPosition;
+         if (socialTarget.GlobalPosition < myCharacter.GlobalPosition)
+            {
+                // If moving right, set scale.x to positive value
+                myCharacter.myAnimator.FlipH = true;
+            }
+            else
+            {
+                // If moving left, set scale.x to negative value
+                myCharacter.myAnimator.FlipH = false;
+            }
 
             //play social interaction animation
             PlayAnimation(myCharacter.myAnimator, $"{myCharacter.chosenInteractionWithCharacter}_{myCharacter.characterData.mainEmotion}");
@@ -63,10 +72,9 @@ public partial class Interact : Node
         //SATISFY DESIRE
         SatisfyDesires();
 
-        DetermineTheConversationMakeup();
+        HaveConversation();
         //CALCULATE RELATIONSHIP EFFECT
-        ImpactEffects();
-        ImpactRelationships();
+
 
 
     }
@@ -76,7 +84,7 @@ public partial class Interact : Node
         myCharacter.characterData.desires[effect] = ClampMin(0, myCharacter.characterData.desires[effect] - myCharacter.characterData.effectsList[effect].actionSatisfaction);
 
     }
-    void DetermineTheConversationMakeup()
+   void HaveConversation()
     {
         /*4 ponged effect
          * 1- the type of social interaction
@@ -85,38 +93,99 @@ public partial class Interact : Node
          * 4- their previous activity
          * */
         var socialTarget = (Characters)myCharacter.useTarget;
+        var myCharacterData = myCharacter.characterData;
+        var targetCharacterData = socialTarget.characterData;
 
         //1
         var typeOfSocial = myCharacter.chosenInteractionWithCharacter;
         var desireOfSocial = myCharacter.chosenDesireToSocializeOn;
         //2
-        var objectTargetIsUsing = socialTarget.interactingWith;
+        var objectTargetIsUsing = (Furniture)socialTarget.interactingWith;
         //3
         var myEmotion = myCharacter.characterData.mainEmotion;
         var targetsEmotion = socialTarget.characterData.mainEmotion;
         //4
         //to be added
 
+        var objectToSocialInteraction = false;
         //PHASE 1 WILL TARGET ENGAGE WITH TYPE OF SOCIAL INTERACTION
   
         var targetsPreferenceToDesire = socialTarget.characterData.effectsList[desireOfSocial].strength;
         if(targetsPreferenceToDesire<0)
-            return;
-  
-            
-
-        //PHASE 2 
+            objectToSocialInteraction=true;
 
 
+
+        //PHASE 2 DO THEY EVEN LIKE ME ENOUGH TO WANT MY INTERACTION
+        if (!objectToSocialInteraction)
+        {
+            var targetsRelationshipWithMe= socialTarget.characterData.relationshipsList[myCharacter];
+            if (targetsRelationshipWithMe.strength[RelationshipType.friendship] <Settings.tweak_minimumRelationshipToWantToInteract)  
+            {
+                objectToSocialInteraction=true;
+            }
+        }
+
+        //PHASE 3 BOND OVER TARGETS CURRENT ACTIVITY
+        var myTotalPreference = 0f;
+        var targetsTotalPreference = 0f;
+
+        if (!objectToSocialInteraction && objectTargetIsUsing!=null)
+        {
+            //try to find common ground
+
+
+            foreach(KeyValuePair<Effect,int> effect in objectTargetIsUsing.objectData.usedEffects)
+            {
+                var objectEffectValue =(float)effect.Value;
+                myTotalPreference += objectEffectValue  * myCharacterData.effectsList[effect.Key].strength;
+                targetsTotalPreference+= objectEffectValue* targetCharacterData.effectsList[effect.Key].strength;
+            }
+        }
+
+        //PHASE 4 VIBE CHECK EMOTION COMBINATION
+        //contextual anger - maybe in the future we can bond over being angry at something we both dislike
+        //for now lets just see what the general vibe of both emotions are and if romance is involved
+        var basicVibe = 0f;
+        var romanticVibe = 0f;
+        if (!objectToSocialInteraction)
+        {
+            basicVibe=myCharacterData.feelings[Effect.happiness]+ targetCharacterData.feelings[Effect.happiness];
+            romanticVibe= myCharacterData.feelings[Effect.romance] + targetCharacterData.feelings[Effect.romance];
+        }
+
+
+        //PHASE 5 MIX EMOTION VIBES AND CONVERSATION BOND
+        var basicImpactOnTarget = 0f;
+        var basicImpactOnUs = 0f;
+
+        if (!objectToSocialInteraction)
+        {
+            basicImpactOnUs= (basicVibe+ myTotalPreference)/Settings.tweak_socialInteractionDampner;
+            basicImpactOnTarget = (basicVibe+ targetsTotalPreference) / Settings.tweak_socialInteractionDampner;
+
+        }
+        else
+        {
+            basicImpactOnTarget=-10;
+        }
+
+
+        ImpactFeelings(myCharacter, basicImpactOnUs);
+        ImpactFeelings(socialTarget, basicImpactOnTarget);
+        ImpactRelationships(myCharacter, socialTarget, basicImpactOnUs);
+        ImpactRelationships(socialTarget, myCharacter, basicImpactOnTarget);
+        //if both happy and both like the activity then romantic can happen!?
     }
 
-    void ImpactEffects()
+    void ImpactFeelings(Characters character, float impact )
     {
-
+        //effect feelings 
+        character.characterData.feelings[Effect.happiness] += impact;
     }
-    void ImpactRelationships()
+    void ImpactRelationships(Characters subjectCharacter,Characters objectCharacter, float impact)
     {
-
+        subjectCharacter.characterData.relationshipsList[objectCharacter].strength[RelationshipType.friendship] += impact;
     }
 
     public void UseFunitureTarget()

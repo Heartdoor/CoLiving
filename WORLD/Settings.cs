@@ -5,7 +5,7 @@ using static Asriela.BasicFunctions;
 
 public partial class Settings : Node
 {
-    public static bool autoSetupStart = Toggle(1);
+    public static bool autoSetupStart = Toggle(0);
     public static bool furnitureUnlocked =      Toggle(1);
     public static bool charactersUnlocked =     Toggle(1);
     public static bool infinateMoney      =     Toggle(1);
@@ -16,7 +16,8 @@ public partial class Settings : Node
     public static bool characterLabelHasTargetName = Toggle(0);
     public static bool characterLabelHasHappinessValue = Toggle(1);
     public static bool characterLabelHasDesiresValues = Toggle(1);
-    public static bool objectsLabelHasCoOrdinates = Toggle(1);
+    public static bool characterLabelHasRelationshipValues = Toggle(1);
+    public static bool objectsLabelHasCoOrdinates = Toggle(0);
 
     public static bool showCharacterStateSquare = Toggle(1);
     public static bool exitButton = Toggle(1);
@@ -28,6 +29,8 @@ public partial class Settings : Node
     public static float tweak_negativeFlatEffectsBoost = 3;
     public static float tweak_socializingDistance = 10*5;
     public static float tweak_interactionDistance = 10;
+    public static float tweak_minimumRelationshipToWantToInteract =-10;
+    public static float tweak_socialInteractionDampner = 5;
 
     public static Color stateColorBeingSocializedWithAndNotUsingFurniture = ColorYellow;
     public static Color stateColorInactive = ColorGrey;
@@ -51,6 +54,7 @@ public partial class Settings : Node
             exitButton = Toggle(0);
             characterLabelHasTargetName = Toggle(0);
             characterLabelHasHappinessValue = Toggle(0);
+            characterLabelHasRelationshipValues = Toggle(0);
             objectsRoomTypeLabel = Toggle(0);
             infinateMoney = Toggle(0);
             charactersUnlocked = Toggle(0);

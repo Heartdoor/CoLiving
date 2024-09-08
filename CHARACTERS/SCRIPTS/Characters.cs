@@ -51,6 +51,7 @@ public partial class Characters : CharacterBody2D
     public Sprite2D stateSquare;
     public Sprite2D actionSquare;
     public Sprite2D grumpyIcon;
+    public Sprite2D redirectPoint;
     public Main.Character characterData;
     public AnimatedSprite2D myAnimator;
     public Interact useItemArm;
@@ -85,6 +86,8 @@ public partial class Characters : CharacterBody2D
     public Effect chosenDesireToSocializeOn = Effect.none;
     public bool interpersonalInteraction = false;
     public int mySeatingIndex =0;
+    public bool repositioning = false;
+    public Vector2 repositionDestination ;
     #endregion
 
     #region DATA
@@ -113,6 +116,7 @@ public partial class Characters : CharacterBody2D
         mySelectionBox.Visible=false;
         stateSquare = GetNode<Sprite2D>("StateUI");
         actionSquare = GetNode<Sprite2D>("ActionUI");
+        redirectPoint= GetParent().GetNode<Sprite2D>("RedirectPoint");
         mainLabel = GetNode<Label>("HappinessLabel");
 
         bleedLabel = GetNode<Label>("BleedLabel");
@@ -174,6 +178,9 @@ public partial class Characters : CharacterBody2D
         ZIndex = (int)GlobalPosition.Y;
         FlipAnimatedSprite(myAnimator, Velocity);
         alarm.Run();
+        if (repositioning) 
+            Reposition();
+            else
         if (wander)
             Wander();
         else
@@ -313,6 +320,18 @@ public partial class Characters : CharacterBody2D
 
             
         }
+        {
+            foreach (KeyValuePair<Characters, Main.Relationship> relationship in characterData.relationshipsList)
+            {
+                foreach (KeyValuePair<RelationshipType, float> relationshipType in relationship.Value.strength)
+                {
+                    mainLabel.Text += $"{relationship.Key.characterData.name} : {relationshipType.Key} : {relationshipType.Value.ToString("F2")}\n";
+                }
+                    
+            }
+
+
+        }
     }
 
     void StopBeingMad()
@@ -339,6 +358,13 @@ public partial class Characters : CharacterBody2D
         }
     }
 
+    void Reposition()
+    {
+        ChangeStateSquare(stateSquare, Settings.stateColorInactive);
+        GlobalPosition = ChangePositionByAngle(GlobalPosition, PointDirectionPosition(GlobalPosition,repositionDestination), -0.5f);
+        if(DistanceBetweenPoints(GlobalPosition, repositionDestination)<4)
+            repositioning=false;
+    }
     public void AddMyselfToEveryonesRelationshipsList()
     {
         var allCharacters = Main.flatsList[Main.FlatNumberMouseIsIn].charactersInFlat;
@@ -504,9 +530,7 @@ public partial class Characters : CharacterBody2D
      
         if (valuedFurniture == null && valuedCharacter == null)
         {
-            alarm.Start(TimerType.wander, 5, false, 0);
-            wander = true;
-            accessTarget = null;
+            StartWander();
         }
         else
         if(furnitureValue>= characterValue)
@@ -517,6 +541,8 @@ public partial class Characters : CharacterBody2D
                 useTarget = FindNearestFurniture(this, this.GetTree(), null, "Object", valuedFurniture.name, myFlatNumber);
                 accessTarget = FindNearestOfGroupType(useTarget, this.GetTree(), null, "Object", valuedFurniture.useFromGroup, myFlatNumber);
                 accessNode = FindNearestAccessNode(this, accessTarget);
+
+
             }
             else
             {
@@ -534,13 +560,24 @@ public partial class Characters : CharacterBody2D
             accessNode= accessTarget;
 
         }
-            
 
+        if (useTarget == null)
+        {
+            StartWander();
+            accessTarget=null;
+            accessNode=null;
+        }
+            
 
         // UpdatePath(currentTarget.GlobalPosition);
 
     }
-
+    void StartWander()
+    {
+        alarm.Start(TimerType.wander, 5, false, 0);
+        wander = true;
+        accessTarget = null;
+    }
     void MoveToTarget(Node2D target)
     {
         if(interactingWithCharacter != null)return;
@@ -570,7 +607,10 @@ public partial class Characters : CharacterBody2D
         //MAKE SURE WE ARNT TOO CLOSE FOR A SOCIAL INTERACTION
         if(interpersonalInteraction && DistanceBetweenObjects(this, useTarget) < Settings.tweak_socializingDistance-10) {
             var destination = ChangePositionByAngle(useTarget.GlobalPosition, PointDirection((CharacterBody2D)useTarget,this), Settings.tweak_socializingDistance);
-            GotoPoint(this, NavAgent, speed, accel, delta, destination);
+            redirectPoint.GlobalPosition = destination;
+            repositioning = true;
+            repositionDestination = destination;
+            
             return;
         }
 

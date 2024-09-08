@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/Characters.cs" id="1_ofd6p"]
 [ext_resource type="SpriteFrames" uid="uid://bkp5ae72qsdxb" path="res://CHARACTERS/ANIMATIONS/grannyAnimations.tres" id="2_yioed"]
-[ext_resource type="Texture2D" uid="uid://dqr11f2ca3cf2" path="res://CHARACTERS/SPRITES/granny_s.png" id="4_2ttrf"]
+[ext_resource type="Texture2D" uid="uid://dnicu2n0mr5q4" path="res://CHARACTERS/SPRITES/granny_s.png" id="4_2ttrf"]
 [ext_resource type="Texture2D" uid="uid://blrxm36436cmi" path="res://UI/SPRITES/StateSquares/stateSquare.png" id="4_6kv68"]
 [ext_resource type="Texture2D" uid="uid://d4jlrvoonwg1v" path="res://UI/SPRITES/Selection/characterSelect.png" id="5_wbj8j"]
 
@@ -10,7 +10,9 @@
 radius = 5.00009
 height = 14.0002
 
-[sub_resource type="LabelSettings" id="LabelSettings_33pwc"]
+[sub_resource type="LabelSettings" id="LabelSettings_pt7tr"]
+shadow_size = 16
+shadow_color = Color(0, 0, 0, 0.278431)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5mf7c"]
 bg_color = Color(0.772549, 0, 0, 0.223529)
@@ -55,12 +57,13 @@ disabled = true
 
 [node name="HappinessLabel" type="Label" parent="."]
 unique_name_in_owner = true
-offset_left = -8.0
-offset_top = 13.0
-offset_right = 32.0
-offset_bottom = 36.0
+offset_left = -37.0
+offset_top = 14.0
+offset_right = 3.0
+offset_bottom = 37.0
 scale = Vector2(0.43, 0.43)
-label_settings = SubResource("LabelSettings_33pwc")
+text = "hi"
+label_settings = SubResource("LabelSettings_pt7tr")
 horizontal_alignment = 1
 
 [node name="BleedLabel" type="Label" parent="."]

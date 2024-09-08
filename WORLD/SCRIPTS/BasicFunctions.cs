@@ -1388,6 +1388,11 @@ namespace Asriela
             return subject.Position.DistanceTo(target.Position);
         }
 
+        public static float DistanceBetweenPoints(Vector2 start, Vector2 end)
+        {
+            return start.DistanceTo(end);
+        }
+
         public static Vector2 MousePosition(Node subject)
         {
             return subject.GetViewport().GetMousePosition();
@@ -1465,7 +1470,13 @@ namespace Asriela
 
             return angle;
         }
+        public static float PointDirectionPosition(Vector2 start, Vector2 end)
+        {
+            Vector2 direction = (start - end).Normalized();
+            float angle = Mathf.Atan2(direction.Y, direction.X); // Calculate angle in radians
 
+            return angle;
+        }
         #endregion
 
         #region COLOR
