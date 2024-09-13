@@ -81,6 +81,7 @@ public partial class Main : Node2D
             public Direction rotation { get; set; }
 
             public bool ontopUsePosition { get; set; }
+            public bool debugItem { get; set; }
             public List<AccessPosition> accessPositions { get; set; }
 
             public UseAnimation useAnimation { get; set; }
@@ -109,6 +110,7 @@ public partial class Main : Node2D
                 this.usedEffects = new Dictionary<Effect, int>();
                 this.usedRadiantEffects = new Dictionary<Effect, int>();
                 this.floorObject = false;
+                this.debugItem = false;
 
         }
         }
@@ -172,9 +174,11 @@ public partial class Main : Node2D
 
             public Emotion mainEmotion { get; set; }
 
-            public string emoji { get; set; }
+            public bool debugItem { get; set; }
 
-        public Character(CharacterType name, string emoji, Dictionary<Effect, EffectProperties> effectsList)
+        public string emoji { get; set; }
+
+        public Character(CharacterType name, string emoji, bool debugItem, Dictionary<Effect, EffectProperties> effectsList)
             {
                 this.name = name;
                 image_path = $"res://CHARACTERS/SPRITES/{name}.png";
@@ -189,6 +193,7 @@ public partial class Main : Node2D
                 desires = new Dictionary<Effect, float>();
                 mainEmotion=Emotion.neutral;
                 this.emoji =emoji;
+                this.debugItem= debugItem;
         }
         }
         public static List<Character> charactersList = new List<Character>();
@@ -260,15 +265,18 @@ public partial class Main : Node2D
     #region SETUPS
 
 
-    void AddNewObject(FurnitureName name)
+    void AddNewObject(FurnitureName name  )
     {
+        
         o = new Object(name);  
         objectsList.Add(o);
+  
     }
     void SetupObjects()
     {
-
+        
         AddNewObject(FurnitureName.debug1);
+        o.debugItem = true;
         o.type = FurnitureType._core;
         o.roomTypes.Add(RoomType.livingroom);
         o.flatWideEffect = false;
@@ -372,6 +380,7 @@ public partial class Main : Node2D
 
 
         AddNewObject(FurnitureName.rockingChair);
+        o.debugItem = true;
         o.type = FurnitureType._object;
         o.group = FurnitureGroup.chair;
         o.roomTypes.Add(RoomType.livingroom);
@@ -442,6 +451,7 @@ public partial class Main : Node2D
         o.usedEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.stonePainting);
+        o.debugItem = true;
         o.type = FurnitureType._object;
         o.roomTypes.Add(RoomType.livingroom);
         o.roomTypes.Add(RoomType.bedroom);
@@ -456,6 +466,7 @@ public partial class Main : Node2D
         o.usedEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.roarRock);
+        o.debugItem = true;
         o.type = FurnitureType._object;
         o.roomTypes.Add(RoomType.livingroom);
         o.roomTypes.Add(RoomType.bedroom);
@@ -487,6 +498,7 @@ public partial class Main : Node2D
         #region setup
         CharacterType name;
         string emoji;
+        bool debugItem ;
 
         Dictionary<Effect, EffectProperties> myEffects =new Dictionary<Effect, EffectProperties>();
 
@@ -523,11 +535,13 @@ public partial class Main : Node2D
    
         name = CharacterType.granny;
         emoji = "👵";
+        debugItem = false;
         //add a new effect of social, likes socializing by 1, bleeds as a need by socialR, grows a desire to act on social by social r, will do action talk when desire is high enough, do social action for length of?, then reduce the desire by amount after action
         NewEffect(ref myEffects, Effect.social, 1, socialR, socialR, DesireAction.talk);
+        //NewEffect(ref myEffects, Effect.social, -3, 0, 0, DesireAction.talk);
         NewEffect(ref myEffects, Effect.food,           2, hungryR, 0);
-        NewEffect(ref myEffects,Effect.sleep,           3, sleepyR, 0);
-        NewEffect(ref myEffects,Effect.hygiene,         3, hygieneR, 0);        
+        NewEffect(ref myEffects,Effect.sleep,           3, 0, 0);
+        NewEffect(ref myEffects,Effect.hygiene,         3, 0, 0);        
         NewEffect(ref myEffects,Effect.safety,           3, 0, 0);
         NewEffect(ref myEffects,Effect.comfort,         3, 0, 0);
         NewEffect(ref myEffects,Effect.romance,        0, 0, 0);
@@ -542,13 +556,14 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.hunting,          1, 0, 0);
 
         #region apply
-        var charInfo = new Character(name, emoji, myEffects);
+        var charInfo = new Character(name, emoji, debugItem, myEffects);
         charactersList.Add(charInfo);
         ClearCharacterListData(ref myEffects);
         #endregion
 
         name = CharacterType.punkRocker;
         emoji = "👩‍🎤";
+        debugItem = false;
         NewEffect(ref myEffects,Effect.food,         0, 0, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
@@ -568,12 +583,13 @@ public partial class Main : Node2D
         NewEffect(ref myEffects, Effect.debug1, 5, 0, 0);
 
         #region apply
-        charactersList.Add(new Character(name,emoji, myEffects));
+        charactersList.Add(new Character(name,emoji, debugItem, myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
         name = CharacterType.yeti;
         emoji = "❄🐵";
+        debugItem = true;
         NewEffect(ref myEffects,Effect.food,         3, hungryR*2, 0);
         NewEffect(ref myEffects,Effect.sleep,        1, sleepyR, 0);
         NewEffect(ref myEffects,Effect.hygiene,      -1, 0, 0);
@@ -591,7 +607,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,       2, 0, 0);
         #region apply
-        charactersList.Add(new Character(name,emoji, myEffects));
+        charactersList.Add(new Character(name,emoji, debugItem , myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 

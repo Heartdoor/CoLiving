@@ -23,6 +23,9 @@ BasicFunctions="*res://WORLD/SCRIPTS/BasicFunctions.cs"
 
 window/size/viewport_width=1266
 window/size/viewport_height=668
+window/size/initial_position_type=0
+window/size/initial_position=Vector2i(2000, 0)
+window/size/initial_screen=1
 
 [dotnet]
 

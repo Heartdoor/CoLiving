@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=54 format=3 uid="uid://bkp5ae72qsdxb"]
+[gd_resource type="SpriteFrames" load_steps=61 format=3 uid="uid://bkp5ae72qsdxb"]
 
 [ext_resource type="Texture2D" uid="uid://75d7xf7gvnof" path="res://CHARACTERS/SPRITES/grannyAngry.png" id="1_7ffwk"]
 [ext_resource type="Texture2D" uid="uid://dab58acka2bl6" path="res://CHARACTERS/SPRITES/grannyCook_angry.png" id="1_56ayy"]
@@ -17,6 +17,7 @@
 [ext_resource type="Texture2D" uid="uid://wehht3251eio" path="res://CHARACTERS/SPRITES/grannyListenToMusic_flirty.png" id="10_t7mhc"]
 [ext_resource type="Texture2D" uid="uid://d34dnxbhdrpxc" path="res://CHARACTERS/SPRITES/grannyListenToMusic_happy.png" id="11_d5qae"]
 [ext_resource type="Texture2D" uid="uid://bkm70vve2tmkb" path="res://CHARACTERS/SPRITES/grannySit_angry.png" id="13_1peh8"]
+[ext_resource type="Texture2D" uid="uid://dbm7x6ry44u35" path="res://CHARACTERS/SPRITES/grannyReject.png" id="13_w2s3b"]
 [ext_resource type="Texture2D" uid="uid://bv7i20y1sn3lg" path="res://CHARACTERS/SPRITES/grannySit_flirty.png" id="14_6mq8l"]
 [ext_resource type="Texture2D" uid="uid://fqwdhrndj185" path="res://CHARACTERS/SPRITES/grannySitAndKnitt_flirty.png" id="14_jvudj"]
 [ext_resource type="Texture2D" uid="uid://bs4begu0f0fxi" path="res://CHARACTERS/SPRITES/grannySitAndKnitt_happy.png" id="15_myh74"]
@@ -89,6 +90,30 @@ region = Rect2(45, 0, 45, 58)
 [sub_resource type="AtlasTexture" id="AtlasTexture_8gqny"]
 atlas = ExtResource("6_4soco")
 region = Rect2(0, 0, 45, 58)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ec6kc"]
+atlas = ExtResource("13_w2s3b")
+region = Rect2(0, 0, 35, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p54xk"]
+atlas = ExtResource("13_w2s3b")
+region = Rect2(35, 0, 35, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t5blg"]
+atlas = ExtResource("13_w2s3b")
+region = Rect2(70, 0, 35, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hnirg"]
+atlas = ExtResource("13_w2s3b")
+region = Rect2(105, 0, 35, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_naj48"]
+atlas = ExtResource("13_w2s3b")
+region = Rect2(140, 0, 35, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_52n8d"]
+atlas = ExtResource("13_w2s3b")
+region = Rect2(175, 0, 35, 61)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_eqljo"]
 atlas = ExtResource("21_hr7jh")
@@ -366,6 +391,68 @@ animations = [{
 }],
 "loop": true,
 "name": &"listenToMusic_neutral",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ec6kc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ec6kc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p54xk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p54xk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t5blg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t5blg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hnirg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hnirg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_naj48")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_52n8d")
+}],
+"loop": true,
+"name": &"reject",
 "speed": 5.0
 }, {
 "frames": [{

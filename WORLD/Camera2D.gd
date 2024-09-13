@@ -13,7 +13,11 @@ func _ready():
 	#alarm_timer.start(0)
 	target_position = Vector2(260,170)
 	position=target_position;
-	
+
+	# Get the screen count and set the display to the second screen (screen 1, assuming you have two monitors)
+
+
+
 
 	
 # Constants
@@ -25,11 +29,12 @@ const MOUSE_MARGIN: float = 20.0
 var target_position: Vector2
 
 func _process(delta):
-	if CAN_PAN:
+	if CAN_PAN and Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 		var viewport_size = get_viewport_rect().size
 		var mouse_pos = get_viewport().get_mouse_position()
 
-
+		if mouse_pos.x < 0 or mouse_pos.y < 0 or mouse_pos.x > viewport_size.x or mouse_pos.y > viewport_size.y:
+			return 
 		mouse_pos.x = clamp(mouse_pos.x, 0, viewport_size.x)
 		mouse_pos.y = clamp(mouse_pos.y, 0, viewport_size.y)
 

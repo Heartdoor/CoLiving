@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://38pejcme5say"
-path="res://.godot/imported/punkRockerSit.png-6f9b70f60b68b289e437a728a4f42256.ctex"
+uid="uid://tm6m4hr4nix1"
+path="res://.godot/imported/punkRockerListenToMusic_neutral.png-409de249aa04cbbfab8d942abec89dbb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://CHARACTERS/SPRITES/punkRockerSit.png"
-dest_files=["res://.godot/imported/punkRockerSit.png-6f9b70f60b68b289e437a728a4f42256.ctex"]
+source_file="res://CHARACTERS/SPRITES/punkRockerListenToMusic_neutral.png"
+dest_files=["res://.godot/imported/punkRockerListenToMusic_neutral.png-409de249aa04cbbfab8d942abec89dbb.ctex"]
 
 [params]
 

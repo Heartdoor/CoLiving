@@ -1,14 +1,18 @@
-[gd_resource type="SpriteFrames" load_steps=40 format=3 uid="uid://2u5sg4ryk2i6"]
+[gd_resource type="SpriteFrames" load_steps=52 format=3 uid="uid://2u5sg4ryk2i6"]
 
 [ext_resource type="Texture2D" uid="uid://4h76y12n12hk" path="res://CHARACTERS/SPRITES/punkRockerAngry.png" id="1_0jbky"]
 [ext_resource type="Texture2D" uid="uid://bwlji5ewab8rj" path="res://CHARACTERS/SPRITES/punkRocker_flirty.png" id="2_aga0d"]
 [ext_resource type="Texture2D" uid="uid://dajr5uw0du0ye" path="res://CHARACTERS/SPRITES/punkRocker.png" id="2_qwc08"]
 [ext_resource type="Texture2D" uid="uid://dfgkjpq0culs6" path="res://CHARACTERS/SPRITES/punkRockerHappy.png" id="3_mjeeg"]
-[ext_resource type="Texture2D" uid="uid://38pejcme5say" path="res://CHARACTERS/SPRITES/punkRockerSit.png" id="4_mmfb5"]
+[ext_resource type="Texture2D" uid="uid://38pejcme5say" path="res://CHARACTERS/SPRITES/punkRockerSit_neutral.png" id="4_mmfb5"]
 [ext_resource type="Texture2D" uid="uid://beitiom7raclh" path="res://CHARACTERS/SPRITES/punkRockerSit_angry.png" id="5_4s5qj"]
+[ext_resource type="Texture2D" uid="uid://1o13d6sgbq4g" path="res://CHARACTERS/SPRITES/punkRockerListenToMusic_anrgy.png" id="5_me4q8"]
+[ext_resource type="Texture2D" uid="uid://di6jss8572e5k" path="res://CHARACTERS/SPRITES/punkRockerListenToMusic_flirty.png" id="6_vq76x"]
 [ext_resource type="Texture2D" uid="uid://dpxbgdqggcsfk" path="res://CHARACTERS/SPRITES/punkRockerSit_flirty.png" id="6_yqgn2"]
 [ext_resource type="Texture2D" uid="uid://2vq0uafo2eb8" path="res://CHARACTERS/SPRITES/punkRockerSit_happy.png" id="7_0ymk1"]
+[ext_resource type="Texture2D" uid="uid://b0vomw5m7e0rj" path="res://CHARACTERS/SPRITES/punkRockerListenToMusic_happy.png" id="7_6hd5g"]
 [ext_resource type="Texture2D" uid="uid://ckx5v14fft8sx" path="res://CHARACTERS/SPRITES/punkRockerUpset.png" id="7_rv76s"]
+[ext_resource type="Texture2D" uid="uid://tm6m4hr4nix1" path="res://CHARACTERS/SPRITES/punkRockerListenToMusic_neutral.png" id="8_hv10c"]
 [ext_resource type="Texture2D" uid="uid://bko4swa7hlmeb" path="res://CHARACTERS/SPRITES/punkRockerStrumGuitar_angry.png" id="9_gqfyb"]
 [ext_resource type="Texture2D" uid="uid://cvbx2fspfu247" path="res://CHARACTERS/SPRITES/punkRockerStrumGuitar_flirty.png" id="10_8ibnk"]
 [ext_resource type="Texture2D" uid="uid://qj3mwevkuqwq" path="res://CHARACTERS/SPRITES/punkRockerStrumGuitar_happy.png" id="11_a1n5l"]
@@ -17,6 +21,38 @@
 [ext_resource type="Texture2D" uid="uid://bxvs08u1sbbs6" path="res://CHARACTERS/SPRITES/punkRockerTalk_flirty.png" id="14_kf5mp"]
 [ext_resource type="Texture2D" uid="uid://djafekfx7w35o" path="res://CHARACTERS/SPRITES/punkRockerTalk_happy.png" id="15_323gk"]
 [ext_resource type="Texture2D" uid="uid://befpwu0cw05fy" path="res://CHARACTERS/SPRITES/punkRockerTalk_neutral.png" id="16_eia4w"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dxocy"]
+atlas = ExtResource("5_me4q8")
+region = Rect2(0, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_k6xhr"]
+atlas = ExtResource("5_me4q8")
+region = Rect2(43, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xj00w"]
+atlas = ExtResource("6_vq76x")
+region = Rect2(0, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_17i1k"]
+atlas = ExtResource("6_vq76x")
+region = Rect2(43, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_shobb"]
+atlas = ExtResource("7_6hd5g")
+region = Rect2(0, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lp1dt"]
+atlas = ExtResource("7_6hd5g")
+region = Rect2(43, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_88p2l"]
+atlas = ExtResource("8_hv10c")
+region = Rect2(0, 0, 43, 61)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vr4ck"]
+atlas = ExtResource("8_hv10c")
+region = Rect2(43, 0, 43, 61)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fv2uh"]
 atlas = ExtResource("9_gqfyb")
@@ -140,9 +176,96 @@ animations = [{
 "name": &"idle_neutral",
 "speed": 5.0
 }, {
-"frames": [],
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dxocy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dxocy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dxocy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k6xhr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k6xhr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_k6xhr")
+}],
 "loop": true,
-"name": &"listenToMusic",
+"name": &"listenToMusic_angry",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xj00w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xj00w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xj00w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_17i1k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_17i1k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_17i1k")
+}],
+"loop": true,
+"name": &"listenToMusic_flirty",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_shobb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_shobb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_shobb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lp1dt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lp1dt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lp1dt")
+}],
+"loop": true,
+"name": &"listenToMusic_happy",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_88p2l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_88p2l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_88p2l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vr4ck")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vr4ck")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vr4ck")
+}],
+"loop": true,
+"name": &"listenToMusic_neutral",
 "speed": 5.0
 }, {
 "frames": [{

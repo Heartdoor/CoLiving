@@ -44,7 +44,7 @@ public partial class CreationButtons : Button
              
                 foreach (var item in Main.CharactersAvailableToPlayerList)
                 {
-          
+                    if(item.debugItem && !Settings.enableDebugItems) continue;
                     var newButton= (Button) SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
                     
                     newButton.Text = $"{item.name}";
@@ -59,7 +59,7 @@ public partial class CreationButtons : Button
              
                 foreach (var item in Main.FurnitureUnlockedList)
                 {
-             
+                    if (item.debugItem && !Settings.enableDebugItems) continue;
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
 
                     newButton.Text = $"{item.name}  ${item.price}";

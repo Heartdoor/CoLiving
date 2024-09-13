@@ -291,6 +291,7 @@ namespace Asriela
                 Effect.romance => "💋",
                 Effect.safety => "🔑",
                 Effect.academic => "📕",
+                Effect.social => "💬",
                 _ => ""
             };
         }
@@ -768,6 +769,7 @@ namespace Asriela
             spawnInterval,
             spawnInterval2,
             actionLength,
+            sideActionLength,
             FindTarget,
             life,
             moveOn,
@@ -782,6 +784,8 @@ namespace Asriela
             public float TimeLength { get; set; }
             public bool Triggered { get; set; }
             public bool Loops { get; set; }
+
+            public bool Paused { get; set; }
             public float EndTime { get; set; }
             public int Count { get; set; }
 
@@ -794,6 +798,7 @@ namespace Asriela
                 this.Triggered = Triggered;
                 this.Loops = Loops;
                 this.EndTime = EndTime;
+                this.Paused  = false;
                 Ended = 0;
                 Count = 0;
             }
@@ -875,7 +880,7 @@ namespace Asriela
 
 
 
-                    if (alarmsList[key].Triggered)
+                    if (alarmsList[key].Triggered && !alarmsList[key].Paused)
                     {
 
 
@@ -903,7 +908,17 @@ namespace Asriela
 
                 }
             }
+            public void Pause(TimerType timerType)
+            {
+                if(alarmsList.ContainsKey(timerType))
+                alarmsList[timerType].Paused = true;
+            }
 
+            public void UnPause(TimerType timerType)
+            {
+                if (alarmsList.ContainsKey(timerType))
+                    alarmsList[timerType].Paused = false;
+            }
             public bool Ended(TimerType timerType)
             {
                 //if (alarmsList[timerType].Triggered)
@@ -1309,6 +1324,20 @@ namespace Asriela
         #endregion
 
         #region SPRITES
+
+        public static void FlipToFaceEachOther(Node2D theSubject, Node2D theObject, AnimatedSprite2D animator)
+        {
+            if (theObject.GlobalPosition < theSubject.GlobalPosition)
+            {
+                // If moving right, set scale.x to positive value
+                animator.FlipH = true;
+            }
+            else
+            {
+                // If moving left, set scale.x to negative value
+                animator.FlipH = false;
+            }
+        }
         public static void FlipAnimatedSprite(AnimatedSprite2D animator, Vector2 velocity)
         {
 
@@ -1347,7 +1376,24 @@ namespace Asriela
         public static void PlayAnimation(AnimatedSprite2D animator, string animation)
         {
             if (animator.Animation != animation)
+            {
                 animator.Play(animation);
+                var frames = animator.SpriteFrames;
+                frames.SetAnimationLoop(animation, true);
+            }
+                
+        }
+
+        public static void PlayAnimationOnce(AnimatedSprite2D animator, string animation)
+        {
+            if (animator.Animation != animation)
+            {
+                animator.Play(animation);
+                var frames = animator.SpriteFrames;
+                frames.SetAnimationLoop(animation,false);
+            }
+                
+
         }
 
         public static void PlayAnimationUntilLoopsComplete(AnimatedSprite2D animator, string animation, float loops, ref string animationActionCompleted)
@@ -1489,6 +1535,7 @@ namespace Asriela
         public static readonly Color ColorYellow = new Color(0xFFCC4Cff);
         public static readonly Color ColorPurple = new Color(0xCC4CFFff);
         public static readonly Color ColorGrey = new Color(0xCCd3d3d3);
+        public static readonly Color ColorBlack = new Color(0x000000ff);
         public static readonly Color ColorTransparent = new Color(0xFFFFFF00);
         
 

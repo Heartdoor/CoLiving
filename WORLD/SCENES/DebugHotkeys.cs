@@ -40,7 +40,7 @@ public partial class DebugHotkeys : Node
         Main.Object furniture;
         Main.Character character;
         Characters newCharacter;
-        if (KeyPressed("debug_1") || action1)
+        if (KeyPressed("debug_3") )
         {
             action1=false;
             furniture = Main.GetObjectFromType(FurnitureName.couch);
@@ -52,23 +52,36 @@ public partial class DebugHotkeys : Node
 
         }
 
+        if (KeyPressed("debug_1") || action1)
+        {
+            action1 = false;
+
+            Main.RoomNumberMouseIsIn = 1;
+            furniture = Main.GetObjectFromType(FurnitureName.couch);
+            myMain.PlaceObjects(ref furniture, true, new Vector2(265, 255));
+
+            furniture = Main.GetObjectFromType(FurnitureName.recordPlayer);
+            myMain.PlaceObjects(ref furniture, true, new Vector2(205, 265));
+
+            furniture = Main.GetObjectFromType(FurnitureName.yarnBasket);
+            myMain.PlaceObjects(ref furniture, true, new Vector2(315, 265));
+        }
+
         if (KeyPressed("debug_2") || action2) 
         {
             action2= false;
             character = Main.GetCharacterFromType(CharacterType.punkRocker);
             newCharacter=myMain.PlaceCharacter(ref character, true, new Vector2(115, 205));
-            newCharacter.characterData.desires[Effect.social]=10;
+            newCharacter.characterData.desires[Effect.social]=90;
+            var tempOtherCharacter = newCharacter;
 
             character = Main.GetCharacterFromType(CharacterType.granny);
             newCharacter=myMain.PlaceCharacter(ref character, true, new Vector2(135, 355));
-
+            newCharacter.characterData.relationshipsList[tempOtherCharacter].strength[RelationshipType.friendship]=40;
 
 
         }
-        if (KeyPressed("debug_3"))
-        {
-
-        }
+  
     }
 
     void DesireManipulationHotKeys()

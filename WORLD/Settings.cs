@@ -6,6 +6,7 @@ using static Asriela.BasicFunctions;
 public partial class Settings : Node
 {
     public static bool autoSetupStart = Toggle(0);
+    public static bool enableDebugItems = Toggle(0);
     public static bool furnitureUnlocked =      Toggle(1);
     public static bool charactersUnlocked =     Toggle(1);
     public static bool infinateMoney      =     Toggle(1);
@@ -19,7 +20,7 @@ public partial class Settings : Node
     public static bool characterLabelHasRelationshipValues = Toggle(1);
     public static bool objectsLabelHasCoOrdinates = Toggle(0);
 
-    public static bool showCharacterStateSquare = Toggle(1);
+    public static bool showCharacterStateSquare = Toggle(0);
     public static bool exitButton = Toggle(1);
 
 
@@ -27,10 +28,12 @@ public partial class Settings : Node
 
     public static float tweak_desireVSobjectValue = 1;//percentage to devide desire value to put it in the 0-10 range instead of 0-100 range
     public static float tweak_negativeFlatEffectsBoost = 3;
-    public static float tweak_socializingDistance = 10*5;
+    public static float tweak_socializingDistance = 10*7;
     public static float tweak_interactionDistance = 10;
     public static float tweak_minimumRelationshipToWantToInteract =-10;
     public static float tweak_socialInteractionDampner = 5;
+    public static float tweak_socialRejectionActionLength=3;
+    public static float tweak_rejectionNegativeImpact=20;
 
     public static Color stateColorBeingSocializedWithAndNotUsingFurniture = ColorYellow;
     public static Color stateColorInactive = ColorGrey;
@@ -41,6 +44,7 @@ public partial class Settings : Node
     public static Color stateColorUpset = ColorMaroon;
     public static Color stateColorFind = ColorRed;
     public static Color stateColorArrive = ColorGreen;
+    public static Color stateColorNothing = ColorBlack;
     void Start()
     {
         if (infinateMoney)
@@ -50,7 +54,8 @@ public partial class Settings : Node
 
         if(playerMode)
         {
-            autoSetupStart= Toggle(0);
+            enableDebugItems = Toggle(0);
+            autoSetupStart = Toggle(0);
             exitButton = Toggle(0);
             characterLabelHasTargetName = Toggle(0);
             characterLabelHasHappinessValue = Toggle(0);

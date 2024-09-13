@@ -88,6 +88,8 @@ public partial class Characters : CharacterBody2D
     public int mySeatingIndex =0;
     public bool repositioning = false;
     public Vector2 repositionDestination ;
+    public bool targetObjectedToSocialInteraction = false;
+    public Node2D rejectingSomeone = null;
     #endregion
 
     #region DATA
@@ -117,7 +119,8 @@ public partial class Characters : CharacterBody2D
         stateSquare = GetNode<Sprite2D>("StateUI");
         actionSquare = GetNode<Sprite2D>("ActionUI");
         redirectPoint= GetParent().GetNode<Sprite2D>("RedirectPoint");
-        mainLabel = GetNode<Label>("HappinessLabel");
+        mainLabel = GetNode<Label>("InfoLabel");
+        mainLabel.Visible = false;
 
         bleedLabel = GetNode<Label>("BleedLabel");
         grumpyIcon = GetNode<Sprite2D>("Grumpy");
@@ -150,6 +153,8 @@ public partial class Characters : CharacterBody2D
 
         if(color == Settings.stateColorInactive)
             square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare.png");
+        if (color == Settings.stateColorNothing)
+            square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare.png");
         if (color == Settings.stateColorBeingSocializedWithAndNotUsingFurniture)
             square.Texture = GetTexture2D("res://UI/SPRITES/StateSquares/stateSquare_socialize.png");
         if (color == Settings.stateColorSocializing)
@@ -172,12 +177,15 @@ public partial class Characters : CharacterBody2D
     {
     
         stateSquare.Visible = Settings.showCharacterStateSquare;
-        ChangeStateSquare(stateSquare, Settings.stateColorInactive);
+        ChangeStateSquare(stateSquare, Settings.stateColorNothing);
         
         isInInteraction =false;
         ZIndex = (int)GlobalPosition.Y;
         FlipAnimatedSprite(myAnimator, Velocity);
         alarm.Run();
+        if (rejectingSomeone!=null)
+            RejectingSomeone();
+            else
         if (repositioning) 
             Reposition();
             else
@@ -192,7 +200,11 @@ public partial class Characters : CharacterBody2D
             else
             {
                 if (interactingWithCharacter != null)
+                {
+                    FlipToFaceEachOther(this, interactingWithCharacter, myAnimator);
                     ChangeStateSquare(stateSquare, Settings.stateColorBeingSocializedWithAndNotUsingFurniture);
+                }
+                    
 
                 if (interactingWithTarget == null )
                     MoveToTarget(accessTarget);
@@ -224,8 +236,14 @@ public partial class Characters : CharacterBody2D
     void CheckIfSelected()
     {
         mySelectionBox.Visible = false;
+        mainLabel.Visible = false;
         if (Main.SelectedCharacter == this)
+        {
             mySelectionBox.Visible = true;
+           mainLabel.Visible = true;
+
+        }
+
     }
     void FadeActionSquare()
     {
@@ -234,7 +252,7 @@ public partial class Characters : CharacterBody2D
     }
     void MoveAndIdleAnimations()
     {
-        if(isUpset || isInInteraction)
+        if(isUpset || isInInteraction || rejectingSomeone!=null)
         return;
         
 
@@ -250,7 +268,7 @@ public partial class Characters : CharacterBody2D
         foreach (KeyValuePair<Effect, float> effect in characterData.needs)
         {
             characterData.needs[effect.Key] -= characterData.effectsList[effect.Key].needBleedRate/1000;
-            if (characterData.needs[effect.Key] < 0)
+            if (characterData.needs[effect.Key] < -20)
             {
                 if (Main.TestGameMode == Main.testGameMode.flowingMoney)
                 Main.Money += characterData.needs[effect.Key];
@@ -357,10 +375,24 @@ public partial class Characters : CharacterBody2D
             wander = false;
         }
     }
-
+    void RejectingSomeone()
+    {
+        FlipToFaceEachOther(this, rejectingSomeone, myAnimator);
+        ChangeStateSquare(stateSquare, Settings.stateColorUpset);
+        if (alarm.Ended(TimerType.sideActionLength))
+        {
+            rejectingSomeone = null;
+            wander = false;
+            alarm.UnPause(TimerType.actionLength);
+        }
+            
+    }
     void Reposition()
     {
         ChangeStateSquare(stateSquare, Settings.stateColorInactive);
+        //check if directly above or below
+
+
         GlobalPosition = ChangePositionByAngle(GlobalPosition, PointDirectionPosition(GlobalPosition,repositionDestination), -0.5f);
         if(DistanceBetweenPoints(GlobalPosition, repositionDestination)<4)
             repositioning=false;
@@ -605,8 +637,25 @@ public partial class Characters : CharacterBody2D
     public void ReachTarget()
     {
         //MAKE SURE WE ARNT TOO CLOSE FOR A SOCIAL INTERACTION
-        if(interpersonalInteraction && DistanceBetweenObjects(this, useTarget) < Settings.tweak_socializingDistance-10) {
-            var destination = ChangePositionByAngle(useTarget.GlobalPosition, PointDirection((CharacterBody2D)useTarget,this), Settings.tweak_socializingDistance);
+        bool rightAboveOrBelow = Math.Abs(useTarget.GlobalPosition.X - GlobalPosition.X)<30;
+        bool tooClose = DistanceBetweenObjects(this, useTarget) < Settings.tweak_socializingDistance - 10;
+        if (interpersonalInteraction && (tooClose || rightAboveOrBelow)) {
+            float addHorizontal=0; 
+            float socialDistance = 0;
+            if(tooClose)
+                socialDistance=Settings.tweak_socializingDistance;
+            //if directly above or below - we must add an angle to the final position
+            if (rightAboveOrBelow)
+            {
+                if(useTarget.GlobalPosition.X<= GlobalPosition.X)
+                addHorizontal =30;
+                else
+                addHorizontal =-30;
+            }
+
+                
+            var destination = ChangePositionByAngle(useTarget.GlobalPosition, PointDirection((CharacterBody2D)useTarget,this), socialDistance - Math.Abs(addHorizontal)+10);
+            destination=ChangePosition(destination, addHorizontal, 0);
             redirectPoint.GlobalPosition = destination;
             repositioning = true;
             repositionDestination = destination;
@@ -656,13 +705,23 @@ public partial class Characters : CharacterBody2D
     }
 
 
+    public void ImpactRelationship(Characters whoToTarget, RelationshipType type, float amount)
+    {
+        characterData.relationshipsList[whoToTarget].strength[type]+= amount;
+    }
+
     public void SelectedCharacter(Node viewport, InputEvent inputEvent, int shapeIdx)
      {
+
         if (LeftMousePressed(inputEvent)) {
-            
+          
+            if(Main.SelectedCharacter==this)
+                Main.SelectedCharacter=null;
+            else
             Main.SelectedCharacter = this;
 
-            }
+
+        }
 
        }
     #region OLD

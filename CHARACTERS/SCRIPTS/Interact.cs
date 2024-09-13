@@ -35,7 +35,7 @@ public partial class Interact : Node
         //start social interaction
         if (myCharacter.interactingWith == null)
         {
-
+            // START SOCIAL INTERACTION
             myCharacter.interactingWith=socialTarget;
             //add flat wide effects later 
 
@@ -43,19 +43,26 @@ public partial class Interact : Node
             myCharacter.interactingWithCharacter= socialTarget;
             socialTarget.interactingWithCharacter= myCharacter;
             var lastPosition = myCharacter.GlobalPosition;
-         if (socialTarget.GlobalPosition < myCharacter.GlobalPosition)
+            FlipToFaceEachOther(myCharacter, socialTarget, myCharacter.myAnimator);
+
+            //play social interaction animation
+            if (DidSocialTargetRejectUs(socialTarget))
             {
-                // If moving right, set scale.x to positive value
-                myCharacter.myAnimator.FlipH = true;
+                socialTarget.rejectingSomeone = myCharacter;
+                PlayAnimationOnce(socialTarget.myAnimator, $"reject");
+                PlayAnimationOnce(myCharacter.myAnimator, $"{myCharacter.chosenInteractionWithCharacter}_{myCharacter.characterData.mainEmotion}");
+                FlipToFaceEachOther(socialTarget, myCharacter, socialTarget.myAnimator);
+                socialTarget.alarm.Start(TimerType.sideActionLength, Settings.tweak_socialRejectionActionLength, false, 0);
+                socialTarget.alarm.Pause(TimerType.actionLength);
+                myCharacter.alarm.Start(TimerType.actionLength, Settings.tweak_socialRejectionActionLength, false, 0);
             }
             else
             {
-                // If moving left, set scale.x to negative value
-                myCharacter.myAnimator.FlipH = false;
+                PlayAnimation(myCharacter.myAnimator, $"{myCharacter.chosenInteractionWithCharacter}_{myCharacter.characterData.mainEmotion}");
+
+
             }
 
-            //play social interaction animation
-            PlayAnimation(myCharacter.myAnimator, $"{myCharacter.chosenInteractionWithCharacter}_{myCharacter.characterData.mainEmotion}");
 
         }
 
@@ -67,10 +74,39 @@ public partial class Interact : Node
         }
 
     }
+
+    bool DidSocialTargetRejectUs(Characters socialTarget)
+    {
+        var myCharacterData = myCharacter.characterData;
+        var targetCharacterData = socialTarget.characterData;
+        var desireOfSocial = myCharacter.chosenDesireToSocializeOn;
+        myCharacter.targetObjectedToSocialInteraction= false;
+
+        //PHASE 1 WILL TARGET ENGAGE WITH TYPE OF SOCIAL INTERACTION  
+        var targetsPreferenceToDesire = socialTarget.characterData.effectsList[desireOfSocial].strength;
+        if (targetsPreferenceToDesire < 0)
+            myCharacter.targetObjectedToSocialInteraction = true;
+
+
+
+        //PHASE 2 DO THEY EVEN LIKE ME ENOUGH TO WANT MY INTERACTION
+        if (!myCharacter.targetObjectedToSocialInteraction)
+        {
+            var targetsRelationshipWithMe = socialTarget.characterData.relationshipsList[myCharacter];
+            if (targetsRelationshipWithMe.strength[RelationshipType.friendship] < Settings.tweak_minimumRelationshipToWantToInteract)
+            {
+                myCharacter.targetObjectedToSocialInteraction = true;
+            }
+        }
+
+        
+
+        return myCharacter.targetObjectedToSocialInteraction;
+    }
     public void GetEffectedBySocial()
     {
         //SATISFY DESIRE
-        SatisfyDesires();
+        
 
         HaveConversation();
         //CALCULATE RELATIONSHIP EFFECT
@@ -78,12 +114,7 @@ public partial class Interact : Node
 
 
     }
-    void SatisfyDesires()
-    {
-        var effect = myCharacter.chosenDesireToSocializeOn;
-        myCharacter.characterData.desires[effect] = ClampMin(0, myCharacter.characterData.desires[effect] - myCharacter.characterData.effectsList[effect].actionSatisfaction);
 
-    }
    void HaveConversation()
     {
         /*4 ponged effect
@@ -98,7 +129,7 @@ public partial class Interact : Node
 
         //1
         var typeOfSocial = myCharacter.chosenInteractionWithCharacter;
-        var desireOfSocial = myCharacter.chosenDesireToSocializeOn;
+
         //2
         var objectTargetIsUsing = (Furniture)socialTarget.interactingWith;
         //3
@@ -107,30 +138,14 @@ public partial class Interact : Node
         //4
         //to be added
 
-        var objectToSocialInteraction = false;
-        //PHASE 1 WILL TARGET ENGAGE WITH TYPE OF SOCIAL INTERACTION
-  
-        var targetsPreferenceToDesire = socialTarget.characterData.effectsList[desireOfSocial].strength;
-        if(targetsPreferenceToDesire<0)
-            objectToSocialInteraction=true;
 
 
-
-        //PHASE 2 DO THEY EVEN LIKE ME ENOUGH TO WANT MY INTERACTION
-        if (!objectToSocialInteraction)
-        {
-            var targetsRelationshipWithMe= socialTarget.characterData.relationshipsList[myCharacter];
-            if (targetsRelationshipWithMe.strength[RelationshipType.friendship] <Settings.tweak_minimumRelationshipToWantToInteract)  
-            {
-                objectToSocialInteraction=true;
-            }
-        }
 
         //PHASE 3 BOND OVER TARGETS CURRENT ACTIVITY
         var myTotalPreference = 0f;
         var targetsTotalPreference = 0f;
 
-        if (!objectToSocialInteraction && objectTargetIsUsing!=null)
+        if (!myCharacter.targetObjectedToSocialInteraction && objectTargetIsUsing!=null)
         {
             //try to find common ground
 
@@ -148,7 +163,7 @@ public partial class Interact : Node
         //for now lets just see what the general vibe of both emotions are and if romance is involved
         var basicVibe = 0f;
         var romanticVibe = 0f;
-        if (!objectToSocialInteraction)
+        if (!myCharacter.targetObjectedToSocialInteraction)
         {
             basicVibe=myCharacterData.feelings[Effect.happiness]+ targetCharacterData.feelings[Effect.happiness];
             romanticVibe= myCharacterData.feelings[Effect.romance] + targetCharacterData.feelings[Effect.romance];
@@ -159,7 +174,7 @@ public partial class Interact : Node
         var basicImpactOnTarget = 0f;
         var basicImpactOnUs = 0f;
 
-        if (!objectToSocialInteraction)
+        if (!myCharacter.targetObjectedToSocialInteraction)
         {
             basicImpactOnUs= (basicVibe+ myTotalPreference)/Settings.tweak_socialInteractionDampner;
             basicImpactOnTarget = (basicVibe+ targetsTotalPreference) / Settings.tweak_socialInteractionDampner;
@@ -167,17 +182,24 @@ public partial class Interact : Node
         }
         else
         {
-            basicImpactOnTarget=-10;
+            basicImpactOnTarget=-Settings.tweak_rejectionNegativeImpact;
+            basicImpactOnUs =-Settings.tweak_rejectionNegativeImpact;
         }
 
-
+        ImpactNeedsAndDesires(myCharacter, myCharacter.chosenDesireToSocializeOn, myCharacter.characterData.effectsList[myCharacter.chosenDesireToSocializeOn].actionSatisfaction);
+        ImpactNeedsAndDesires(socialTarget, myCharacter.chosenDesireToSocializeOn, myCharacter.characterData.effectsList[myCharacter.chosenDesireToSocializeOn].actionSatisfaction/2);
         ImpactFeelings(myCharacter, basicImpactOnUs);
         ImpactFeelings(socialTarget, basicImpactOnTarget);
         ImpactRelationships(myCharacter, socialTarget, basicImpactOnUs);
         ImpactRelationships(socialTarget, myCharacter, basicImpactOnTarget);
         //if both happy and both like the activity then romantic can happen!?
     }
-
+    void ImpactNeedsAndDesires(Characters character, Effect effect, float impact)
+    {
+      
+        character.characterData.desires[effect] = ClampMin(0, character.characterData.desires[effect] - impact);
+        character.characterData.needs[effect] = ClampMin(0, character.characterData.needs[effect] - impact);
+   }
     void ImpactFeelings(Characters character, float impact )
     {
         //effect feelings 
@@ -271,7 +293,7 @@ public partial class Interact : Node
 
             GetEffectedByFurniture(myCharacter.basePrefOfObjects[item]);
             var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, false, out float sum);
-            GetMoneyEffected(sum, effectsBreakdown);
+            GetMoneyEffected(sum, null,effectsBreakdown);
             StopUsingObject();
             
 
@@ -306,7 +328,7 @@ public partial class Interact : Node
         myCharacter.interactingWith = null;
         myCharacter.accessTarget = null;
         myCharacter.interactingWithTarget = null;
-
+        myCharacter.targetObjectedToSocialInteraction = false;
 
         myCharacter.interactingWithCharacter = null;
         socialTarget.interactingWithCharacter = null;
@@ -323,7 +345,7 @@ public partial class Interact : Node
              
             var effectsBreakdown = CalculateBasePreference(tenant.characterData,furnitureItem,true, out float sum );
             
-            tenant.useItemArm.GetMoneyEffected(sum, effectsBreakdown);
+            tenant.useItemArm.GetMoneyEffected(sum, myCharacter, effectsBreakdown);
 
 
                 
@@ -372,7 +394,7 @@ public partial class Interact : Node
         if (Main.TestGameMode != Main.testGameMode.zooTycoon) return;
         myCharacter.happiness = myCharacter.basePrefOfObjects.Values.Sum();
     }
-    public void GetMoneyEffected(float effectValue, Dictionary<Effect, float> effectBreakdown)
+    public void GetMoneyEffected(float effectValue, Characters characterSource, Dictionary<Effect, float> effectBreakdown)
     {
         if (Main.TestGameMode != Main.testGameMode.flowingMoney) return;
         Main.Money += effectValue;
@@ -384,9 +406,11 @@ public partial class Interact : Node
             myCharacter.stopCurrentAction = true;
             myCharacter.isUpset = true;
             PlayAnimation(myCharacter.myAnimator, $"upset");
+
             myCharacter.alarm.Start(TimerType.grumpy, 5, false, 0);
             myCharacter.characterData.feelings[Effect.happiness] += effectValue*Settings.tweak_negativeFlatEffectsBoost;
-
+            if(characterSource!=null)
+            myCharacter.ImpactRelationship(characterSource, RelationshipType.friendship,effectValue * Settings.tweak_negativeFlatEffectsBoost);
         }
         else
         myCharacter.characterData.feelings[Effect.happiness]+= effectValue;
