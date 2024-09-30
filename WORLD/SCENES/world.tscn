@@ -1,7 +1,7 @@
 [gd_scene load_steps=34 format=3 uid="uid://bvj56a8xici12"]
 
 [ext_resource type="Script" path="res://WORLD/SCRIPTS/Main.cs" id="1_b17qk"]
-[ext_resource type="Script" path="res://WORLD/Settings.cs" id="2_4yrta"]
+[ext_resource type="Script" path="res://WORLD/SCRIPTS/Settings.cs" id="2_4yrta"]
 [ext_resource type="Script" path="res://UI/SCRIPTS/CreationButtons.cs" id="2_5twg1"]
 [ext_resource type="Texture2D" uid="uid://cbk71u5qglo0w" path="res://WORLD/TILEMAP/walltilemap.png" id="3_8n3hg"]
 [ext_resource type="Texture2D" uid="uid://b2leb482hletj" path="res://WORLD/TILEMAP/1.png" id="3_g7hwc"]
@@ -15,8 +15,8 @@
 [ext_resource type="Script" path="res://WORLD/Camera2D.gd" id="8_xlw2e"]
 [ext_resource type="PackedScene" uid="uid://cpq4ft00cf2ha" path="res://WORLD/SCENES/place_item_image.tscn" id="9_wda4i"]
 [ext_resource type="Script" path="res://UI/SCRIPTS/FlatWeAreInLabel.cs" id="10_lxq2t"]
-[ext_resource type="Script" path="res://UI/UnlocksLabel.cs" id="11_ps41o"]
-[ext_resource type="Script" path="res://WORLD/SCENES/DebugEffectOnMouse.cs" id="17_nxhdi"]
+[ext_resource type="Script" path="res://UI/SCRIPTS/UnlocksLabel.cs" id="11_ps41o"]
+[ext_resource type="Script" path="res://WORLD/SCRIPTS/DebugEffectOnMouse.cs" id="17_nxhdi"]
 [ext_resource type="Texture2D" uid="uid://blrxm36436cmi" path="res://UI/SPRITES/StateSquares/stateSquare.png" id="18_2view"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_kiien"]
@@ -224,6 +224,7 @@ script = ExtResource("17_nxhdi")
 
 [node name="Label" type="Label" parent="Label"]
 visible = false
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
 script = ExtResource("17_nxhdi")

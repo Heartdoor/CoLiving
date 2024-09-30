@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://c0ki61bf03tpi"]
 
-[ext_resource type="Script" path="res://UI/SCENES/EffectLabel.cs" id="1_82qe2"]
+[ext_resource type="Script" path="res://UI/SCRIPTS/EffectLabel.cs" id="1_82qe2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8tkbf"]
 bg_color = Color(1, 1, 1, 0.4)
