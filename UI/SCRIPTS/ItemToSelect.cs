@@ -5,8 +5,8 @@ using static Asriela.BasicFunctions;
 
 public partial class ItemToSelect : Button
 {
-    public Main.Object MyObject=null;
-    public Main.Character MyCharacter=null;
+    public Main.FurnitureItem MyObject=null;
+    public Main.CharacterItem MyCharacter=null;
     public int listIndex;
 
 

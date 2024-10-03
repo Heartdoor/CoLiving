@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using static Asriela.BasicFunctions;
 
-public partial class Furniture : StaticBody2D
+public partial class FurnitureController : StaticBody2D
 {
     [Export] public string name = "unassigned";
     bool firstRun = true;
-    public Main.Object objectData;
+    public Main.FurnitureItem furnitureData;
     public CollisionShape2D myArea;
     public CollisionShape2D myCollision;
     public Node2D myUseLocation1;
@@ -16,9 +16,9 @@ public partial class Furniture : StaticBody2D
     public int myFlatNumber = 0;
     public int roomIAmIn = 0;
 
-    public List<Furniture> myConnectedFurniture = new List<Furniture>();
+    public List<FurnitureController> myConnectedFurniture = new List<FurnitureController>();
     public int myLayer;
-    public Main.Room myRoom;
+    public BuildingController.RoomItem myRoom;
 
     public bool inUse = false;
     [Export]
@@ -120,7 +120,7 @@ public partial class Furniture : StaticBody2D
         if (occupants.Count > 0 && inUse == false)
         {
             inUse = true;
-            var temp_texture = GetTexture2D($"res://OBJECTS/SPRITES/{objectData.name}_used.png");
+            var temp_texture = GetTexture2D($"res://OBJECTS/SPRITES/{furnitureData.name}_used.png");
             if (temp_texture != null)
                 mySprite.Texture = temp_texture;
         }
@@ -128,7 +128,7 @@ public partial class Furniture : StaticBody2D
         if (inUse && occupants.Count == 0)
         {
             inUse = false;
-            mySprite.Texture = GetTexture2D($"res://OBJECTS/SPRITES/{objectData.name}.png");
+            mySprite.Texture = GetTexture2D($"res://OBJECTS/SPRITES/{furnitureData.name}.png");
         }
 
 
@@ -178,7 +178,7 @@ public partial class Furniture : StaticBody2D
             var areaNode = node.Value;
             var shiftAwayX = 30;
             var shiftAwayY = 30;
-            switch (objectData.rotation)
+            switch (furnitureData.rotation)
             {
                 case Direction.up:
                     if (newPosition == AccessPosition.up) newPosition = AccessPosition.down;
@@ -237,7 +237,7 @@ public partial class Furniture : StaticBody2D
             case 2:
 
                 myCollision.Scale = new Vector2(6, 1);
-                if (objectData.ontopUsePosition)
+                if (furnitureData.ontopUsePosition)
                 {
                     myUseLocation1.Position = new Vector2(-19, 14);
                     myUseLocation2.Position = new Vector2(19, 14);
@@ -245,7 +245,7 @@ public partial class Furniture : StaticBody2D
 
                 break;
         }
-        foreach (AccessPosition position in objectData.accessPositions)
+        foreach (AccessPosition position in furnitureData.accessPositions)
         {
              CreateAccessNode(position);
         }

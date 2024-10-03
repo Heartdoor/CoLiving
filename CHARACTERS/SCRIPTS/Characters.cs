@@ -52,7 +52,7 @@ public partial class Characters : CharacterBody2D
     public Sprite2D actionSquare;
     public Sprite2D grumpyIcon;
     public Sprite2D redirectPoint;
-    public Main.Character characterData;
+    public Main.CharacterItem characterData;
     public AnimatedSprite2D myAnimator;
     public Interact useItemArm;
     Label mainLabel;
@@ -61,9 +61,9 @@ public partial class Characters : CharacterBody2D
 
     #region EFFECTS
     public float happiness = 0;
-    public Dictionary<Main.Object, float> basePrefOfObjects = new Dictionary<Main.Object, float>();       // agent's item preferences 
-    public Dictionary<Main.Object, float> heatOfObjects = new Dictionary<Main.Object, float>();           // current "heat" of items 
-    Queue<Main.Object> objectQueue = new Queue<Main.Object>();
+    public Dictionary<Main.FurnitureItem, float> basePrefOfObjects = new Dictionary<Main.FurnitureItem, float>();       // agent's item preferences 
+    public Dictionary<Main.FurnitureItem, float> heatOfObjects = new Dictionary<Main.FurnitureItem, float>();           // current "heat" of items 
+    Queue<Main.FurnitureItem> objectQueue = new Queue<Main.FurnitureItem>();
 
     int maxQueueLength = 20;
     public int lastMoneyEffect = 0;
@@ -93,7 +93,8 @@ public partial class Characters : CharacterBody2D
     #endregion
 
     #region DATA
-    public int myFlatNumber = 1;
+    public int myBuildingNumber = 1;
+    public BuildingController.RoomItem roomIAmIn=null;
     #endregion
     void SetupNavigation()
     {
@@ -178,7 +179,7 @@ public partial class Characters : CharacterBody2D
     
         stateSquare.Visible = Settings.showCharacterStateSquare;
         ChangeStateSquare(stateSquare, Settings.stateColorNothing);
-        
+        DetermineRoomIAmIn();
         isInInteraction =false;
         ZIndex = (int)GlobalPosition.Y;
         FlipAnimatedSprite(myAnimator, Velocity);
@@ -232,6 +233,12 @@ public partial class Characters : CharacterBody2D
         MoveAndIdleAnimations();
         FadeActionSquare();
         CheckIfSelected();
+    }
+
+    void DetermineRoomIAmIn()
+    {
+        var roomNumberIAmIn = GameTileGrid.GetRoomNumberWeAreIn(GlobalPosition,Main.MyTileMap);
+        roomIAmIn = BuildingController.buildingsList[myBuildingNumber].rooms[roomNumberIAmIn];
     }
     void CheckIfSelected()
     {
@@ -324,7 +331,7 @@ public partial class Characters : CharacterBody2D
         mainLabel.Text = ""; 
         // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
         if (accessTarget != null && Settings.characterLabelHasTargetName) 
-            mainLabel.Text += $"{((Furniture)useTarget).objectData.name}\n";
+            mainLabel.Text += $"{((FurnitureController)useTarget).furnitureData.name}\n";
 
         if ( Settings.characterLabelHasHappinessValue)
             mainLabel.Text += $"{characterData.feelings[Effect.happiness]}\n";
@@ -399,7 +406,7 @@ public partial class Characters : CharacterBody2D
     }
     public void AddMyselfToEveryonesRelationshipsList()
     {
-        var allCharacters = Main.flatsList[Main.FlatNumberMouseIsIn].charactersInFlat;
+        var allCharacters = BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding;
         foreach (Characters character in allCharacters)
         {
             if (character != this)
@@ -412,18 +419,18 @@ public partial class Characters : CharacterBody2D
         }
     }
 
-    (Main.Object furniture,float value) ChooseObjectFromList()
+    (Main.FurnitureItem furniture,float value) ChooseObjectFromList()
     {
         var noObjectsFound = false;
 
-        foreach (var item in Main.flatsList[myFlatNumber].objects)
+        foreach (var item in BuildingController.buildingsList[myBuildingNumber].furnitureObjects)
         {
-            var furnitureItem = (Furniture)item;
-            var objectItem = furnitureItem.objectData;
+            var furnitureItem = (FurnitureController)item;
+            var objectItem = furnitureItem.furnitureData;
             //not already in list add new base preference 
             if (basePrefOfObjects.ContainsKey(objectItem) == false && (objectItem.type == FurnitureType._core || objectItem.type == FurnitureType._object))
             {
-                var objE = objectItem.usedEffects;
+                var objE = objectItem.basicEffects;
                 var charE = characterData.effectsList;
                 Log($"CALCULATING {objectItem.name}", LogType.step);
                 // Log($"Base Pref Of: {objectItem.objectData.name} is [objE]", LogType.step);
@@ -486,7 +493,7 @@ public partial class Characters : CharacterBody2D
 
 
         //  Log($"{basePrefOfObjects[item]}", LogType.game);  
-        Main.Object mostValuedObject=null;
+        Main.FurnitureItem mostValuedObject=null;
         float highestHeat = 0f;
         if (noObjectsFound == false)
         {
@@ -509,11 +516,11 @@ public partial class Characters : CharacterBody2D
         chosenInteractionWithCharacter = DesireAction.none;
         Characters characterObject = null;
         var highestValue = 0f;
-        var charactersInFlat=Main.flatsList[Main.FlatNumberMouseIsIn].charactersInFlat;
-        if (charactersInFlat.Count < 2) return (null, 0f);
+        var charactersInBuilding=BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding;
+        if (charactersInBuilding.Count < 2) return (null, 0f);
 
         
-        foreach (Characters character in charactersInFlat)
+        foreach (Characters character in charactersInBuilding)
         {
             if(character != this) 
             {
@@ -550,7 +557,7 @@ public partial class Characters : CharacterBody2D
         var furnitureValue = mostValuedObject.value;
 
         var mostValuedInterpersonal = ChooseFromCharacterList();
-        Main.Character valuedCharacter=null;
+        Main.CharacterItem valuedCharacter=null;
         var characterValue =0f;
         if (mostValuedInterpersonal.character!= null)
         {
@@ -570,15 +577,15 @@ public partial class Characters : CharacterBody2D
             interpersonalInteraction= false;
             if (valuedFurniture.useFromGroup== FurnitureGroup.chair)
             {
-                useTarget = FindNearestFurniture(this, this.GetTree(), null, "Object", valuedFurniture.name, myFlatNumber);
-                accessTarget = FindNearestOfGroupType(useTarget, this.GetTree(), null, "Object", valuedFurniture.useFromGroup, myFlatNumber);
+                useTarget = FindNearestFurniture(this, this.GetTree(), null, "Object", valuedFurniture.name, myBuildingNumber);
+                accessTarget = FindNearestOfGroupType(useTarget, this.GetTree(), null, "Object", valuedFurniture.useFromGroup, myBuildingNumber);
                 accessNode = FindNearestAccessNode(this, accessTarget);
 
 
             }
             else
             {
-                useTarget = FindNearestFurniture(this, this.GetTree(), null, "Object", valuedFurniture.name, myFlatNumber);
+                useTarget = FindNearestFurniture(this, this.GetTree(), null, "Object", valuedFurniture.name, myBuildingNumber);
                 accessTarget = useTarget;
                 accessNode = FindNearestAccessNode(this, accessTarget);
             }
@@ -587,7 +594,7 @@ public partial class Characters : CharacterBody2D
         else
         {
             interpersonalInteraction=true;
-            useTarget = FindNearestCharacter(this, this.GetTree(), null, "Character", valuedCharacter.name, myFlatNumber);  
+            useTarget = FindNearestCharacter(this, this.GetTree(), null, "Character", valuedCharacter.name, myBuildingNumber);  
             accessTarget = useTarget;
             accessNode= accessTarget;
 
@@ -678,8 +685,8 @@ public partial class Characters : CharacterBody2D
         }
         else
         {
-            var furnitureObject = (Furniture)interactingWithTarget;
-            alarm.Start(TimerType.actionLength, furnitureObject.objectData.useLength, false, 0);
+            var furnitureObject = (FurnitureController)interactingWithTarget;
+            alarm.Start(TimerType.actionLength, furnitureObject.furnitureData.useLength, false, 0);
         }
         Log("Reached target", LogType.step);
     }

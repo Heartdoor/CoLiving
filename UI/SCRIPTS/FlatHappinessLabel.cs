@@ -7,7 +7,7 @@ public partial class FlatHappinessLabel : Label
     void Run()
     {
         if(Main.TestGameMode != Main.testGameMode.flowingMoney)
-        Text = $"Flat Happiness: {Main.flatsList[Main.FlatNumberMouseIsIn].charactersInFlat.Sum(node=>node.happiness)}   Money:{Main.Money}";
+        Text = $"Flat Happiness: {BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding.Sum(node=>node.happiness)}   Money:{Main.Money}";
         else
         Text = $"Money: {(int)Main.Money}";
     }

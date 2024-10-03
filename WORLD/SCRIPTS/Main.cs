@@ -13,16 +13,16 @@ public partial class Main : Node2D
 
     #region MAIN CONTROL SETUP
     public static float Money=200f;
-    public static Object HeldObject=null;
-    public static Character HeldCharacter= null;
+    public static FurnitureItem HeldObject=null;
+    public static CharacterItem HeldCharacter= null;
 
 
-    public static int FlatNumberMouseIsIn = 1;
+    public static int BuildingNumberMouseIsIn = 1;
     public static int RoomNumberMouseIsIn = 1;
     int lastFlatWeWereIn = 1;
-    public static List<Character> CharactersAvailableToPlayerList = new List<Character> ();
-    public static List<Character> PlacedCharactersList = new List<Character>();
-    public static List<Furniture> leaderFurnitureList = new List<Furniture>();
+    public static List<CharacterItem> CharactersAvailableToPlayerList = new List<CharacterItem> ();
+    public static List<CharacterItem> PlacedCharactersList = new List<CharacterItem>();
+    public static List<FurnitureController> leaderFurnitureList = new List<FurnitureController>();
     public static int OverLeaderFurnitureLayer=0;
 
     Sprite2D placeItemImage;
@@ -52,19 +52,20 @@ public partial class Main : Node2D
     #region STATICS
     public static Characters SelectedCharacter = null;
     public static string DebugEffectOnMouse = "";
+   
     #endregion
 
     #region CLASSES SETUP
-    public static List<Object>  FurnitureUnlockedList = new List<Object>();
+    public static List<FurnitureItem>  FurnitureUnlockedList = new List<FurnitureItem>();
     public int startingAmountOfUnlockedFurniture;
-    public class Object
+    public class FurnitureItem
         {
             public FurnitureName name { get; set; }
             public bool flatWideEffect { get; set; }
             public string image_path { get; set; }
             public Texture2D texture { get; set; }
             public Texture2D shadowTexture { get; set; }
-            public Dictionary<Effect, int> usedEffects { get; set; }
+            public Dictionary<Effect, int> basicEffects { get; set; }
             public Dictionary<Effect, int> usedRadiantEffects { get; set; }
             public Vector2 usePosition { get; set; }
             public float useLength { get; set; }
@@ -86,7 +87,7 @@ public partial class Main : Node2D
 
             public UseAnimation useAnimation { get; set; }
 
-        public Object(FurnitureName name,  bool flatWideEffect = false,  int size=1,int price=0,  float useLength = 10f) 
+        public FurnitureItem(FurnitureName name,  bool flatWideEffect = false,  int size=1,int price=0,  float useLength = 10f) 
             {
                 this.name = name;
                 this.type = FurnitureType._decor;
@@ -107,14 +108,14 @@ public partial class Main : Node2D
                 this.price = price;
                 this.usePosition =   new Vector2(0, 0);
                 this.useLength = useLength;
-                this.usedEffects = new Dictionary<Effect, int>();
+                this.basicEffects = new Dictionary<Effect, int>();
                 this.usedRadiantEffects = new Dictionary<Effect, int>();
                 this.floorObject = false;
                 this.debugItem = false;
 
         }
         }
-        public static List<Object> objectsList = new List<Object>();
+        public static List<FurnitureItem> objectsList = new List<FurnitureItem>();
 
         public class EffectProperties
         {
@@ -157,7 +158,7 @@ public partial class Main : Node2D
             }
 
     }
-        public class Character
+        public class CharacterItem
         {
             public CharacterType name { get; set; }
             public string image_path { get; set; } 
@@ -178,7 +179,7 @@ public partial class Main : Node2D
 
         public string emoji { get; set; }
 
-        public Character(CharacterType name, string emoji, bool debugItem, Dictionary<Effect, EffectProperties> effectsList)
+        public CharacterItem(CharacterType name, string emoji, bool debugItem, Dictionary<Effect, EffectProperties> effectsList)
             {
                 this.name = name;
                 image_path = $"res://CHARACTERS/SPRITES/{name}.png";
@@ -196,59 +197,9 @@ public partial class Main : Node2D
                 this.debugItem= debugItem;
         }
         }
-        public static List<Character> charactersList = new List<Character>();
+        public static List<CharacterItem> charactersList = new List<CharacterItem>();
 
-        public class Room
-        {
-            public RoomType type { get; set; }
-            public int number { get; set; }
-         
-            public List<Node2D> objects { get; set; }
-
-        public Room(int number, RoomType type)
-        {
-            this.number = number;
-            this.type = type;
-            objects = new List<Node2D>();
-
-        }
-
-
-    }
-        public class Flat
-        {
-            public int number { get; set; }
-        private List<Room> _rooms;
-
-        public List<Node2D> objects { get; set; }
-
-            public string image_path { get; set; }
-            public Color color { get; set; }
-            public double happiness { get; set; }
-            public List<Characters> charactersInFlat { get; set; }
-
-
-            public Flat(int number, Color color, params Room[] rooms)
-            {
-           
-                this.number = number;
-                image_path = $"res://FLATS/SPRITES/{number}.png";
-                this.color = color;
-                this.charactersInFlat = new List<Characters>();
-            this._rooms = new List<Room>(rooms);
-
-            this.objects = new List<Node2D>();
-           }
-          public List<Room> rooms
-        {
-            get
-            {
-                return new List<Room>(_rooms.Select((room, index)=>index>0 ? _rooms[index - 1] :room));
-            }
-            set { _rooms = value; }
-        } 
-        }
-        public static List<Flat> flatsList = new List<Flat>();
+       
 
     #endregion
 
@@ -258,7 +209,7 @@ public partial class Main : Node2D
     #endregion
 
     #region LOCAL SETUPS
-    Object o;
+    FurnitureItem o;
     DebugHotkeys debugHotkeys  = new DebugHotkeys();
     #endregion
 
@@ -268,7 +219,7 @@ public partial class Main : Node2D
     void AddNewObject(FurnitureName name  )
     {
         
-        o = new Object(name);  
+        o = new FurnitureItem(name);  
         objectsList.Add(o);
   
     }
@@ -286,7 +237,7 @@ public partial class Main : Node2D
         o.rotation = Direction.down;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
         o.useAnimation = UseAnimation.idle;
-        o.usedEffects.Add(Effect.debug1, 5);
+        o.basicEffects.Add(Effect.debug1, 5);
 
 
         AddNewObject(FurnitureName.couch);
@@ -301,7 +252,7 @@ public partial class Main : Node2D
         o.rotation = Direction.down;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         o.useAnimation = UseAnimation.sit;
-        o.usedEffects.Add(Effect.comfort, 1);
+        o.basicEffects.Add(Effect.comfort, 1);
 
 
 
@@ -315,9 +266,9 @@ public partial class Main : Node2D
         o.rotation = Direction.down;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
         o.useAnimation = UseAnimation.strumGuitar;
-        o.usedEffects.Add(Effect.music, 3);
-        o.usedEffects.Add(Effect.noise, 3);
-        o.usedEffects.Add(Effect.grunge, 2);
+        o.basicEffects.Add(Effect.music, 3);
+        o.basicEffects.Add(Effect.noise, 3);
+        o.basicEffects.Add(Effect.grunge, 2);
 
         o.usedRadiantEffects.Add(Effect.noise, 2);
         o.usedRadiantEffects.Add(Effect.grunge, 2);
@@ -332,8 +283,8 @@ public partial class Main : Node2D
         o.useLength = 10;
         o.rotation = Direction.down;
         o.useAnimation = UseAnimation.listenToMusic;
-        o.usedEffects.Add(Effect.music, 4);
-        o.usedEffects.Add(Effect.vintage, 3);
+        o.basicEffects.Add(Effect.music, 4);
+        o.basicEffects.Add(Effect.vintage, 3);
         o.usedRadiantEffects.Add(Effect.music, 2);
         o.usedRadiantEffects.Add(Effect.vintage, 1);
 
@@ -347,8 +298,8 @@ public partial class Main : Node2D
         o.rotation = Direction.up;
         o.useAnimation = UseAnimation.cook;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        o.usedEffects.Add(Effect.food, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.food, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
         o.usedRadiantEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.fridge);
@@ -361,8 +312,8 @@ public partial class Main : Node2D
         o.rotation = Direction.right;
         o.useAnimation = UseAnimation.idle;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        o.usedEffects.Add(Effect.food, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.food, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.counterTop);
         o.type = FurnitureType._core;
@@ -374,8 +325,8 @@ public partial class Main : Node2D
         o.rotation = Direction.down;
         o.useAnimation = UseAnimation.idle;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        o.usedEffects.Add(Effect.food, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.food, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
 
 
@@ -392,8 +343,8 @@ public partial class Main : Node2D
         o.rotation = Direction.left;
         o.useAnimation = UseAnimation.sit;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        o.usedEffects.Add(Effect.comfort, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.comfort, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.rug);
         o.type = FurnitureType._decor;
@@ -407,8 +358,8 @@ public partial class Main : Node2D
         o.price = 100;
         o.useLength = 10;
         o.rotation = Direction.down;
-        o.usedEffects.Add(Effect.comfort, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.comfort, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.smallSideTable);
         o.type = FurnitureType._decor;
@@ -419,8 +370,8 @@ public partial class Main : Node2D
         o.price = 50;
         o.useLength = 10;
         o.rotation = Direction.down;
-        o.usedEffects.Add(Effect.comfort, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.comfort, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.tv);
         o.type = FurnitureType._object;
@@ -433,7 +384,7 @@ public partial class Main : Node2D
         o.useLength = 10;
         o.rotation = Direction.up;
         o.useAnimation = UseAnimation.sit;
-        o.usedEffects.Add(Effect.entertainment, 5);
+        o.basicEffects.Add(Effect.entertainment, 5);
         o.usedRadiantEffects.Add(Effect.entertainment, 2);
 
         AddNewObject(FurnitureName.yarnBasket);
@@ -447,8 +398,8 @@ public partial class Main : Node2D
         o.useLength = 10;
         o.rotation = Direction.down;
         o.useAnimation = UseAnimation.sitAndKnitt;
-        o.usedEffects.Add(Effect.comfort, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.comfort, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.stonePainting);
         o.debugItem = true;
@@ -462,8 +413,8 @@ public partial class Main : Node2D
         o.rotation = Direction.down;
         o.useAnimation = UseAnimation.idle;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        o.usedEffects.Add(Effect.comfort, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.comfort, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         AddNewObject(FurnitureName.roarRock);
         o.debugItem = true;
@@ -478,8 +429,8 @@ public partial class Main : Node2D
         o.ontopUsePosition = true;
         o.useAnimation = UseAnimation.roar;
         o.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
-        o.usedEffects.Add(Effect.comfort, 4);
-        o.usedEffects.Add(Effect.cozy, 2);
+        o.basicEffects.Add(Effect.comfort, 4);
+        o.basicEffects.Add(Effect.cozy, 2);
 
         if (Settings.furnitureUnlocked)
             startingAmountOfUnlockedFurniture = objectsList.Count();//2;
@@ -556,7 +507,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.hunting,          1, 0, 0);
 
         #region apply
-        var charInfo = new Character(name, emoji, debugItem, myEffects);
+        var charInfo = new CharacterItem(name, emoji, debugItem, myEffects);
         charactersList.Add(charInfo);
         ClearCharacterListData(ref myEffects);
         #endregion
@@ -583,7 +534,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects, Effect.debug1, 5, 0, 0);
 
         #region apply
-        charactersList.Add(new Character(name,emoji, debugItem, myEffects));
+        charactersList.Add(new CharacterItem(name,emoji, debugItem, myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
@@ -607,7 +558,7 @@ public partial class Main : Node2D
         NewEffect(ref myEffects,Effect.academic,    -1, 0, 0);
         NewEffect(ref myEffects,Effect.hunting,       2, 0, 0);
         #region apply
-        charactersList.Add(new Character(name,emoji, debugItem , myEffects));
+        charactersList.Add(new CharacterItem(name,emoji, debugItem , myEffects));
         ClearCharacterListData(ref myEffects);
         #endregion
 
@@ -626,18 +577,6 @@ public partial class Main : Node2D
 
     }
 
-    void SetupFlats()
-    {
-        AddNewFlat(0, ColorGrey); 
-        var firstflat=AddNewFlat(1, ColorBlue, 
-            new Room(1,RoomType.none),
-            new Room(2, RoomType.none),
-            new Room(3, RoomType.none),
-            new Room(4, RoomType.none),
-            new Room(4, RoomType.none));
-
- 
-    }
 
     void SetupUI()
     {
@@ -645,21 +584,9 @@ public partial class Main : Node2D
         MyUnlocksLabel = GetNode<Godot.CanvasLayer>("CanvasLayer").GetNode<Label>("UnlocksLabel");
     }
 
-    void SetupFirstFlat()
-    {
-        if (SpawnInitialObjects == false) return;
-        var theObject = GetObjectFromType(FurnitureName.couch);
 
-        PlaceObjects(ref theObject, true, new Vector2(576, 237));
-        theObject = GetObjectFromType(FurnitureName.electricGuitar);
 
-        PlaceObjects(ref theObject, true, new Vector2(376, 437));
-        theObject = GetObjectFromType(FurnitureName.recordPlayer);
-
-        PlaceObjects(ref theObject, true, new Vector2(656, 437));
-        var theCharacter = GetCharacterFromType(CharacterType.granny);
-        PlaceCharacter(ref theCharacter , true, new Vector2(276, 237));
-    }
+ 
     #endregion
 
 
@@ -676,10 +603,8 @@ public partial class Main : Node2D
         SetupUI();
         SetupObjects();
         SetupCharacters();
-        SetupFlats();
-        SetupFirstFlat();
         SetupDebugHotkeys();
-        
+   
 
 
 
@@ -690,6 +615,7 @@ public partial class Main : Node2D
     {
 
         RunDebugHotkeys();
+
 
         if (canPlace) 
         { 
@@ -715,10 +641,10 @@ public partial class Main : Node2D
         }
 
     }
-    Object ChooseNewFurnitureToUnlock()
+    FurnitureItem ChooseNewFurnitureToUnlock()
     {
         Random random = new Random();
-        Object chosenItem;
+        FurnitureItem chosenItem;
         var tries = 50;
         var i = 0;
             do
@@ -737,10 +663,10 @@ public partial class Main : Node2D
         return chosenItem;
     }
 
-    Character ChooseNewCharacterToUnlock()
+    CharacterItem ChooseNewCharacterToUnlock()
     {
         Random random = new Random();
-        Character chosenItem;
+        CharacterItem chosenItem;
         var tries = 50;
         var i = 0;
         do
@@ -775,19 +701,19 @@ public partial class Main : Node2D
         if (furnitureItem != null)
             unlocksLabelClass.NewUnlock($"{furnitureItem.name}");
     }
-    public void PlaceObjects(ref Object HeldObject, bool placeManually, Vector2 position)
+    public void PlaceObjects(ref FurnitureItem HeldObject, bool placeManually, Vector2 position)
     {
 
         if (HeldObject == null) return;
 
 
-        Room roomWeAreIn = null;
-        if(FlatNumberMouseIsIn > 0 && RoomNumberMouseIsIn>0)
-            roomWeAreIn= flatsList[FlatNumberMouseIsIn].rooms[RoomNumberMouseIsIn] ;
+        BuildingController.RoomItem roomWeAreIn = null;
+        if(BuildingNumberMouseIsIn > 0 && RoomNumberMouseIsIn>0)
+            roomWeAreIn= BuildingController.buildingsList[BuildingNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
 
         OverPlaceableTile = false;
 
-        if (roomWeAreIn != null && FlatNumberMouseIsIn>0 && RoomNumberMouseIsIn > -1 )       
+        if (roomWeAreIn != null && BuildingNumberMouseIsIn>0 && RoomNumberMouseIsIn > -1 )       
           if  ((HeldObject.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldObject.roomTypes[0])) ||
                 (HeldObject.type != FurnitureType._core && HeldObject.roomTypes.Contains(roomWeAreIn.type)))
             OverPlaceableTile = true; 
@@ -808,13 +734,13 @@ public partial class Main : Node2D
 
 
             var newObject = Add2DNode("res://OBJECTS/SCENES/object.tscn", this);
-            var newObjectClass = (Furniture)newObject;
-            var newObjectData = newObjectClass.objectData;
+            var newObjectClass = (FurnitureController)newObject;
+            var newObjectData = newObjectClass.furnitureData;
             newObjectData = HeldObject;
-            newObjectClass.objectData = newObjectData;
+            newObjectClass.furnitureData = newObjectData;
             newObjectClass.myShadow.Texture = HeldObject.shadowTexture;
             newObjectClass.mySprite.Texture = placeItemImage.Texture;
-            newObjectClass.myFlatNumber = FlatNumberMouseIsIn;
+            newObjectClass.myFlatNumber = BuildingNumberMouseIsIn;
             newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
             newObjectClass.myRoom = roomWeAreIn;
 
@@ -827,9 +753,8 @@ public partial class Main : Node2D
                 GameTileGrid.SetFloorMaterial(RoomNumberMouseIsIn, roomWeAreIn.type);
             }
 
+            BuildingController.AddFurnitureToRoom(BuildingNumberMouseIsIn, roomWeAreIn, newObject);
 
-            roomWeAreIn.objects.Add(newObject);
-            flatsList[FlatNumberMouseIsIn].objects.Add(newObject);
 
             newObjectClass.ChangeDimensions(newObjectData.size);
 
@@ -866,7 +791,7 @@ public partial class Main : Node2D
     }
 
 
-    public Characters PlaceCharacter(ref Character heldCharacter, bool placeManually, Vector2 position)
+    public Characters PlaceCharacter(ref CharacterItem heldCharacter, bool placeManually, Vector2 position)
     {
         if (heldCharacter == null) return null;
 
@@ -894,9 +819,9 @@ public partial class Main : Node2D
                 newCharacterClass.myAnimator.SpriteFrames = (SpriteFrames)GetResource($"res://CHARACTERS/ANIMATIONS/{newCharacterClass.characterData.name}Animations.tres");
                 newCharacterClass.myAnimator.Animation = "idle_neutral";
                 newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
-                newCharacterClass.myFlatNumber = FlatNumberMouseIsIn;
+                newCharacterClass.myBuildingNumber = BuildingNumberMouseIsIn;
                 newCharacterClass.AddMyselfToEveryonesRelationshipsList();
-                flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newCharacterClass);
+                BuildingController.buildingsList[BuildingNumberMouseIsIn].charactersInBuilding.Add(newCharacterClass);
                 if(placeManually==false)
                 if (heldCharacter != null )
                 {
@@ -954,21 +879,15 @@ public partial class Main : Node2D
 
     }
 
-    Flat AddNewFlat(int flatNumber, Color color, params Room[] rooms  )
-    {
-        var newFlat = new Flat(flatNumber, color, rooms);
-        
-        flatsList.Add(newFlat);
-        return newFlat;
-    }
+  
 
-    public static Object GetObjectFromType(FurnitureName name)
+    public static FurnitureItem GetObjectFromType(FurnitureName name)
     {
         var correctObject = objectsList.FirstOrDefault(obj => obj.name == name);
         return correctObject;
     }
 
-    public static Character GetCharacterFromType(CharacterType name)
+    public static CharacterItem GetCharacterFromType(CharacterType name)
     {
         var correctObject = charactersList.FirstOrDefault(obj => obj.name == name);
         return correctObject;

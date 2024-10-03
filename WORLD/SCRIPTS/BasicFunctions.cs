@@ -486,9 +486,9 @@ namespace Asriela
 
                 if (subject != obj && (mayNotBe != obj) )
                 {
-                    Furniture objectClass = (Furniture)obj;
+                    FurnitureController objectClass = (FurnitureController)obj;
 
-                    if(objectName == objectClass.objectData.name && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if(objectName == objectClass.furnitureData.name && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.furnitureData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -520,7 +520,7 @@ namespace Asriela
                 {
                     Characters characterClass = (Characters)obj;
 
-                    if (objectName == characterClass.characterData.name && characterClass.myFlatNumber == flatNumber && characterClass.interactingWithCharacter==null)
+                    if (objectName == characterClass.characterData.name && characterClass.myBuildingNumber == flatNumber && characterClass.interactingWithCharacter==null)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -551,9 +551,9 @@ namespace Asriela
 
                 if (subject != obj && (mayNotBe != obj))
                 {
-                    Furniture objectClass = (Furniture)obj;
+                    FurnitureController objectClass = (FurnitureController)obj;
 
-                    if (objectGroup == objectClass.objectData.group && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if (objectGroup == objectClass.furnitureData.group && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.furnitureData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -574,7 +574,7 @@ namespace Asriela
         public static Node2D FindNearestAccessNode(Node2D subject, Node2D target)
         {
             Node2D nearestNode = null;
-            var furnitureItem = (Furniture)target;
+            var furnitureItem = (FurnitureController)target;
             float nearestDistance = 99999999999999;
             foreach (KeyValuePair<AccessPosition, Area2D> node in furnitureItem.myAccessNodes)
             {

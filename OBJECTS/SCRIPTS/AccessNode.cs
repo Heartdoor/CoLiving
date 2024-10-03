@@ -4,7 +4,7 @@ using static Asriela.BasicFunctions;
 
 public partial class AccessNode : Area2D
 {
-    public Furniture myObject;
+    public FurnitureController myObject;
     /*
     private void OnBodyEntered(Node body)
     {
