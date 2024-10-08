@@ -1,13 +1,12 @@
 using Godot;
-using System;
 using static Asriela.BasicFunctions;
 public partial class CloseSelectionMenu : Button
 {
 
-    void OnPressed() 
+    void OnPressed()
     {
-     
-            Destroy(Main.SelectionMenuOpen);
+
+        Destroy(Main.SelectionMenuOpen);
         Main.SelectionMenuOpen = null;
     }
 

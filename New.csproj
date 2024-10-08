@@ -6,6 +6,10 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="configs\CharactersConfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CONFIGS\" />
     <Folder Include="UI\SCENES\" />
   </ItemGroup>
   <ItemGroup>

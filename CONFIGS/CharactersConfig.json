@@ -1,0 +1,23 @@
+﻿[
+  {
+    "Name": "granny",
+    "Emoji": "👵",
+    "DebugItem": false,
+    "Effects": [
+      {
+        "Type": "social",
+        "Strength": 1,
+        "NeedBleedRate": 0.0001,
+        "DesireGrowRate": 0.0001,
+        "Action": "talk"
+      },
+      {
+        "Type": "food",
+        "Strength": 2,
+        "NeedBleedRate": 0.01,
+        "DesireGrowRate": 0
+      }
+    ]
+  }
+  // Add more character configurations here...
+]

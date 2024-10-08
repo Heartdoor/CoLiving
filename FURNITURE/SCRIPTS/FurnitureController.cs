@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using static Asriela.BasicFunctions;
 
-public partial class Furniture : StaticBody2D
+public partial class FurnitureController : StaticBody2D
 {
     [Export] public string name = "unassigned";
     bool firstRun = true;
-    public Main.Object objectData;
+    public FurnitureItem objectData;
     public CollisionShape2D myArea;
     public CollisionShape2D myCollision;
     public Node2D myUseLocation1;
@@ -16,7 +16,7 @@ public partial class Furniture : StaticBody2D
     public int myFlatNumber = 0;
     public int roomIAmIn = 0;
 
-    public List<Furniture> myConnectedFurniture = new List<Furniture>();
+    public List<FurnitureController> myConnectedFurniture = new List<FurnitureController>();
     public int myLayer;
     public Main.Room myRoom;
 
@@ -145,8 +145,8 @@ public partial class Furniture : StaticBody2D
     {
         /*
         //if we are not holding a core object 
-        if (Main.HeldObject == null || objectData.type != FurnitureType._core) return;
-           if( !Main.HeldObject.furnitureGroups.Contains(objectData.isGroupLeader) ) return;
+        if (Main.HeldFurnitureItem == null || objectData.type != FurnitureType._core) return;
+           if( !Main.HeldFurnitureItem.furnitureGroups.Contains(objectData.isGroupLeader) ) return;
         var halfWidth = 8;
         var halfHeight = 8;
         var topLeftTile = new Vector2I(myCenterTile.X-halfWidth, myCenterTile.Y-halfHeight);

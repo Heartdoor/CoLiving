@@ -1,8 +1,5 @@
 using Godot;
-using System;
-using System.Data.SqlTypes;
 using static Asriela.BasicFunctions;
-using static System.Net.Mime.MediaTypeNames;
 
 public partial class CreationButtons : Button
 {
@@ -20,43 +17,36 @@ public partial class CreationButtons : Button
 
     void OnPressed()
     {
-
-
         if (Main.SelectionMenuOpen != null)
         {
             Destroy(Main.SelectionMenuOpen);
         }
-        
-    
 
-
-
-
-        uiContainer =SpawnUI(GetScene("res://UI/SCENES/selection_menu.tscn"), this);
+        uiContainer = SpawnUI(GetScene("res://UI/SCENES/selection_menu.tscn"), this);
         Main.SelectionMenuOpen = uiContainer;
-      uiContainer.Position = new Vector2(120,0);
+        uiContainer.Position = new Vector2(120, 0);
         var scrollContainer = uiContainer.GetNode<ScrollContainer>("ScrollContainer");
         var gridContainer = scrollContainer.GetNode<GridContainer>("GridContainer");
         switch (buttonType)
         {
             case "characters":
                 Main.HoldNothing();
-             
+
                 foreach (var item in Main.CharactersAvailableToPlayerList)
                 {
-                    if(item.debugItem && !Settings.enableDebugItems) continue;
-                    var newButton= (Button) SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
-                    
+                    if (item.debugItem && !Settings.enableDebugItems) continue;
+                    var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
+
                     newButton.Text = $"{item.name}";
                     newButton.Icon = item.texture;
                     var buttonClass = (ItemToSelect)newButton;
-                    
+
                     buttonClass.MyCharacter = item;
                 }
-            break;
+                break;
             case "objects":
                 Main.HoldNothing();
-             
+
                 foreach (var item in Main.FurnitureUnlockedList)
                 {
                     if (item.debugItem && !Settings.enableDebugItems) continue;
@@ -64,27 +54,27 @@ public partial class CreationButtons : Button
 
                     newButton.Text = $"{item.name}  ${item.price}";
                     newButton.Icon = item.texture;
-                    if(Main.Money< item.price)
-                    ChangeColorUI(newButton, ColorRed);
+                    if (Main.Money < item.price)
+                        ChangeColorUI(newButton, ColorRed);
                     var buttonClass = (ItemToSelect)newButton;
-                    buttonClass.MyObject = item;
+                    buttonClass.myFurnitureItem = item;
 
                 }
                 break;
             case "rooms":
                 Main.HoldNothing();
-              
+
                 foreach (var item in Main.flatsList)
                 {
-                   
+
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);
 
                     newButton.Text = item.number.ToString();
                 }
                 break;
         }
-        
-        
+
+
     }
 
     #region OLD
