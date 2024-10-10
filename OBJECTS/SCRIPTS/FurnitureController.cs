@@ -41,6 +41,7 @@ public partial class FurnitureController : StaticBody2D
 
     private void PlaceTilesToCoverShape(Rect2 shapeRect)
     {
+        if(furnitureData.type == FurnitureType._decor) return;
         // Get the top-left and bottom-right corners of the rectangle in local coordinates.
         Vector2 topLeft = shapeRect.Position + GlobalPosition;
         Vector2 bottomRight = shapeRect.Position + shapeRect.Size + GlobalPosition;

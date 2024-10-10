@@ -328,8 +328,11 @@ public partial class Characters : CharacterBody2D
     }
     public void ManageIconsCharacterUI()
     {
-        mainLabel.Text = ""; 
-        // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
+        mainLabel.Text = "";
+
+        if (Settings.characterLabelHasLastEffectAmount )
+            mainLabel.Text += $"{lastMoneyEffect}\n";
+            // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
         if (accessTarget != null && Settings.characterLabelHasTargetName) 
             mainLabel.Text += $"{((FurnitureController)useTarget).furnitureData.name}\n";
 

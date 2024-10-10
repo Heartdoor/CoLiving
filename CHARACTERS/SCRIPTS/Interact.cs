@@ -290,11 +290,14 @@ public partial class Interact : Node
             myCharacter.heatOfObjects[item] = 0;
 
 
-            GetEffectedByFurniture(BuildingController.GetRoomDecorEffect(myCharacter.characterData, myCharacter.roomIAmIn ));
-            GetEffectedByFurniture(myCharacter.basePrefOfObjects[item]);
+     
             var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, false, out float sum);
-            
-            GetMoneyEffected(sum, null,effectsBreakdown);
+            var roomDecorEffect = BuildingController.GetRoomDecorEffect(myCharacter.characterData, myCharacter.roomIAmIn);
+            var totalSum = sum+ roomDecorEffect;
+
+            Log($"{sum} + {roomDecorEffect}", LogType.game);
+
+            GetMoneyEffected(totalSum, null,effectsBreakdown);
             StopUsingObject();
             
 
@@ -384,7 +387,7 @@ public partial class Interact : Node
     }
     public void GetEffectedByFurniture(float effectValue)
     {
-        if (Main.TestGameMode != Main.testGameMode.complex) return;
+        //if (Main.TestGameMode != Main.testGameMode.complex) return;
         myCharacter.happiness += effectValue;
     }
 

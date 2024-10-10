@@ -110,9 +110,19 @@ public partial class BuildingController : Node
         foreach (KeyValuePair<Effect, int> effects in furnitureData.basicEffects)
         {
             if (!room.decorationEffects.ContainsKey(effects.Key))
+            {
+
+                Log($"Added {effects.Key} with {effects.Value} as decoration", LogType.game);
+
                 room.decorationEffects.Add(effects.Key, effects.Value);
+            }
+
             else
+            {
+                Log($"Added {effects.Key} with {effects.Value} as decoration", LogType.game);
                 room.decorationEffects[effects.Key] += effects.Value;
+            }
+               
         }
     }
     public static float GetRoomDecorEffect(Main.CharacterItem characterData , RoomItem room )
@@ -134,6 +144,8 @@ public partial class BuildingController : Node
 
         var products = intersectedKeys.Select(key =>
         {
+           
+      
             var product = objE[key] * charE[key].strength;
             effectsBreakdown.Add(key, product);
             //Log(, LogType.step);

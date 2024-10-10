@@ -18,6 +18,7 @@ public partial class Settings : Node
     public static bool characterLabelHasHappinessValue = Toggle(1);
     public static bool characterLabelHasDesiresValues = Toggle(1);
     public static bool characterLabelHasRelationshipValues = Toggle(1);
+    public static bool characterLabelHasLastEffectAmount = Toggle(1);
     public static bool objectsLabelHasCoOrdinates = Toggle(0);
 
     public static bool showCharacterStateSquare = Toggle(1);
