@@ -36,6 +36,7 @@ public partial class DebugHotkeys : Node
 
     void QuickLevelSetupHotKeys()
     {
+
         FurnitureItem furniture;
         Character character;
         CharacterController newCharacter;

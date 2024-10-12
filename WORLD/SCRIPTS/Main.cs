@@ -6,6 +6,7 @@ using static Asriela.BasicFunctions;
 
 public partial class Main : Node2D
 {
+
 	#region STATES
 	public static Control SelectionMenuOpen = null;
 	public static bool canPlace = true;
@@ -60,59 +61,7 @@ public partial class Main : Node2D
 	public static List<FurnitureItem> objectsList = new List<FurnitureItem>();
 	public static List<Character> charactersList = new List<Character>();
 
-	public class Room
-	{
-		public RoomType type { get; set; }
-		public int number { get; set; }
-
-		public List<Node2D> objects { get; set; }
-
-		public Room(int number, RoomType type)
-		{
-			this.number = number;
-			this.type = type;
-			objects = new List<Node2D>();
-
-		}
-	}
-
-	public class Flat
-	{
-		public int number { get; set; }
-		private List<Room> _rooms;
-
-		public List<Node2D> objects { get; set; }
-
-		public string image_path { get; set; }
-		public Color color { get; set; }
-		public double happiness { get; set; }
-		public List<CharacterController> charactersInFlat { get; set; }
-
-
-		public Flat(int number, Color color, params Room[] rooms)
-		{
-
-			this.number = number;
-			image_path = $"res://FLATS/SPRITES/{number}.png";
-			this.color = color;
-			this.charactersInFlat = new List<CharacterController>();
-			this._rooms = new List<Room>(rooms);
-
-			this.objects = new List<Node2D>();
-		}
-		public List<Room> rooms
-		{
-			get
-			{
-				return new List<Room>(_rooms.Select((room, index) => index > 0 ? _rooms[index - 1] : room));
-			}
-			set { _rooms = value; }
-		}
-	}
-
-	public static List<Flat> flatsList = new List<Flat>();
-
-	#endregion
+	
 
 	#region COLOR SETUPS
 	public static readonly Color ColorCantBePlaced = new Color(0xff00008d);
@@ -125,16 +74,7 @@ public partial class Main : Node2D
 	#endregion
 
 	#region SETUPS
-	void SetupFlats()
-	{
-		AddNewFlat(0, ColorGrey);
-		var firstflat = AddNewFlat(1, ColorBlue,
-			new Room(1, RoomType.none),
-			new Room(2, RoomType.none),
-			new Room(3, RoomType.none),
-			new Room(4, RoomType.none),
-			new Room(4, RoomType.none));
-	}
+
 
 	void SetupUI()
 	{
@@ -142,21 +82,7 @@ public partial class Main : Node2D
 		MyUnlocksLabel = GetNode<CanvasLayer>("CanvasLayer").GetNode<Label>("UnlocksLabel");
 	}
 
-	void SetupFirstFlat()
-	{
-		if (SpawnInitialObjects == false) return;
-		var theObject = GetObjectFromType(FurnitureName.couch);
 
-		PlaceObjects(ref theObject, true, new Vector2(576, 237));
-		theObject = GetObjectFromType(FurnitureName.electricGuitar);
-
-		PlaceObjects(ref theObject, true, new Vector2(376, 437));
-		theObject = GetObjectFromType(FurnitureName.recordPlayer);
-
-		PlaceObjects(ref theObject, true, new Vector2(656, 437));
-		var theCharacter = GetCharacterFromType(CharacterType.granny);
-		PlaceCharacter(ref theCharacter, true, new Vector2(276, 237));
-	}
 	#endregion
 
 
@@ -243,6 +169,7 @@ public partial class Main : Node2D
 		}
 		while ((CharactersAvailableToPlayerList.Contains(chosenItem) || PlacedCharactersList.Contains(chosenItem)) && i < tries);
 
+
 		if (i < tries)
 			CharactersAvailableToPlayerList.Add(chosenItem);
 		else
@@ -262,6 +189,7 @@ public partial class Main : Node2D
 	{
 		var unlocksLabelClass = (UnlocksLabel)MyUnlocksLabel;
 
+
 		var furnitureItem = ChooseNewCharacterToUnlock();
 		if (furnitureItem != null)
 			unlocksLabelClass.NewUnlock($"{furnitureItem.name}");
@@ -269,14 +197,46 @@ public partial class Main : Node2D
 	public void PlaceObjects(ref FurnitureItem HeldFurnitureItem, bool placeManually, Vector2 position)
 	{
 
+
 		if (HeldFurnitureItem == null) return;
 
+        BuildingController.RoomItem roomWeAreIn = null;
+        if(BuildingNumberMouseIsIn > 0 && RoomNumberMouseIsIn>0)
+            roomWeAreIn= BuildingController.buildingsList[BuildingNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
 
-		Room roomWeAreIn = null;
-		if (FlatNumberMouseIsIn > 0 && RoomNumberMouseIsIn > 0)
-			roomWeAreIn = flatsList[FlatNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
+        OverPlaceableTile = false;
 
-		OverPlaceableTile = false;
+        if (roomWeAreIn != null && BuildingNumberMouseIsIn>0 && RoomNumberMouseIsIn > -1 )       
+          if  ((HeldObject.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldObject.roomTypes[0])) ||
+                (HeldObject.type != FurnitureType._core && HeldObject.roomTypes.Contains(roomWeAreIn.type)))
+            OverPlaceableTile = true; 
+        
+            
+
+
+        placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates * MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
+        placeItemImage.Texture = HeldObject.texture;
+        if (OverPlaceableTile)
+            ChangeColor(placeItemImage, ColorPlace);
+        else
+            ChangeColor(placeItemImage, ColorCantBePlaced);
+
+        var cost = HeldObject.price;
+        if ((KeyPressed("RightClick") && Money >= cost && OverPlaceableTile) || placeManually)
+        {
+
+
+            var newObject = Add2DNode("res://OBJECTS/SCENES/object.tscn", this);
+            var newObjectClass = (FurnitureController)newObject;
+            var newObjectData = newObjectClass.furnitureData;
+            newObjectData = HeldObject;
+            newObjectClass.furnitureData = newObjectData;
+            newObjectClass.myShadow.Texture = HeldObject.shadowTexture;
+            newObjectClass.mySprite.Texture = placeItemImage.Texture;
+            newObjectClass.myFlatNumber = BuildingNumberMouseIsIn;
+            newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
+            newObjectClass.myRoom = roomWeAreIn;
+
 
 		if (roomWeAreIn != null && FlatNumberMouseIsIn > 0 && RoomNumberMouseIsIn > -1)
 			if ((HeldFurnitureItem.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldFurnitureItem.roomTypes[0])) ||
@@ -284,198 +244,161 @@ public partial class Main : Node2D
 				OverPlaceableTile = true;
 
 
+            if (HeldObject.type == FurnitureType._core)
+            {
+                roomWeAreIn.type = newObjectData.roomTypes[0];
+                GameTileGrid.SetFloorMaterial(RoomNumberMouseIsIn, roomWeAreIn.type);
+            }
+
+            BuildingController.AddFurnitureToRoom(BuildingNumberMouseIsIn, roomWeAreIn, newObject);
 
 
-		placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates * MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
-		placeItemImage.Texture = HeldFurnitureItem.texture;
-		if (OverPlaceableTile)
-			ChangeColor(placeItemImage, ColorPlace);
-		else
-			ChangeColor(placeItemImage, ColorCantBePlaced);
-
-		var cost = HeldFurnitureItem.price;
-		if ((KeyPressed("RightClick") && Money >= cost && OverPlaceableTile) || placeManually)
-		{
-
-
-			var newObject = Add2DNode("res://OBJECTS/SCENES/object.tscn", this);
-			var newObjectClass = (FurnitureController)newObject;
-			var newObjectData = newObjectClass.objectData;
-			newObjectData = HeldFurnitureItem;
-			newObjectClass.objectData = newObjectData;
-			newObjectClass.myShadow.Texture = HeldFurnitureItem.shadowTexture;
-			newObjectClass.mySprite.Texture = placeItemImage.Texture;
-			newObjectClass.myFlatNumber = FlatNumberMouseIsIn;
-			newObjectClass.roomIAmIn = RoomNumberMouseIsIn;
-			newObjectClass.myRoom = roomWeAreIn;
-
-			if (newObjectData.floorObject)
-				newObjectClass.mySprite.ZIndex = -2000;
-
-			if (HeldFurnitureItem.type == FurnitureType._core)
-			{
-				roomWeAreIn.type = newObjectData.roomTypes[0];
-				GameTileGrid.SetFloorMaterial(RoomNumberMouseIsIn, roomWeAreIn.type);
-			}
-
-
-			roomWeAreIn.objects.Add(newObject);
-			flatsList[FlatNumberMouseIsIn].objects.Add(newObject);
-
-			newObjectClass.ChangeDimensions(newObjectData.size);
+            newObjectClass.ChangeDimensions(newObjectData.size);
 
 
 
-			if (placeManually)
-			{
-				newObject.GlobalPosition = position;
+            if (placeManually)
+            {
+                newObject.GlobalPosition = position;
 
 
-			}
+            }
 
-			else
-			{
-				UnlockNewFurniture();
-				newObject.GlobalPosition = placeItemImage.GlobalPosition;
+            else
+            {
+                UnlockNewFurniture();
+                newObject.GlobalPosition = placeItemImage.GlobalPosition;
 
-				Money -= cost;
-			}
+                Money -= cost;
+            }
 
 
 
 
-			if (placeManually == false)
-				if (HeldCharacter != null || HeldFurnitureItem != null)
-				{
-					HoldNothing();
+            if (placeManually == false)
+                if (HeldCharacter != null || HeldObject != null)
+                {
+                    HoldNothing();
 
-					Destroy(SelectionMenuOpen);
-					SelectionMenuOpen = null;
+                    Destroy(Main.SelectionMenuOpen);
+                    Main.SelectionMenuOpen = null;
 
-				}
-		}
-	}
-
-
-	public CharacterController PlaceCharacter(ref Character heldCharacter, bool placeManually, Vector2 position)
-	{
-		if (heldCharacter == null) return null;
-
-		CharacterController newCharacterClass = null;
-		placeItemImage.GlobalPosition = GetGlobalMousePosition();
-		placeItemImage.Texture = heldCharacter.texture;
-
-		if (KeyPressed("RightClick") || placeManually)
-		{
-			PlacedCharactersList.Add(heldCharacter);
+                }
+        }
+    }
 
 
+    public Characters PlaceCharacter(ref CharacterItem heldCharacter, bool placeManually, Vector2 position)
+    {
+        if (heldCharacter == null) return null;
 
-			var newObject = Add2DNode("res://CHARACTERS/SCENES/character.tscn", this);
-			if (placeManually)
-				newObject.GlobalPosition = position;
-			else
-				newObject.GlobalPosition = GetGlobalMousePosition();
-			var character = heldCharacter;
-			Main.CharactersAvailableToPlayerList = Main.CharactersAvailableToPlayerList.Where(x => x != character).ToList();
+        Characters newCharacterClass = null;
+        placeItemImage.GlobalPosition = GetGlobalMousePosition();
+        placeItemImage.Texture = heldCharacter.texture;
 
-			newCharacterClass = (CharacterController)newObject;
-			newCharacterClass.characterData = heldCharacter;
-			newCharacterClass.SetupBleedList();
-			newCharacterClass.myAnimator.SpriteFrames = (SpriteFrames)GetResource($"res://CHARACTERS/ANIMATIONS/{newCharacterClass.characterData.name}Animations.tres");
-			newCharacterClass.myAnimator.Animation = "idle_neutral";
-			newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
-			newCharacterClass.myFlatNumber = FlatNumberMouseIsIn;
-			newCharacterClass.AddMyselfToEveryonesRelationshipsList();
-			flatsList[FlatNumberMouseIsIn].charactersInFlat.Add(newCharacterClass);
-			if (placeManually == false)
-				if (heldCharacter != null)
-				{
-					HoldNothing();
-					Destroy(Main.SelectionMenuOpen);
-					Main.SelectionMenuOpen = null;
+            if (KeyPressed("RightClick") || placeManually)
+            {
+            PlacedCharactersList.Add(heldCharacter);
 
-				}
-		}
-		return newCharacterClass;
+            var newObject = Add2DNode("res://CHARACTERS/SCENES/character.tscn", this);
+            if (placeManually)
+                newObject.GlobalPosition = position;
+            else
+                newObject.GlobalPosition = GetGlobalMousePosition();
+            var character = heldCharacter;
+            Main.CharactersAvailableToPlayerList = Main.CharactersAvailableToPlayerList.Where(x => x != character).ToList();
+
+            newCharacterClass = (Characters)newObject;
+                newCharacterClass.characterData = heldCharacter;
+                newCharacterClass.SetupBleedList();
+                newCharacterClass.myAnimator.SpriteFrames = (SpriteFrames)GetResource($"res://CHARACTERS/ANIMATIONS/{newCharacterClass.characterData.name}Animations.tres");
+                newCharacterClass.myAnimator.Animation = "idle_neutral";
+                newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
+                newCharacterClass.myBuildingNumber = BuildingNumberMouseIsIn;
+                newCharacterClass.AddMyselfToEveryonesRelationshipsList();
+                BuildingController.buildingsList[BuildingNumberMouseIsIn].charactersInBuilding.Add(newCharacterClass);
+                if(placeManually==false)
+                if (heldCharacter != null )
+                {
+                    HoldNothing();
+                    Destroy(Main.SelectionMenuOpen);
+                    Main.SelectionMenuOpen = null;
+
+                }
+                }
+            return newCharacterClass;
 
 
-	}
+    }   
 
 
 
-	public static void HoldNothing()
-	{
-		HeldFurnitureItem = null;
-		HeldCharacter = null;
-	}
+    public static void HoldNothing()
+    {
+        HeldObject = null;
+        HeldCharacter = null;
+    }
+    void RunDebugHotkeys()
+    {
+        if(KeyPressed("Restart") && QuickRestart)
+        {
+            RestartScene(this); 
+        }
+        if (KeyPressed("Money") && MoneyCheat)
+        {
+            Money += 100;
+        }
+        if (KeyPressed("UnlockObject") && UnlockCheat)
+        {
+            UnlockNewFurniture();
+        }
 
-	void RunDebugHotkeys()
-	{
-		if (KeyPressed("Restart") && QuickRestart)
-		{
-			RestartScene(this);
-		}
-		if (KeyPressed("Money") && MoneyCheat)
-		{
-			Money += 100;
-		}
-		if (KeyPressed("UnlockObject") && UnlockCheat)
-		{
-			UnlockNewFurniture();
-		}
+        debugHotkeys.Run();
+        
+    }
 
-		debugHotkeys.Run();
+    void ClearObjectListData( ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref List<FurnitureGroup> furnitureGroups,  ref FurnitureGroup isGroupLeader)
+    {
+     
+        usedEffects.Clear();
+        furnitureGroups.Clear();
+        usePosition.X = 0;
+        usePosition.Y = 0;
+        isGroupLeader = FurnitureGroup.none;
+    }
 
-	}
+    void ClearCharacterListData( ref Dictionary<Effect, EffectProperties> usedEffects)
+    {
+       
+        usedEffects.Clear();
 
-	void ClearObjectListData(ref Dictionary<Effect, int> usedEffects, ref Vector2 usePosition, ref List<FurnitureGroup> furnitureGroups, ref FurnitureGroup isGroupLeader)
-	{
+    }
 
-		usedEffects.Clear();
-		furnitureGroups.Clear();
-		usePosition.X = 0;
-		usePosition.Y = 0;
-		isGroupLeader = FurnitureGroup.none;
-	}
+  
 
-	public void ClearCharacterListData(ref Dictionary<Effect, CharacterEffectors.EffectProperties> usedEffects)
-	{
+    public static FurnitureItem GetObjectFromType(FurnitureName name)
+    {
+        var correctObject = objectsList.FirstOrDefault(obj => obj.name == name);
+        return correctObject;
+    }
 
-		usedEffects.Clear();
-
-	}
-
-	Flat AddNewFlat(int flatNumber, Color color, params Room[] rooms)
-	{
-		var newFlat = new Flat(flatNumber, color, rooms);
-
-		flatsList.Add(newFlat);
-		return newFlat;
-	}
-
-	public static FurnitureItem GetObjectFromType(FurnitureName name)
-	{
-		var correctObject = objectsList.FirstOrDefault(obj => obj.name == name);
-		return correctObject;
-	}
-
-	public static Character GetCharacterFromType(CharacterType name)
-	{
-		var correctObject = charactersList.FirstOrDefault(obj => obj.name == name);
-		return correctObject;
-	}
+    public static CharacterItem GetCharacterFromType(CharacterType name)
+    {
+        var correctObject = charactersList.FirstOrDefault(obj => obj.name == name);
+        return correctObject;
+    }
 
 
 
-	#region OLD
-	public override void _Ready()
-	{
-		Start();
-	}
-	public override void _Process(double delta)
-	{
-		Run();
-	}
-	#endregion
+    #region OLD
+    public override void _Ready()
+    {
+        Start();
+    }
+    public override void _Process(double delta)
+    {
+        Run();
+    }
+    #endregion
+
 }

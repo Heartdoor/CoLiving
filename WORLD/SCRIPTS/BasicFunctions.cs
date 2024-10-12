@@ -488,7 +488,7 @@ namespace Asriela
                 {
                     FurnitureController objectClass = (FurnitureController)obj;
 
-                    if(objectName == objectClass.objectData.name && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if(objectName == objectClass.furnitureData.name && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.furnitureData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -520,7 +520,7 @@ namespace Asriela
                 {
                     CharacterController characterClass = (CharacterController)obj;
 
-                    if (objectName == characterClass.characterData.name && characterClass.myFlatNumber == flatNumber && characterClass.interactingWithCharacter==null)
+                    if (objectName == characterClass.characterData.name && characterClass.myBuildingNumber == flatNumber && characterClass.interactingWithCharacter==null)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)
@@ -553,7 +553,7 @@ namespace Asriela
                 {
                     FurnitureController objectClass = (FurnitureController)obj;
 
-                    if (objectGroup == objectClass.objectData.group && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.objectData.size)
+                    if (objectGroup == objectClass.furnitureData.group && objectClass.myFlatNumber == flatNumber && objectClass.occupants.Count < objectClass.furnitureData.size)
                     {
                         float distance = MeasureDistance(subject, obj);
                         if (distance < nearestDistance)

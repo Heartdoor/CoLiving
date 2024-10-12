@@ -2,9 +2,11 @@ using Godot;
 
 public partial class ItemToSelect : Button
 {
+
 	public FurnitureItem myFurnitureItem = null;
 	public Character MyCharacter = null;
 	public int listIndex;
+
 
 
 	void OnPressed()

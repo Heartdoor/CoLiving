@@ -1,10 +1,11 @@
-[gd_scene load_steps=34 format=3 uid="uid://bvj56a8xici12"]
+[gd_scene load_steps=35 format=3 uid="uid://bvj56a8xici12"]
 
 [ext_resource type="Script" path="res://WORLD/SCRIPTS/Main.cs" id="1_b17qk"]
 [ext_resource type="Script" path="res://WORLD/SCRIPTS/Settings.cs" id="2_4yrta"]
 [ext_resource type="Script" path="res://UI/SCRIPTS/CreationButtons.cs" id="2_5twg1"]
 [ext_resource type="Texture2D" uid="uid://cbk71u5qglo0w" path="res://WORLD/TILEMAP/walltilemap.png" id="3_8n3hg"]
 [ext_resource type="Texture2D" uid="uid://b2leb482hletj" path="res://WORLD/TILEMAP/1.png" id="3_g7hwc"]
+[ext_resource type="Script" path="res://WORLD/SCRIPTS/BuildingController.cs" id="3_i1ecg"]
 [ext_resource type="Material" uid="uid://by74r537rp22w" path="res://WORLD/SHADER/autofloor.tres" id="3_ykq8s"]
 [ext_resource type="Texture2D" uid="uid://cov5fc03hcmh8" path="res://WORLD/TILEMAP/2.png" id="4_1h5i6"]
 [ext_resource type="Texture2D" uid="uid://c3106sjx04ry4" path="res://WORLD/TILEMAP/3.png" id="5_k3tn3"]
@@ -122,6 +123,9 @@ script = ExtResource("1_b17qk")
 
 [node name="Settings" type="Node" parent="."]
 script = ExtResource("2_4yrta")
+
+[node name="BuidlingController" type="Node" parent="."]
+script = ExtResource("3_i1ecg")
 
 [node name="TileMap" type="TileMap" parent="."]
 unique_name_in_owner = true

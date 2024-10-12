@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://cyo7maaf58goi"]
 
-[ext_resource type="Script" path="res://FURNITURE/SCRIPTS/FurnitureController.cs" id="1_l254b"]
+[ext_resource type="Script" path="res://OBJECTS/SCRIPTS/FurnitureController.cs" id="1_l254b"]
 [ext_resource type="Texture2D" uid="uid://0s0ft74ny7vs" path="res://OBJECTS/SPRITES/tv.png" id="2_cf6rd"]
 [ext_resource type="Texture2D" uid="uid://de5p6vfi8nft6" path="res://OBJECTS/SPRITES/tv_s.png" id="3_wdunq"]
 

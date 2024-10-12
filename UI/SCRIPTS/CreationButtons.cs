@@ -64,7 +64,8 @@ public partial class CreationButtons : Button
             case "rooms":
                 Main.HoldNothing();
 
-                foreach (var item in Main.flatsList)
+              
+                foreach (var item in BuildingController.buildingsList)
                 {
 
                     var newButton = (Button)SpawnUI(GetScene("res://UI/SCENES/item_to_select.tscn"), gridContainer);

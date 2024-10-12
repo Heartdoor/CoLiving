@@ -6,7 +6,7 @@ using static Asriela.BasicFunctions;
 public partial class Settings : Node
 {
     public static bool autoSetupStart = Toggle(0);
-    public static bool enableDebugItems = Toggle(0);
+    public static bool enableDebugItems = Toggle(1);
     public static bool furnitureUnlocked =      Toggle(1);
     public static bool charactersUnlocked =     Toggle(1);
     public static bool infinateMoney      =     Toggle(1);
@@ -18,9 +18,10 @@ public partial class Settings : Node
     public static bool characterLabelHasHappinessValue = Toggle(1);
     public static bool characterLabelHasDesiresValues = Toggle(1);
     public static bool characterLabelHasRelationshipValues = Toggle(1);
+    public static bool characterLabelHasLastEffectAmount = Toggle(1);
     public static bool objectsLabelHasCoOrdinates = Toggle(0);
 
-    public static bool showCharacterStateSquare = Toggle(0);
+    public static bool showCharacterStateSquare = Toggle(1);
     public static bool exitButton = Toggle(1);
 
 
