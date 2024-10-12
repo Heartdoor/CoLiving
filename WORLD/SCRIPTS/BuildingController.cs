@@ -35,7 +35,7 @@ public partial class BuildingController : Node
         public string image_path { get; set; }
         public Color color { get; set; }
         public double happiness { get; set; }
-        public List<Characters> charactersInBuilding { get; set; }
+        public List<CharacterController> charactersInBuilding { get; set; }
 
 
         public BuildingItem(int number, Color color, params RoomItem[] rooms)
@@ -44,7 +44,7 @@ public partial class BuildingController : Node
             this.number = number;
             image_path = $"res://FLATS/SPRITES/{number}.png";
             this.color = color;
-            this.charactersInBuilding = new List<Characters>();
+            this.charactersInBuilding = new List<CharacterController>();
             this._rooms = new List<RoomItem>(rooms);
 
             this.furnitureObjects = new List<Node2D>();
@@ -125,7 +125,7 @@ public partial class BuildingController : Node
                
         }
     }
-    public static float GetRoomDecorEffect(Main.CharacterItem characterData , RoomItem room )
+    public static float GetRoomDecorEffect(CharacterData characterData , RoomItem room )
     {
         Dictionary<Effect, float> effectsBreakdown = new Dictionary<Effect, float>();
 

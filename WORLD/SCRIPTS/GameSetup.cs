@@ -5,7 +5,7 @@ using static Asriela.BasicFunctions;
 
 internal class GameSetup
 {
-    FurnitureItem furnitureItem;
+    FurnitureData furnitureItem;
     Main mainController = new Main();
 
     public void SetupStart()
@@ -17,7 +17,7 @@ internal class GameSetup
     void AddNewFurnitureItem(FurnitureName name)
     {
 
-        furnitureItem = new FurnitureItem(name);
+        furnitureItem = new FurnitureData(name);
         // Referenced using class instead of instance because the lists are labelled as static
         Main.objectsList.Add(furnitureItem);
 
@@ -36,7 +36,7 @@ internal class GameSetup
         furnitureItem.rotation = Direction.down;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
         furnitureItem.useAnimation = UseAnimation.idle;
-        furnitureItem.usedEffects.Add(Effect.debug1, 5);
+        furnitureItem.basicEffects.Add(Effect.debug1, 5);
 
 
         AddNewFurnitureItem(FurnitureName.couch);
@@ -51,7 +51,7 @@ internal class GameSetup
         furnitureItem.rotation = Direction.down;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
         furnitureItem.useAnimation = UseAnimation.sit;
-        furnitureItem.usedEffects.Add(Effect.comfort, 1);
+        furnitureItem.basicEffects.Add(Effect.comfort, 1);
 
 
 
@@ -65,9 +65,9 @@ internal class GameSetup
         furnitureItem.rotation = Direction.down;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
         furnitureItem.useAnimation = UseAnimation.strumGuitar;
-        furnitureItem.usedEffects.Add(Effect.music, 3);
-        furnitureItem.usedEffects.Add(Effect.noise, 3);
-        furnitureItem.usedEffects.Add(Effect.grunge, 2);
+        furnitureItem.basicEffects.Add(Effect.music, 3);
+        furnitureItem.basicEffects.Add(Effect.noise, 3);
+        furnitureItem.basicEffects.Add(Effect.grunge, 2);
 
         furnitureItem.usedRadiantEffects.Add(Effect.noise, 2);
         furnitureItem.usedRadiantEffects.Add(Effect.grunge, 2);
@@ -82,8 +82,8 @@ internal class GameSetup
         furnitureItem.useLength = 10;
         furnitureItem.rotation = Direction.down;
         furnitureItem.useAnimation = UseAnimation.listenToMusic;
-        furnitureItem.usedEffects.Add(Effect.music, 4);
-        furnitureItem.usedEffects.Add(Effect.vintage, 3);
+        furnitureItem.basicEffects.Add(Effect.music, 4);
+        furnitureItem.basicEffects.Add(Effect.vintage, 3);
         furnitureItem.usedRadiantEffects.Add(Effect.music, 2);
         furnitureItem.usedRadiantEffects.Add(Effect.vintage, 1);
 
@@ -97,8 +97,8 @@ internal class GameSetup
         furnitureItem.rotation = Direction.up;
         furnitureItem.useAnimation = UseAnimation.cook;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        furnitureItem.usedEffects.Add(Effect.food, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.food, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
         furnitureItem.usedRadiantEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.fridge);
@@ -111,8 +111,8 @@ internal class GameSetup
         furnitureItem.rotation = Direction.right;
         furnitureItem.useAnimation = UseAnimation.idle;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        furnitureItem.usedEffects.Add(Effect.food, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.food, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.counterTop);
         furnitureItem.type = FurnitureType._core;
@@ -124,8 +124,8 @@ internal class GameSetup
         furnitureItem.rotation = Direction.down;
         furnitureItem.useAnimation = UseAnimation.idle;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        furnitureItem.usedEffects.Add(Effect.food, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.food, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
 
 
@@ -142,8 +142,8 @@ internal class GameSetup
         furnitureItem.rotation = Direction.left;
         furnitureItem.useAnimation = UseAnimation.sit;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        furnitureItem.usedEffects.Add(Effect.comfort, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.comfort, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.rug);
         furnitureItem.type = FurnitureType._decor;
@@ -157,8 +157,8 @@ internal class GameSetup
         furnitureItem.price = 100;
         furnitureItem.useLength = 10;
         furnitureItem.rotation = Direction.down;
-        furnitureItem.usedEffects.Add(Effect.comfort, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.comfort, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.smallSideTable);
         furnitureItem.type = FurnitureType._decor;
@@ -169,8 +169,8 @@ internal class GameSetup
         furnitureItem.price = 50;
         furnitureItem.useLength = 10;
         furnitureItem.rotation = Direction.down;
-        furnitureItem.usedEffects.Add(Effect.comfort, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.comfort, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.tv);
         furnitureItem.type = FurnitureType._object;
@@ -183,7 +183,7 @@ internal class GameSetup
         furnitureItem.useLength = 10;
         furnitureItem.rotation = Direction.up;
         furnitureItem.useAnimation = UseAnimation.sit;
-        furnitureItem.usedEffects.Add(Effect.entertainment, 5);
+        furnitureItem.basicEffects.Add(Effect.entertainment, 5);
         furnitureItem.usedRadiantEffects.Add(Effect.entertainment, 2);
 
         AddNewFurnitureItem(FurnitureName.yarnBasket);
@@ -197,8 +197,8 @@ internal class GameSetup
         furnitureItem.useLength = 10;
         furnitureItem.rotation = Direction.down;
         furnitureItem.useAnimation = UseAnimation.sitAndKnitt;
-        furnitureItem.usedEffects.Add(Effect.comfort, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.comfort, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.stonePainting);
         furnitureItem.debugItem = true;
@@ -212,8 +212,8 @@ internal class GameSetup
         furnitureItem.rotation = Direction.down;
         furnitureItem.useAnimation = UseAnimation.idle;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down });
-        furnitureItem.usedEffects.Add(Effect.comfort, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.comfort, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         AddNewFurnitureItem(FurnitureName.roarRock);
         furnitureItem.debugItem = true;
@@ -228,8 +228,8 @@ internal class GameSetup
         furnitureItem.ontopUsePosition = true;
         furnitureItem.useAnimation = UseAnimation.roar;
         furnitureItem.accessPositions.AddRange(new AccessPosition[] { AccessPosition.down, AccessPosition.up, AccessPosition.left, AccessPosition.right });
-        furnitureItem.usedEffects.Add(Effect.comfort, 4);
-        furnitureItem.usedEffects.Add(Effect.cozy, 2);
+        furnitureItem.basicEffects.Add(Effect.comfort, 4);
+        furnitureItem.basicEffects.Add(Effect.cozy, 2);
 
         if (Settings.furnitureUnlocked)
             mainController.startingAmountOfUnlockedFurniture = Main.objectsList.Count();//2;
@@ -306,7 +306,7 @@ internal class GameSetup
         NewEffect(ref myEffects, Effect.hunting, 1, 0, 0);
 
         #region apply
-        var charInfo = new Character(name, emoji, debugItem, myEffects);
+        var charInfo = new CharacterData(name, emoji, debugItem, myEffects);
         Main.charactersList.Add(charInfo);
         mainController.ClearCharacterListData(ref myEffects);
         #endregion
@@ -333,7 +333,7 @@ internal class GameSetup
         NewEffect(ref myEffects, Effect.debug1, 5, 0, 0);
 
         #region apply
-        Main.charactersList.Add(new Character(name, emoji, debugItem, myEffects));
+        Main.charactersList.Add(new CharacterData(name, emoji, debugItem, myEffects));
         mainController.ClearCharacterListData(ref myEffects);
         #endregion
 
@@ -357,7 +357,7 @@ internal class GameSetup
         NewEffect(ref myEffects, Effect.academic, -1, 0, 0);
         NewEffect(ref myEffects, Effect.hunting, 2, 0, 0);
         #region apply
-        Main.charactersList.Add(new Character(name, emoji, debugItem, myEffects));
+        Main.charactersList.Add(new CharacterData(name, emoji, debugItem, myEffects));
         mainController.ClearCharacterListData(ref myEffects);
         #endregion
 

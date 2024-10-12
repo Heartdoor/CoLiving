@@ -3,8 +3,8 @@ using Godot;
 public partial class ItemToSelect : Button
 {
 
-	public FurnitureItem myFurnitureItem = null;
-	public Character MyCharacter = null;
+	public FurnitureData myFurnitureItem = null;
+	public CharacterData MyCharacter = null;
 	public int listIndex;
 
 

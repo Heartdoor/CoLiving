@@ -52,8 +52,7 @@ public partial class CharacterController : CharacterBody2D
     public Sprite2D actionSquare;
     public Sprite2D grumpyIcon;
     public Sprite2D redirectPoint;
-    public Character characterData;
-
+    public CharacterData characterData;
     public AnimatedSprite2D myAnimator;
     public Interact useItemArm;
     Label mainLabel;
@@ -62,11 +61,9 @@ public partial class CharacterController : CharacterBody2D
 
     #region EFFECTS
     public float happiness = 0;
-
-    public Dictionary<FurnitureItem, float> basePrefOfObjects = new Dictionary<FurnitureItem, float>();       // agent's item preferences 
-    public Dictionary<FurnitureItem, float> heatOfObjects = new Dictionary<FurnitureItem, float>();           // current "heat" of items 
-    Queue<FurnitureItem> objectQueue = new Queue<FurnitureItem>();
-
+    public Dictionary<FurnitureData, float> basePrefOfObjects = new Dictionary<FurnitureData, float>();       // agent's item preferences 
+    public Dictionary<FurnitureData, float> heatOfObjects = new Dictionary<FurnitureData, float>();           // current "heat" of items 
+    Queue<FurnitureData> objectQueue = new Queue<FurnitureData>();
 
     int maxQueueLength = 20;
     public int lastMoneyEffect = 0;
@@ -97,7 +94,7 @@ public partial class CharacterController : CharacterBody2D
 
     #region DATA
     public int myBuildingNumber = 1;
-    public BuildingController.RoomItem roomIAmIn=null;
+    public BuildingController.RoomItem roomIAmIn = null;
     #endregion
     void SetupNavigation()
     {
@@ -176,10 +173,8 @@ public partial class CharacterController : CharacterBody2D
 
         stateSquare.Visible = Settings.showCharacterStateSquare;
         ChangeStateSquare(stateSquare, Settings.stateColorNothing);
-
         DetermineRoomIAmIn();
-        isInInteraction =false;
-
+        isInInteraction = false;
         ZIndex = (int)GlobalPosition.Y;
         FlipAnimatedSprite(myAnimator, Velocity);
         alarm.Run();
@@ -233,10 +228,9 @@ public partial class CharacterController : CharacterBody2D
         FadeActionSquare();
         CheckIfSelected();
     }
-
     void DetermineRoomIAmIn()
     {
-        var roomNumberIAmIn = GameTileGrid.GetRoomNumberWeAreIn(GlobalPosition,Main.MyTileMap);
+        var roomNumberIAmIn = GameTileGrid.GetRoomNumberWeAreIn(GlobalPosition, Main.MyTileMap);
         roomIAmIn = BuildingController.buildingsList[myBuildingNumber].rooms[roomNumberIAmIn];
     }
     void CheckIfSelected()
@@ -328,14 +322,9 @@ public partial class CharacterController : CharacterBody2D
     public void ManageIconsCharacterUI()
     {
         mainLabel.Text = "";
-
-
-        if (Settings.characterLabelHasLastEffectAmount )
-            mainLabel.Text += $"{lastMoneyEffect}\n";
-            // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
-        if (accessTarget != null && Settings.characterLabelHasTargetName) 
+        // happinessLabel.Text =Main.TestGameMode == Main.testGameMode.flowingMoney ? $"{lastMoneyEffect}" : $"{happiness}";\
+        if (accessTarget != null && Settings.characterLabelHasTargetName)
             mainLabel.Text += $"{((FurnitureController)useTarget).furnitureData.name}\n";
-
 
         if (Settings.characterLabelHasHappinessValue)
             mainLabel.Text += $"{characterData.feelings[Effect.happiness]}\n";
@@ -410,10 +399,9 @@ public partial class CharacterController : CharacterBody2D
     }
     public void AddMyselfToEveryonesRelationshipsList()
     {
-
         var allCharacters = BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding;
-        foreach (Characters character in allCharacters)
 
+        foreach (CharacterController character in allCharacters)
         {
             if (character != this)
             {
@@ -425,18 +413,14 @@ public partial class CharacterController : CharacterBody2D
         }
     }
 
-
-    (FurnitureItem furniture, float value) ChooseObjectFromList()
-
+    (FurnitureData furniture, float value) ChooseObjectFromList()
     {
         var noObjectsFound = false;
 
-        foreach (var item in BuildingController.buildingsList[myBuildingNumber].furnitureObjects)
+        foreach(var item in BuildingController.buildingsList[myBuildingNumber].furnitureObjects) 
         {
             var furnitureItem = (FurnitureController)item;
-
-            var objectItem = furnitureItem.objectData;
-
+            var objectItem = furnitureItem.furnitureData;
             //not already in list add new base preference 
             if (basePrefOfObjects.ContainsKey(objectItem) == false && (objectItem.type == FurnitureType._core || objectItem.type == FurnitureType._object))
             {
@@ -503,9 +487,7 @@ public partial class CharacterController : CharacterBody2D
 
 
         //  Log($"{basePrefOfObjects[item]}", LogType.game);  
-
-        FurnitureItem mostValuedObject = null;
-
+        FurnitureData mostValuedObject = null;
         float highestHeat = 0f;
         if (noObjectsFound == false)
         {
@@ -528,22 +510,11 @@ public partial class CharacterController : CharacterBody2D
         chosenInteractionWithCharacter = DesireAction.none;
         CharacterController characterObject = null;
         var highestValue = 0f;
-
-        var charactersInBuilding=BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding;
+        var charactersInBuilding = BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding;
         if (charactersInBuilding.Count < 2) return (null, 0f);
 
-        
-        foreach (Characters character in charactersInBuilding)
-        {
-            if(character != this) 
-            {
-            //look at all possible interactions with this character, 
-            //by looking at the desires we have 
-            chosenDesireToSocializeOn=Effect.none;
-            
 
-
-        foreach (CharacterController character in charactersInFlat)
+        foreach (CharacterController character in charactersInBuilding)
         {
             if (character != this)
             {
@@ -580,11 +551,9 @@ public partial class CharacterController : CharacterBody2D
         var furnitureValue = mostValuedObject.value;
 
         var mostValuedInterpersonal = ChooseFromCharacterList();
-
-        Character valuedCharacter = null;
+        CharacterData valuedCharacter = null;
         var characterValue = 0f;
         if (mostValuedInterpersonal.character != null)
-
         {
             valuedCharacter = mostValuedInterpersonal.character.characterData;
             characterValue = mostValuedInterpersonal.value;
@@ -618,10 +587,8 @@ public partial class CharacterController : CharacterBody2D
         }
         else
         {
-
-            interpersonalInteraction=true;
-            useTarget = FindNearestCharacter(this, this.GetTree(), null, "Character", valuedCharacter.name, myBuildingNumber);  
-
+            interpersonalInteraction = true;
+            useTarget = FindNearestCharacter(this, this.GetTree(), null, "Character", valuedCharacter.name, myBuildingNumber);
             accessTarget = useTarget;
             accessNode = accessTarget;
 
@@ -714,9 +681,7 @@ public partial class CharacterController : CharacterBody2D
         else
         {
             var furnitureObject = (FurnitureController)interactingWithTarget;
-
-            alarm.Start(TimerType.actionLength, furnitureObject.objectData.useLength, false, 0);
-
+            alarm.Start(TimerType.actionLength, furnitureObject.furnitureData.useLength, false, 0);
         }
         Log("Reached target", LogType.step);
     }

@@ -1261,7 +1261,7 @@ namespace Asriela
         }
         public static PackedScene GetObject(string path)
         {
-            return (PackedScene)ResourceLoader.Load("res://OBJECTS/" + path);
+            return (PackedScene)ResourceLoader.Load("res://FURNITURE/" + path);
         }
         public static Node SpawnRandom(PackedScene objectToSpawn, Vector2 position, float innerRange, float outerRange, Node nodeToSpawnOn)
         {

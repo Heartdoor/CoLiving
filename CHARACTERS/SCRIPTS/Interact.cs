@@ -292,7 +292,7 @@ public partial class Interact : Node
 
      
             var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, false, out float sum);
-            var roomDecorEffect = BuildingController.GetRoomDecorEffect(myCharacter.characterData, myCharacter.roomIAmIn);
+            var roomDecorEffect = BuildingController.GetRoomDecorEffect(myCharacter.characterData, myCharacter.roomIAmIn); 
             var totalSum = sum+ roomDecorEffect;
 
             Log($"{sum} + {roomDecorEffect}", LogType.game);
@@ -342,7 +342,7 @@ public partial class Interact : Node
         
     }
 
-    public void EffectEntireFlat(FurnitureItem furnitureItem)
+    public void EffectEntireFlat(FurnitureData furnitureItem)
     {
         foreach(CharacterController tenant in BuildingController.buildingsList[myCharacter.myBuildingNumber].charactersInBuilding)
 
@@ -358,7 +358,7 @@ public partial class Interact : Node
         }
     }
 
-    public Dictionary<Effect, float> CalculateBasePreference(Character tenant, FurnitureItem furniture, bool isRadiantEffect, out float sum)
+    public Dictionary<Effect, float> CalculateBasePreference(CharacterData tenant, FurnitureData furniture, bool isRadiantEffect, out float sum)
     {
 
             Dictionary<Effect, float> effectsBreakdown = new Dictionary<Effect, float>();
