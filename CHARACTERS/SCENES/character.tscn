@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://bj7bw5jnmx0nn"]
 
-[ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/Characters.cs" id="1_ofd6p"]
+[ext_resource type="Script" path="res://CHARACTERS/SCRIPTS/CharacterController.cs" id="1_ofd6p"]
 [ext_resource type="SpriteFrames" uid="uid://bkp5ae72qsdxb" path="res://CHARACTERS/ANIMATIONS/grannyAnimations.tres" id="2_yioed"]
 [ext_resource type="Texture2D" uid="uid://dnicu2n0mr5q4" path="res://CHARACTERS/SPRITES/granny_s.png" id="4_2ttrf"]
 [ext_resource type="Texture2D" uid="uid://blrxm36436cmi" path="res://UI/SPRITES/StateSquares/stateSquare.png" id="4_6kv68"]
@@ -59,6 +59,7 @@ speed_scale = 2.0
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 unique_name_in_owner = true
 path_desired_distance = 0.1
+debug_enabled = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5708

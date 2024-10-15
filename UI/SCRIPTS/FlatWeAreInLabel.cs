@@ -1,13 +1,11 @@
 using Godot;
-using System;
-using System.Linq;
 
 public partial class FlatWeAreInLabel : Label
 {
     void Run()
     {
 
-            Text = $"Room: {Main.RoomNumberMouseIsIn}";
+        Text = $"Room: {Main.RoomNumberMouseIsIn}";
     }
 
 

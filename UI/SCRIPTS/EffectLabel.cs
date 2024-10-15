@@ -44,7 +44,6 @@ public partial class EffectLabel : Control
 
     public void SetLabel(Effect effect, bool bad, int index)
     {
-
         myLabel.Text = ConvertToEmoji(effect);
         if(bad)
         ChangeColorUI(myLabel,ColorRed);

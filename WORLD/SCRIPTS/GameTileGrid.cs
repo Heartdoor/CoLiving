@@ -86,6 +86,16 @@ public partial class GameTileGrid : Godot.TileMap
         cellCoordinates = LocalToMap(localMousePosition);
     }
 
+    public static int GetRoomNumberWeAreIn(Vector2 position, TileMap tileMap)
+    {
+        // Get the global position of the mouse click.
+        
+
+        // Convert the global position to a local position relative to the TileMap.
+        var localPosition = tileMap.ToLocal(position);
+
+        return tileMap.GetCellSourceId(1, tileMap.LocalToMap(localPosition));
+    }
 
 
     public void FillFlatWithPlaceableArea()

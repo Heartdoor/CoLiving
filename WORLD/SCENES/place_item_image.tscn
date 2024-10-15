@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://qa2nxg6an7l6" path="res://OBJECTS/SPRITES/electricGuitar.png" id="1_jbr1t"]
 
+
 [node name="PlaceItemImage" type="Node2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

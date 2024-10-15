@@ -6,10 +6,10 @@ using System.Linq;
 
 public partial class Interact : Node
 {
-    Characters myCharacter;
+    CharacterController myCharacter;
 
 
-    public Interact(Characters myCharacter)
+    public Interact(CharacterController myCharacter)
     {
         this.myCharacter = myCharacter;
     }
@@ -30,7 +30,7 @@ public partial class Interact : Node
         //Furniture accessObject =null;
         //if(myCharacter.accessTarget!=null)
         //accessObject  = (Furniture)myCharacter.accessTarget;
-        var socialTarget = (Characters)myCharacter.useTarget;
+        var socialTarget = (CharacterController)myCharacter.useTarget;
 
         //start social interaction
         if (myCharacter.interactingWith == null)
@@ -75,7 +75,7 @@ public partial class Interact : Node
 
     }
 
-    bool DidSocialTargetRejectUs(Characters socialTarget)
+    bool DidSocialTargetRejectUs(CharacterController socialTarget)
     {
         var myCharacterData = myCharacter.characterData;
         var targetCharacterData = socialTarget.characterData;
@@ -123,7 +123,7 @@ public partial class Interact : Node
          * 3- emotion they are both in
          * 4- their previous activity
          * */
-        var socialTarget = (Characters)myCharacter.useTarget;
+        var socialTarget = (CharacterController)myCharacter.useTarget;
         var myCharacterData = myCharacter.characterData;
         var targetCharacterData = socialTarget.characterData;
 
@@ -131,7 +131,7 @@ public partial class Interact : Node
         var typeOfSocial = myCharacter.chosenInteractionWithCharacter;
 
         //2
-        var objectTargetIsUsing = (Furniture)socialTarget.interactingWith;
+        var objectTargetIsUsing = (FurnitureController)socialTarget.interactingWith;
         //3
         var myEmotion = myCharacter.characterData.mainEmotion;
         var targetsEmotion = socialTarget.characterData.mainEmotion;
@@ -150,7 +150,7 @@ public partial class Interact : Node
             //try to find common ground
 
 
-            foreach(KeyValuePair<Effect,int> effect in objectTargetIsUsing.objectData.usedEffects)
+            foreach(KeyValuePair<Effect,int> effect in objectTargetIsUsing.furnitureData.basicEffects)
             {
                 var objectEffectValue =(float)effect.Value;
                 myTotalPreference += objectEffectValue  * myCharacterData.effectsList[effect.Key].strength;
@@ -194,18 +194,18 @@ public partial class Interact : Node
         ImpactRelationships(socialTarget, myCharacter, basicImpactOnTarget);
         //if both happy and both like the activity then romantic can happen!?
     }
-    void ImpactNeedsAndDesires(Characters character, Effect effect, float impact)
+    void ImpactNeedsAndDesires(CharacterController character, Effect effect, float impact)
     {
       
         character.characterData.desires[effect] = ClampMin(0, character.characterData.desires[effect] - impact);
         character.characterData.needs[effect] = ClampMin(0, character.characterData.needs[effect] - impact);
    }
-    void ImpactFeelings(Characters character, float impact )
+    void ImpactFeelings(CharacterController character, float impact )
     {
         //effect feelings 
         character.characterData.feelings[Effect.happiness] += impact;
     }
-    void ImpactRelationships(Characters subjectCharacter,Characters objectCharacter, float impact)
+    void ImpactRelationships(CharacterController subjectCharacter,CharacterController objectCharacter, float impact)
     {
         subjectCharacter.characterData.relationshipsList[objectCharacter].strength[RelationshipType.friendship] += impact;
     }
@@ -223,27 +223,27 @@ public partial class Interact : Node
 
         myCharacter.isInInteraction = true;
 
-        var accessObject = (Furniture)myCharacter.accessTarget;
-        var useObject = (Furniture)myCharacter.useTarget;
+        var accessObject = (FurnitureController)myCharacter.accessTarget;
+        var useObject = (FurnitureController)myCharacter.useTarget;
 
         if (accessObject == null)
             accessObject = useObject;
             //START USING
         if (myCharacter.interactingWith == null)
         {
-            if(accessObject.occupants.Count < accessObject.objectData.size) 
+            if(accessObject.occupants.Count < accessObject.furnitureData.size) 
             { 
                 myCharacter.interactingWith = useObject;
                 //MAKE A FLAT WIDE EFFECT HAPPEN
-                if(useObject.objectData.flatWideEffect)
-                EffectEntireFlat(useObject.objectData);
+                if(useObject.furnitureData.flatWideEffect)
+                EffectEntireFlat(useObject.furnitureData);
 
                 myCharacter.mySeatingIndex = accessObject.occupants.Count; 
 
                 
                 if (accessObject.occupants.Count==1)
                 {
-                    var otherSeater = (Characters)accessObject.occupants[0];
+                    var otherSeater = (CharacterController)accessObject.occupants[0];
                     if(otherSeater.mySeatingIndex==1)
                         myCharacter.mySeatingIndex = 0;
                 }
@@ -255,9 +255,9 @@ public partial class Interact : Node
                 if (accessObject!= useObject)
                 accessObject.occupants.Add(myCharacter);
 
-                PlayAnimation(myCharacter.myAnimator, $"{useObject.objectData.useAnimation}_{myCharacter.characterData.mainEmotion}");//myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
+                PlayAnimation(myCharacter.myAnimator, $"{useObject.furnitureData.useAnimation}_{myCharacter.characterData.mainEmotion}");//myCharacter.ChangeSprite($"{ useObject.objectData.useAnimation}");
 
-                if (!accessObject.objectData.ontopUsePosition)
+                if (!accessObject.furnitureData.ontopUsePosition)
                 {
                     myCharacter.GlobalPosition = myCharacter.accessNode.GlobalPosition;
                 }
@@ -279,7 +279,7 @@ public partial class Interact : Node
         {
 
 
-            var item = useObject.objectData;
+            var item = useObject.furnitureData;
             // Update heat values after task completion 
             foreach (var key in myCharacter.heatOfObjects.Keys.ToList())
             {
@@ -290,10 +290,14 @@ public partial class Interact : Node
             myCharacter.heatOfObjects[item] = 0;
 
 
-
-            GetEffectedByFurniture(myCharacter.basePrefOfObjects[item]);
+     
             var effectsBreakdown = CalculateBasePreference(myCharacter.characterData, item, false, out float sum);
-            GetMoneyEffected(sum, null,effectsBreakdown);
+            var roomDecorEffect = BuildingController.GetRoomDecorEffect(myCharacter.characterData, myCharacter.roomIAmIn); 
+            var totalSum = sum+ roomDecorEffect;
+
+            Log($"{sum} + {roomDecorEffect}", LogType.game);
+
+            GetMoneyEffected(totalSum, null,effectsBreakdown);
             StopUsingObject();
             
 
@@ -306,8 +310,8 @@ public partial class Interact : Node
 
     void StopUsingObject()
     {
-        var accessObject = (Furniture)myCharacter.accessTarget;
-        var useObject = (Furniture)myCharacter.useTarget;
+        var accessObject = (FurnitureController)myCharacter.accessTarget;
+        var useObject = (FurnitureController)myCharacter.useTarget;
         myCharacter.interactingWith = null;
         myCharacter.accessTarget = null;
         myCharacter.interactingWithTarget = null;
@@ -324,7 +328,7 @@ public partial class Interact : Node
     void StopSocializing()
     {
        // var accessObject = (Furniture)myCharacter.accessTarget;
-        var socialTarget = (Characters)myCharacter.useTarget;
+        var socialTarget = (CharacterController)myCharacter.useTarget;
         myCharacter.interactingWith = null;
         myCharacter.accessTarget = null;
         myCharacter.interactingWithTarget = null;
@@ -337,9 +341,11 @@ public partial class Interact : Node
 
         
     }
-    public void EffectEntireFlat(Main.Object furnitureItem)
+
+    public void EffectEntireFlat(FurnitureData furnitureItem)
     {
-        foreach(Characters tenant in Main.flatsList[myCharacter.myFlatNumber].charactersInFlat)
+        foreach(CharacterController tenant in BuildingController.buildingsList[myCharacter.myBuildingNumber].charactersInBuilding)
+
         {
             //calculate base preference for this object
              
@@ -351,12 +357,13 @@ public partial class Interact : Node
                 
         }
     }
-    public Dictionary<Effect, float> CalculateBasePreference(Main.Character tenant, Main.Object furniture, bool isRadiantEffect, out float sum)
+
+    public Dictionary<Effect, float> CalculateBasePreference(CharacterData tenant, FurnitureData furniture, bool isRadiantEffect, out float sum)
     {
 
             Dictionary<Effect, float> effectsBreakdown = new Dictionary<Effect, float>();
             
-            var objE = furniture.usedEffects;
+            var objE = furniture.basicEffects;
             if (isRadiantEffect) objE = furniture.usedRadiantEffects;
             var charE = tenant.effectsList;
             Log($"CALCULATING {furniture.type}", LogType.step);
@@ -383,7 +390,7 @@ public partial class Interact : Node
     }
     public void GetEffectedByFurniture(float effectValue)
     {
-        if (Main.TestGameMode != Main.testGameMode.complex) return;
+        //if (Main.TestGameMode != Main.testGameMode.complex) return;
         myCharacter.happiness += effectValue;
     }
 
@@ -394,7 +401,7 @@ public partial class Interact : Node
         if (Main.TestGameMode != Main.testGameMode.zooTycoon) return;
         myCharacter.happiness = myCharacter.basePrefOfObjects.Values.Sum();
     }
-    public void GetMoneyEffected(float effectValue, Characters characterSource, Dictionary<Effect, float> effectBreakdown)
+    public void GetMoneyEffected(float effectValue, CharacterController characterSource, Dictionary<Effect, float> effectBreakdown)
     {
         if (Main.TestGameMode != Main.testGameMode.flowingMoney) return;
         Main.Money += effectValue;

@@ -1,13 +1,12 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using static Asriela.BasicFunctions;
 public partial class DebugHotkeys : Node
 {
     Effect chosenEffect = Effect.social;
-    List<Effect> listOfEffects  = new List<Effect>(); 
-    int listIndex =0;
-    float rate =10;
+    List<Effect> listOfEffects = new List<Effect>();
+    int listIndex = 0;
+    float rate = 10;
     public Main myMain;
 
     bool action1 = false;
@@ -21,28 +20,29 @@ public partial class DebugHotkeys : Node
 
         if (Settings.autoSetupStart)
         {
-            action1=true;
-            action2=true;
+            action1 = true;
+            action2 = true;
 
         }
     }
     public void Run()
     {
-        if(Settings.debugHotkeys_RoomQuickSetup)
-        QuickLevelSetupHotKeys();
+        if (Settings.debugHotkeys_RoomQuickSetup)
+            QuickLevelSetupHotKeys();
         if (Settings.debugHotkeys_DesireControls)
             DesireManipulationHotKeys();
-        Main.DebugEffectOnMouse= $"{ chosenEffect}";
+        Main.DebugEffectOnMouse = $"{chosenEffect}";
     }
 
     void QuickLevelSetupHotKeys()
     {
-        Main.Object furniture;
-        Main.Character character;
-        Characters newCharacter;
-        if (KeyPressed("debug_3") )
+
+        FurnitureData furniture;
+        CharacterData character;
+        CharacterController newCharacter;
+        if (KeyPressed("debug_3"))
         {
-            action1=false;
+            action1 = false;
             furniture = Main.GetObjectFromType(FurnitureName.couch);
             Main.RoomNumberMouseIsIn = 1;
             myMain.PlaceObjects(ref furniture, true, new Vector2(265, 255));
@@ -67,21 +67,21 @@ public partial class DebugHotkeys : Node
             myMain.PlaceObjects(ref furniture, true, new Vector2(315, 265));
         }
 
-        if (KeyPressed("debug_2") || action2) 
+        if (KeyPressed("debug_2") || action2)
         {
-            action2= false;
+            action2 = false;
             character = Main.GetCharacterFromType(CharacterType.punkRocker);
-            newCharacter=myMain.PlaceCharacter(ref character, true, new Vector2(115, 205));
-            newCharacter.characterData.desires[Effect.social]=90;
+            newCharacter = myMain.PlaceCharacter(ref character, true, new Vector2(115, 205));
+            newCharacter.characterData.desires[Effect.social] = 90;
             var tempOtherCharacter = newCharacter;
 
             character = Main.GetCharacterFromType(CharacterType.granny);
-            newCharacter=myMain.PlaceCharacter(ref character, true, new Vector2(135, 355));
-            newCharacter.characterData.relationshipsList[tempOtherCharacter].strength[RelationshipType.friendship]=40;
+            newCharacter = myMain.PlaceCharacter(ref character, true, new Vector2(135, 355));
+            newCharacter.characterData.relationshipsList[tempOtherCharacter].strength[RelationshipType.friendship] = 40;
 
 
         }
-  
+
     }
 
     void DesireManipulationHotKeys()
@@ -90,31 +90,31 @@ public partial class DebugHotkeys : Node
         {
 
 
-            if(Main.SelectedCharacter.characterData.desires.ContainsKey(chosenEffect))
-            Main.SelectedCharacter.characterData.desires[chosenEffect]+=rate; 
+            if (Main.SelectedCharacter.characterData.desires.ContainsKey(chosenEffect))
+                Main.SelectedCharacter.characterData.desires[chosenEffect] += rate;
             else
-                Main.SelectedCharacter.characterData.desires.Add(chosenEffect,0);
+                Main.SelectedCharacter.characterData.desires.Add(chosenEffect, 0);
         }
 
         if (KeyPressed("debug_decrease"))
         {
             if (Main.SelectedCharacter.characterData.desires.ContainsKey(chosenEffect))
                 Main.SelectedCharacter.characterData.desires[chosenEffect] -= rate;
-             else
+            else
                 Main.SelectedCharacter.characterData.desires.Add(chosenEffect, 0);
         }
 
         if (KeyPressed("debug_scrollUp"))
         {
 
-            if(listIndex> listOfEffects.Count-1) listIndex=0; else listIndex++;
+            if (listIndex > listOfEffects.Count - 1) listIndex = 0; else listIndex++;
             chosenEffect = listOfEffects[listIndex];
 
         }
 
         if (KeyPressed("debug_scrollDown"))
         {
-            if (listIndex <0) listIndex = listOfEffects.Count - 1; else listIndex--;
+            if (listIndex < 0) listIndex = listOfEffects.Count - 1; else listIndex--;
             chosenEffect = listOfEffects[listIndex];
         }
     }

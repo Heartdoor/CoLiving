@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using static Asriela.BasicFunctions;
 
 public partial class UnlocksLabel : Label
@@ -7,32 +6,25 @@ public partial class UnlocksLabel : Label
     Alarms alarm = new Alarms();
     bool started = false;
     float fadeSpeed = 0;
-    void Start() {
-
-        
+    void Start()
+    {
         SetAlpha(this, 0);
     }
+
     void Run()
     {
         alarm.Run();
         if (alarm.Ended(TimerType.initialAction))
         {
             SetAlpha(this, 1);
-       
+
             started = true;
         }
         if (started)
         {
             fadeSpeed -= 0.00005f;
             ChangeAlpha(this, fadeSpeed);
-     
-           
-
-
         }
-
-
-
     }
 
     public void NewUnlock(string lastUnlock)

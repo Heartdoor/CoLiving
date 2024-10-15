@@ -19,7 +19,7 @@ public partial class MainScene : Node3D
             Sprite3D objectSprite = (Sprite3D)spriteNode;
             var number = (int)RandomRange(1, 16);
 
-            objectSprite.Texture = GetTexture2D($"res://OBJECTS/OBJECTS/SPRITES/CORAL/{number}.png");
+            objectSprite.Texture = GetTexture2D($"res://FURNITURE/FURNITURE/SPRITES/CORAL/{number}.png");
             
             
             Change3DZ(objectSprite, Choose(-5,-11));
