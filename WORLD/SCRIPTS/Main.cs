@@ -195,20 +195,20 @@ public partial class Main : Node2D
 
 		if (HeldFurnitureItem == null) return;
 
-        BuildingController.RoomItem roomWeAreIn = null;
-        if (BuildingNumberMouseIsIn > 0 && RoomNumberMouseIsIn > 0)
-            roomWeAreIn = BuildingController.buildingsList[BuildingNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
+		BuildingController.RoomItem roomWeAreIn = null;
+		if (BuildingNumberMouseIsIn > 0 && RoomNumberMouseIsIn > 0)
+			roomWeAreIn = BuildingController.buildingsList[BuildingNumberMouseIsIn].rooms[RoomNumberMouseIsIn];
 
-        OverPlaceableTile = false;
+		OverPlaceableTile = false;
 
-        if (roomWeAreIn != null && BuildingNumberMouseIsIn > 0 && RoomNumberMouseIsIn > -1)
-            if ((HeldFurnitureItem.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldFurnitureItem.roomTypes[0])) ||
-                  (HeldFurnitureItem.type != FurnitureType._core && HeldFurnitureItem.roomTypes.Contains(roomWeAreIn.type)))
-                OverPlaceableTile = true;
+		if (roomWeAreIn != null && BuildingNumberMouseIsIn > 0 && RoomNumberMouseIsIn > -1)
+			if ((HeldFurnitureItem.type == FurnitureType._core && (roomWeAreIn.type == RoomType.none || roomWeAreIn.type == HeldFurnitureItem.roomTypes[0])) ||
+				  (HeldFurnitureItem.type != FurnitureType._core && HeldFurnitureItem.roomTypes.Contains(roomWeAreIn.type)))
+				OverPlaceableTile = true;
 
 
 
-        placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates * MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
+		placeItemImage.GlobalPosition = GameTileGrid.cellCoordinates * MyTileMap.TileSet.TileSize + MyTileMap.TileSet.TileSize / 2;
 		placeItemImage.Texture = HeldFurnitureItem.texture;
 		if (OverPlaceableTile)
 			ChangeColor(placeItemImage, ColorPlace);
@@ -241,9 +241,9 @@ public partial class Main : Node2D
 			}
 
 
-            BuildingController.AddFurnitureToRoom(BuildingNumberMouseIsIn, roomWeAreIn, newObject);
+			BuildingController.AddFurnitureToRoom(BuildingNumberMouseIsIn, roomWeAreIn, newObject);
 
-            newObjectClass.ChangeDimensions(newObjectData.size);
+			newObjectClass.ChangeDimensions(newObjectData.size);
 
 
 
@@ -308,8 +308,8 @@ public partial class Main : Node2D
 			newCharacterClass.myShadow.Texture = heldCharacter.shadowTexture;
 			newCharacterClass.myBuildingNumber = BuildingNumberMouseIsIn;
 			newCharacterClass.AddMyselfToEveryonesRelationshipsList();
-            BuildingController.buildingsList[BuildingNumberMouseIsIn].charactersInBuilding.Add(newCharacterClass);
-            if (placeManually == false)
+			BuildingController.buildingsList[BuildingNumberMouseIsIn].charactersInBuilding.Add(newCharacterClass);
+			if (placeManually == false)
 				if (heldCharacter != null)
 				{
 					HoldNothing();
