@@ -50,7 +50,7 @@ public partial class CharacterLoader : Node
         if (File.Exists(absolutePath))
         {
             string jsonContent = File.ReadAllText(absolutePath);
-            GD.Print("File content loaded successfully.");
+            GD.Print("Character file content loaded successfully.");
             CharactersConfig charactersConfig = JsonConvert.DeserializeObject<CharactersConfig>(jsonContent);
 
             foreach (var character in charactersConfig.Characters)
@@ -103,7 +103,7 @@ public partial class CharacterLoader : Node
         }
         else
         {
-            GD.PrintErr($"File does not exist: {absolutePath}");
+            GD.PrintErr($"Character file does not exist: {absolutePath}");
         }
     }
 

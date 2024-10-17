@@ -1,0 +1,293 @@
+{
+  "furnitureItems": [
+    {
+      "name": "debug1",
+      "type": "_core",
+      "roomTypes": [ "livingroom" ],
+      "group": "none",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 0,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [ "down", "up", "left", "right" ],
+      "useAnimation": "idle",
+      "basicEffects": {
+        "debug1": 5
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": true
+    },
+    {
+      "name": "couch",
+      "type": "_core",
+      "roomTypes": [ "livingroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 2,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [ "down" ],
+      "useAnimation": "sit",
+      "basicEffects": {
+        "comfort": 1
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": true,
+      "debugItem": false
+    },
+    {
+      "name": "electricGuitar",
+      "type": "_object",
+      "roomTypes": [ "livingroom" ],
+      "group": "none",
+      "flatWideEffect": true,
+      "size": 1,
+      "price": 200,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [ "down", "up", "left", "right" ],
+      "useAnimation": "strumGuitar",
+      "basicEffects": {
+        "music": 3,
+        "noise": 3,
+        "grunge": 2
+      },
+      "usedRadiantEffects": {
+        "noise": 2,
+        "grunge": 2
+      },
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "recordPlayer",
+      "type": "_object",
+      "roomTypes": [ "livingroom" ],
+      "group": "chair",
+      "flatWideEffect": true,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [],
+      "useAnimation": "listenToMusic",
+      "basicEffects": {
+        "music": 4,
+        "vintage": 3
+      },
+      "usedRadiantEffects": {
+        "music": 2,
+        "vintage": 1
+      },
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "stove",
+      "type": "_core",
+      "roomTypes": [ "kitchen" ],
+      "group": "none",
+      "flatWideEffect": true,
+      "size": 1,
+      "price": 200,
+      "useLength": 10,
+      "rotation": "up",
+      "accessPositions": [ "down" ],
+      "useAnimation": "cook",
+      "basicEffects": {
+        "food": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {
+        "cozy": 2
+      },
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "fridge",
+      "type": "_core",
+      "roomTypes": [ "kitchen" ],
+      "group": "none",
+      "flatWideEffect": true,
+      "size": 1,
+      "price": 200,
+      "useLength": 10,
+      "rotation": "right",
+      "accessPositions": [ "down" ],
+      "useAnimation": "idle",
+      "basicEffects": {
+        "food": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "counterTop",
+      "type": "_core",
+      "roomTypes": [ "kitchen" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [ "down" ],
+      "useAnimation": "idle",
+      "basicEffects": {
+        "food": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "rockingChair",
+      "type": "_object",
+      "roomTypes": [ "livingroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "left",
+      "accessPositions": [ "down" ],
+      "useAnimation": "sit",
+      "basicEffects": {
+        "comfort": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": true
+    },
+    {
+      "name": "rug",
+      "type": "_decor",
+      "roomTypes": [ "livingroom", "bedroom", "kitchen", "bathroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "floorObject": true,
+      "rotation": "down",
+      "accessPositions": [],
+      "useAnimation": "none",
+      "basicEffects": {
+        "comfort": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "smallSideTable",
+      "type": "_decor",
+      "roomTypes": [ "livingroom", "bedroom", "bathroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 50,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [],
+      "useAnimation": "none",
+      "basicEffects": {
+        "comfort": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "tv",
+      "type": "_object",
+      "roomTypes": [ "livingroom", "bedroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "up",
+      "accessPositions": [],
+      "useAnimation": "sit",
+      "basicEffects": {
+        "entertainment": 5
+      },
+      "usedRadiantEffects": {
+        "entertainment": 2
+      },
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "yarnBasket",
+      "type": "_object",
+      "roomTypes": [ "livingroom", "bedroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [],
+      "useAnimation": "sitAndKnitt",
+      "basicEffects": {
+        "comfort": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": false
+    },
+    {
+      "name": "stonePainting",
+      "type": "_object",
+      "roomTypes": [ "livingroom", "bedroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [ "down" ],
+      "useAnimation": "idle",
+      "basicEffects": {
+        "comfort": 4,
+        "cozy": 2
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": false,
+      "debugItem": true
+    },
+    {
+      "name": "roarRock",
+      "type": "_object",
+      "roomTypes": [ "livingroom", "bedroom" ],
+      "group": "chair",
+      "flatWideEffect": false,
+      "size": 1,
+      "price": 100,
+      "useLength": 10,
+      "rotation": "down",
+      "accessPositions": [ "down", "up", "left", "right" ],
+      "useAnimation": "roar",
+      "basicEffects": {
+        "cozy": 2,
+        "comfort": 4
+      },
+      "usedRadiantEffects": {},
+      "ontopUsePosition": true,
+      "debugItem": true
+    }
+  ]
+}

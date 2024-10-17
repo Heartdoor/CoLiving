@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\CHARACTERS\\SCRIPTS",
+    "\\WORLD\\SCRIPTS"
   ],
+  "SelectedNode": "\\New.sln",
   "PreviewInSolutionExplorer": false
 }

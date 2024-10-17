@@ -259,6 +259,7 @@ namespace Asriela
 
         public enum UseAnimation : short
         {
+            none,
             idle,
             sit,
             standBusyHands,

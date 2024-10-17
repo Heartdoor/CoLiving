@@ -57,7 +57,7 @@ public partial class Main : Node2D
 	#region CLASSES SETUP
 	public static List<FurnitureData> FurnitureUnlockedList = new List<FurnitureData>();
 	public int startingAmountOfUnlockedFurniture;
-	public static List<FurnitureData> objectsList = new List<FurnitureData>();
+	public static List<FurnitureData> furnitureList = new List<FurnitureData>();
 	public static List<CharacterData> charactersList = new List<CharacterData>();
 
 
@@ -140,7 +140,7 @@ public partial class Main : Node2D
 		var i = 0;
 		do
 		{
-			chosenItem = objectsList.OrderBy(x => random.Next()).FirstOrDefault();
+			chosenItem = furnitureList.OrderBy(x => random.Next()).FirstOrDefault();
 			i++;
 		}
 		while (FurnitureUnlockedList.Contains(chosenItem) && i < tries);
@@ -371,7 +371,7 @@ public partial class Main : Node2D
 
 	public static FurnitureData GetObjectFromType(FurnitureName name)
 	{
-		var correctObject = objectsList.FirstOrDefault(obj => obj.name == name);
+		var correctObject = furnitureList.FirstOrDefault(obj => obj.name == name);
 		return correctObject;
 	}
 
