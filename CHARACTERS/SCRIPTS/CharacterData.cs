@@ -28,6 +28,8 @@ public class CharacterData
     public bool debugItem { get; set; }
 
     public string emoji { get; set; }
+
+    public CharacterEffectors.Goal currentGoal { get; set; }
     #endregion
 
     // Constructor

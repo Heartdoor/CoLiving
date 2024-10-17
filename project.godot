@@ -11,13 +11,13 @@ config_version=5
 [application]
 
 config/name="CoLiving"
-run/main_scene="res://WORLD/SCENES/world.tscn"
+run/main_scene="res://MAIN/SCENES/world.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-BasicFunctions="*res://WORLD/SCRIPTS/BasicFunctions.cs"
+BasicFunctions="*res://MAIN/SCRIPTS/BasicFunctions.cs"
 
 [display]
 
@@ -35,10 +35,12 @@ project/assembly_name="New"
 
 folder_colors={
 "res://CHARACTERS/": "pink",
+"res://FURNITURE/": "purple",
+"res://LEVELS/": "teal",
+"res://MAIN/": "green",
 "res://OBJECTS/": "teal",
 "res://ROOMS/": "purple",
-"res://UI/": "gray",
-"res://WORLD/": "green"
+"res://UI/": "gray"
 }
 
 [input]

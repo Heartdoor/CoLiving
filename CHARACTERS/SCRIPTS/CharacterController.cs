@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Asriela.BasicFunctions;
 
-public partial class CharacterController : CharacterBody2D
+public partial class CharacterController : CharacterBody2D , ITarget
 {
 
 	#region BASIC FUNCTIONS CONNECTIONS
@@ -82,7 +82,7 @@ public partial class CharacterController : CharacterBody2D
 	public bool canPerformAction = true;
 	public bool isUpset = false;
 	public bool isInInteraction = false;
-	public DesireAction chosenInteractionWithCharacter = DesireAction.none;
+	public SocialAction chosenInteractionWithCharacter = SocialAction.none;
 	public Effect chosenDesireToSocializeOn = Effect.none;
 	public bool interpersonalInteraction = false;
 	public int mySeatingIndex = 0;
@@ -507,7 +507,7 @@ public partial class CharacterController : CharacterBody2D
 	}
 	(CharacterController character, float value) ChooseFromCharacterList()
 	{
-		chosenInteractionWithCharacter = DesireAction.none;
+		chosenInteractionWithCharacter = SocialAction.none;
 		CharacterController characterObject = null;
 		var highestValue = 0f;
 		var charactersInBuilding = BuildingController.buildingsList[Main.BuildingNumberMouseIsIn].charactersInBuilding;

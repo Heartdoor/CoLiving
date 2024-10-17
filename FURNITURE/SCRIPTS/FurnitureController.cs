@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using static Asriela.BasicFunctions;
 
-public partial class FurnitureController : StaticBody2D
+public partial class FurnitureController : StaticBody2D, ITarget
 {
 	[Export] public string name = "unassigned";
 	bool firstRun = true;

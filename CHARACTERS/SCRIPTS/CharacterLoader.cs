@@ -60,10 +60,10 @@ public partial class CharacterLoader : Node
                 foreach (var effect in character.Effects)
                 {
                     Effect effectType = (Effect)Enum.Parse(typeof(Effect), effect.Type);
-                    DesireAction actionType = DesireAction.none;
+                    SocialAction actionType = SocialAction.none;
                     if (!string.IsNullOrEmpty(effect.Action))
                     {
-                        actionType = (DesireAction)Enum.Parse(typeof(DesireAction), effect.Action);
+                        actionType = (SocialAction)Enum.Parse(typeof(SocialAction), effect.Action);
                     }
 
                     // Check for placeholders and replace them with constants

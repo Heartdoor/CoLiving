@@ -1,323 +1,323 @@
-﻿{
+{
   "characters": [
-    {
-      "name": "granny",
-      "emoji": "👵",
-      "debugItem": false,
-      "effects": [
-        {
-          "type": "social",
-          "strength": 1,
-          "needBleedRate": "socialR",
-          "desireGrowRate": "socialR",
-          "action": "talk"
-        },
-        {
-          "type": "food",
-          "strength": 2,
-          "needBleedRate": "hungryR",
-          "desireGrowRate": 0
-        },
-        {
-          "type": "sleep",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "hygiene",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "safety",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "comfort",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "romance",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "noise",
-          "strength": -3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "music",
-          "strength": 2,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "painting",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "entertainment",
-          "strength": 2,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "grunge",
-          "strength": -3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "cozy",
-          "strength": 5,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "vintage",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "academic",
-          "strength": 1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "hunting",
-          "strength": 1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        }
-      ]
-    },
-    {
-      "name": "punkRocker",
-      "emoji": "👨‍🎤",
-      "debugItem": false,
-      "effects": [
-        {
-          "type": "food",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "sleep",
-          "strength": 1,
-          "needBleedRate": "sleepyR",
-          "desireGrowRate": 0
-        },
-        {
-          "type": "hygiene",
-          "strength": -1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "social",
-          "strength": 1,
-          "needBleedRate": "socialR",
-          "desireGrowRate": "socialR * 10",
-          "action": "talk"
-        },
-        {
-          "type": "safety",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "comfort",
-          "strength": 1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "romance",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "noise",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "music",
-          "strength": 4,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "painting",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "entertainment",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "grunge",
-          "strength": 5,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "cozy",
-          "strength": -4,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "vintage",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "academic",
-          "strength": -1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "hunting",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "debug1",
-          "strength": 5,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        }
-      ]
-    },
-    {
-      "name": "yeti",
-      "emoji": "❄🐵",
-      "debugItem": true,
-      "effects": [
-        {
-          "type": "food",
-          "strength": 3,
-          "needBleedRate": "hungryR * 2",
-          "desireGrowRate": 0
-        },
-        {
-          "type": "sleep",
-          "strength": 1,
-          "needBleedRate": "sleepyR",
-          "desireGrowRate": 0
-        },
-        {
-          "type": "hygiene",
-          "strength": -1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "social",
-          "strength": 1,
-          "needBleedRate": "socialR",
-          "desireGrowRate": "socialR",
-          "action": "talk"
-        },
-        {
-          "type": "safety",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "comfort",
-          "strength": 1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "romance",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "noise",
-          "strength": 4,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "music",
-          "strength": 1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "painting",
-          "strength": 2,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "entertainment",
-          "strength": 1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "grunge",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "cozy",
-          "strength": 3,
-          "needBleedRate": 0,
-          "desireGrowRate": "desireR",
-          "action": "hug"
-        },
-        {
-          "type": "vintage",
-          "strength": 0,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "academic",
-          "strength": -1,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        },
-        {
-          "type": "hunting",
-          "strength": 2,
-          "needBleedRate": 0,
-          "desireGrowRate": 0
-        }
-      ]
-    }
+	{
+	  "name": "granny",
+	  "emoji": "👵",
+	  "debugItem": false,
+	  "effects": [
+		{
+		  "type": "social",
+		  "strength": 1,
+		  "needBleedRate": "socialR",
+		  "desireGrowRate": "socialR",
+		  "action": "talk"
+		},
+		{
+		  "type": "food",
+		  "strength": 2,
+		  "needBleedRate": "hungryR",
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "sleep",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "hygiene",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "safety",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "comfort",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "romance",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "noise",
+		  "strength": -3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "music",
+		  "strength": 2,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "painting",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "entertainment",
+		  "strength": 2,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "grunge",
+		  "strength": -3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "cozy",
+		  "strength": 5,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "vintage",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "academic",
+		  "strength": 1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "hunting",
+		  "strength": 1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		}
+	  ]
+	},
+	{
+	  "name": "punkRocker",
+	  "emoji": "👨‍🎤",
+	  "debugItem": false,
+	  "effects": [
+		{
+		  "type": "food",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "sleep",
+		  "strength": 1,
+		  "needBleedRate": "sleepyR",
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "hygiene",
+		  "strength": -1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "social",
+		  "strength": 1,
+		  "needBleedRate": "socialR",
+		  "desireGrowRate": "socialR * 10",
+		  "action": "talk"
+		},
+		{
+		  "type": "safety",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "comfort",
+		  "strength": 1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "romance",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "noise",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "music",
+		  "strength": 4,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "painting",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "entertainment",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "grunge",
+		  "strength": 5,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "cozy",
+		  "strength": -4,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "vintage",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "academic",
+		  "strength": -1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "hunting",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "debug1",
+		  "strength": 5,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		}
+	  ]
+	},
+	{
+	  "name": "yeti",
+	  "emoji": "❄🐵",
+	  "debugItem": true,
+	  "effects": [
+		{
+		  "type": "food",
+		  "strength": 3,
+		  "needBleedRate": "hungryR * 2",
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "sleep",
+		  "strength": 1,
+		  "needBleedRate": "sleepyR",
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "hygiene",
+		  "strength": -1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "social",
+		  "strength": 1,
+		  "needBleedRate": "socialR",
+		  "desireGrowRate": "socialR",
+		  "action": "talk"
+		},
+		{
+		  "type": "safety",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "comfort",
+		  "strength": 1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "romance",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "noise",
+		  "strength": 4,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "music",
+		  "strength": 1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "painting",
+		  "strength": 2,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "entertainment",
+		  "strength": 1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "grunge",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "cozy",
+		  "strength": 3,
+		  "needBleedRate": 0,
+		  "desireGrowRate": "desireR",
+		  "action": "hug"
+		},
+		{
+		  "type": "vintage",
+		  "strength": 0,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "academic",
+		  "strength": -1,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		},
+		{
+		  "type": "hunting",
+		  "strength": 2,
+		  "needBleedRate": 0,
+		  "desireGrowRate": 0
+		}
+	  ]
+	}
   ]
 }
